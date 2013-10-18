@@ -7,7 +7,9 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 
 import org.broad.tribble.annotation.Strand;
@@ -17,7 +19,9 @@ import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
 import org.kohsuke.args4j.Option;
 
+import be.ac.ulg.montefiore.run.jahmm.ForwardBackwardScaledCalculator;
 import be.ac.ulg.montefiore.run.jahmm.Hmm;
+import be.ac.ulg.montefiore.run.jahmm.Observation;
 import be.ac.ulg.montefiore.run.jahmm.ObservationReal;
 import be.ac.ulg.montefiore.run.jahmm.io.OpdfReader;
 import be.ac.ulg.montefiore.run.jahmm.learn.BaumWelchScaledLearner;
@@ -38,6 +42,7 @@ import edu.usc.epigenome.dmntools.dmntools.HmmHunter.sigTestMode;
 
 import edu.usc.epigenome.uecgatk.bissnp.writer.bedObject;
 import edu.usc.epigenome.uecgatk.bissnp.writer.bedObjectWriterImp;
+import gnu.trove.map.hash.THashMap;
 
 
 
@@ -62,15 +67,9 @@ public class NdrHmmHunter extends HmmHunter{
 		//option for local decoding (BetaDiff  test)
 
 		
-		
 		private Hmm<ObservationReal> hmm = null;
-
-
-		// when readCov<10, a>=1 will be filt out, if readCov>=10, a>10% will be filt out
 		
-		/**
-		 * @param args
-		 */
+
 		public static void main(String[] args)
 		throws Exception
 		{
@@ -118,10 +117,7 @@ public class NdrHmmHunter extends HmmHunter{
 
 		
 		
-		
-		//initiate HMM
-		
-		//training HMM
+		//initiate HMM && training HMM
 		protected void trainHmm() throws IOException{
 			System.out.println("HMM training....");
 			if(kmeans){
@@ -172,7 +168,8 @@ public class NdrHmmHunter extends HmmHunter{
 
 		}
 		
-		protected void decodeHmm(){
+		//decoding HMM 
+		protected void decodeHmm() throws Exception{
 				hmm = HmmReader.read(new FileReader(hmmFile), new OpdfBetaReader());
 
 				for(int j=0; j < methyObj.size(); j++){
@@ -187,80 +184,165 @@ public class NdrHmmHunter extends HmmHunter{
 					GenomeLocus[] loci = position.get(j).toArray(new GenomeLocus[position.get(j).size()]);
 
 					Double[] methyState = methyObj.get(j).toArray(new Double[methyObj.get(j).size()]);
-
+					
 					if(beta){
 						NdrForwardBackwardScaledCalculator nfbsc = new NdrForwardBackwardScaledCalculator(methyValue.get(j), hmm);
-						
+						segmentHmmState(loci, methyState, hiddenState, nfbsc, hmm);
 					}
 					else{
 						BbForwardBackwardScaledCalculator nfbsc = new BbForwardBackwardScaledCalculator(methyObj.get(j), hmm);
-						
+						segmentHmmState(loci, methyState, hiddenState, nfbsc, hmm);
 					}
 					
-					if(sigTest == sigTestMode.permutation){
-						
-					}else if(sigTest == sigTestMode.binomial){
-						
-					}else if(sigTest == sigTestMode.fisher){
-						
-					}else if(sigTest == sigTestMode.betaDiff){
-						
-					}else{
-						throw new Exception("Not such a sigTestMode");
-					}
-					
-					getNPRSegmentByHalfLocalComparFBSC(hiddenState, methyState, loci, numCTState, numCState, ndrState, segWriter, true, hmm, nfbsc);
-					getNPRSegmentByHalfLocalComparFBSC(hiddenState, methyState, loci, numCTState, numCState, nprState, nprSegWriter, false, hmm, nfbsc);
-					
-					//getNDRSegment(hiddenState, methyState, loci, numCTState, randomSeqs, ndrState);
-					//getNPRSegmentByLocalCompar(hiddenState, methyState, loci, numCTState, ndrState, segWriter, true);
-					//getNPRSegmentByLocalCompar(hiddenState, methyState, loci, numCTState, nprState, nprSegWriter, false);
-					
-					//getNPRSegmentByHalfLocalCompar(hiddenState, methyState, loci, numCTState, ndrState, segWriter, true);
-					//getNPRSegmentByHalfLocalCompar(hiddenState, methyState, loci, numCTState, nprState, nprSegWriter, false);
-					
-				//	getNPRSegmentByHalfLocalCompar(hiddenState, methyState, loci, numCTState, numCState, ndrState2, segWriter2, true);
-					
+					//segment HMM state by different significant test mode
 					
 					
 					for(int i = 0; i < hiddenState.length; i++){
 						List<Object> tmp = new ArrayList<Object>();
 						tmp.add(hiddenState[i]);
-						tmp.add(numCState[i]);
-						tmp.add(numCTState[i]);
-						//tmp.add(result.numCLeftBound.get(loci));
-						//tmp.add(result.numCtLeftBound.get(loci));
-						//tmp.add(result.numCRightBound.get(loci));
-						//tmp.add(result.numCtRightBound.get(loci));
 						bedObject bedLine = new bedObject(loci[i].getChr(), loci[i].getStart()-1, loci[i].getEnd(), Strand.NONE, (List)tmp);
-						segWriter.add(bedLine);
+						stateWriter.add(bedLine);
 					}
 					//j++;
 				}
 		}
 
-		/* (non-Javadoc)
-		 * @see edu.usc.epigenome.dmntools.dmntools.HmmHunter#segmentHmmState()
-		 */
-		@Override
-		protected void segmentHmmState() {
-			// TODO Auto-generated method stub
-			
-		}
-		
-		//initiate HMM state file writer
-		
-		//decoding
-		
-		//initiate writer
 		
 		//segment 
+		
+		/*******************random permutation to do segmentation *************************/
+		protected void segmentHmmStateByRandomPermutation(GenomeLocus[] loci, Double[] methyState, int[] hiddenState, ForwardBackwardScaledCalculator nfbsc, Hmm<? extends Observation> hmm){
+			double[] randomSeqs = getPermutatedRandomSeqs(result.value, hmm);
+			getNDRSegment(hiddenState, methyState, loci, randomSeqs, ndrState);
+		}
+		
+		
+		private double[] getPermutatedRandomSeqs(ArrayList<LinkedList<ObservationReal>> seqs, Hmm<ObservationReal> hmm, int ndrState){
+			ArrayList<ObservationReal> randomValueList = new ArrayList<ObservationReal>();
+			
+			Iterator<LinkedList<ObservationReal>> it = seqs.iterator();
+			while(it.hasNext()){
+				randomValueList.addAll(it.next());
+			}
+			Collections.shuffle(randomValueList);
+			int[] hiddenState = hmm.mostLikelyStateSequence(randomValueList);
+			double[] score = getScoreInEachStateByRandomPermutation(hiddenState, randomValueList, ndrState);
+			return score;
+		}
+		
+		private double[] getScoreInEachStateByRandomPermutation(int[] hiddenState, ArrayList<ObservationReal> randomValueList){
+			ArrayList<Double> scoreList = new ArrayList<Double>();
+			double score = 0;
+			int preState = -1;
+			int i = 0;
+			Iterator<ObservationReal> it = randomValueList.iterator();
+			while(it.hasNext()){
+				double methyState = it.next().value;
+				if(preState == -1){
+					preState = hiddenState[i];
+					if(preState == ndrState){
+						
+						score += methyState;
+					}
+					i++;
+					continue;
+				}
+				if(preState != ndrState && hiddenState[i] == ndrState){
+
+					score += methyState;
+					preState = hiddenState[i];
+				}
+				else if(preState == ndrState){
+					if(hiddenState[i] != ndrState){
+						preState = hiddenState[i];
+						scoreList.add(score);
+						score = 0;
+					}
+					else{
+						preState = hiddenState[i];
+						score += methyState;
+					}
+					
+				}
+				i++;
+			}
+			double[] scoreCollection = new double[scoreList.size()];
+			Iterator<Double> it2 = scoreList.iterator();
+			i = 0;
+			while(it2.hasNext()){
+				scoreCollection[i++] = it2.next();
+			}
+			return scoreCollection;
+		}
+		
+		private void segmentHmmStateByRandomPermutation(int[] hiddenState, double[] methyState, GenomeLoc[] loci, THashMap<Integer, double[]> randomSeqsScoreInDiffStates){
+			String chr = null;
+			int start = -1;
+			int end = -1;
+			double score = 0;
+			int preState = -1;
+			GenomeLoc preLoc = null;
+			int dataPoint = 0;
+			for(int i=0; i < hiddenState.length; i++){
+				if(preState == -1){
+					preState = hiddenState[i];
+					preLoc = loci[i]; 
+					if(preState == ndrState){
+						chr = loci[i].getContig();
+						start = loci[i].getStart()-1;
+						score += methyState[i];
+						dataPoint++;
+					}	
+					continue;
+				}
+				if(preState != ndrState && hiddenState[i] == ndrState){
+					chr = loci[i].getContig();
+					start = loci[i].getStart()-1;
+					score += methyState[i];
+					dataPoint++;
+					preState = hiddenState[i];
+					preLoc = loci[i];
+				}
+				else if(preState == ndrState){
+					if(hiddenState[i] != ndrState){
+						end = preLoc.getStart();
+						preState = hiddenState[i];
+						List<Object> tmp = new LinkedList<Object>();
+						tmp.add(score);
+						tmp.add(dataPoint);
+						tmp.add(end-start);
+						tmp.add(getPvalue(score, randomSeqs));
+						bedObject bedLine = new bedObject(chr, start, end, Strand.NONE, (List)tmp);
+						segWriter.add(bedLine);
+						score = 0;
+						dataPoint = 0;
+						preLoc = loci[i];
+					}
+					else{
+						preState = hiddenState[i];
+						preLoc = loci[i];
+						score += methyState[i];
+						dataPoint++;
+					}
+					
+				}
+				
+			}
+		}
+		
+		
+		
+		/*******************Binomial Test to do segmentation *************************/
+		
+		
+		
+		/*******************Fisher exact Test to do segmentation *************************/
+		
+		
+		/*******************Beta Diff Test to do segmentation *************************/
 		
 		//calculate p value
 		
 		//calculate FDR
 		
-		
-		
-
 }

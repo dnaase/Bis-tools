@@ -13,6 +13,7 @@ import edu.usc.epigenome.dmntools.distribution.OpdfBeta;
 import edu.usc.epigenome.dmntools.distribution.OpdfBetaBinomial;
 
 
+import be.ac.ulg.montefiore.run.jahmm.ForwardBackwardScaledCalculator;
 import be.ac.ulg.montefiore.run.jahmm.Hmm;
 import be.ac.ulg.montefiore.run.jahmm.Observation;
 import be.ac.ulg.montefiore.run.jahmm.ObservationReal;

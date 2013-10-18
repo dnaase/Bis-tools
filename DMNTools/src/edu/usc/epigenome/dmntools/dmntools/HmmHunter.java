@@ -21,6 +21,9 @@ import org.kohsuke.args4j.Option;
 
 import edu.usc.epigenome.dmntools.distribution.OpdfBeta;
 import edu.usc.epigenome.dmntools.distribution.OpdfBetaFactory;
+import edu.usc.epigenome.dmntools.hmm.BbForwardBackwardScaledCalculator;
+import edu.usc.epigenome.dmntools.hmm.BbViterbiCalculator;
+import edu.usc.epigenome.dmntools.hmm.NdrForwardBackwardScaledCalculator;
 import edu.usc.epigenome.dmntools.hmm.ObservationMethy;
 import edu.usc.epigenome.dmntools.utils.BisulfiteGenomicLocHmm;
 import edu.usc.epigenome.dmntools.utils.FisherExactTest;
@@ -29,6 +32,7 @@ import edu.usc.epigenome.uecgatk.bissnp.writer.bedObject;
 import edu.usc.epigenome.uecgatk.bissnp.writer.bedObjectWriterImp;
 
 
+import be.ac.ulg.montefiore.run.jahmm.ForwardBackwardScaledCalculator;
 import be.ac.ulg.montefiore.run.jahmm.Hmm;
 import be.ac.ulg.montefiore.run.jahmm.Observation;
 import be.ac.ulg.montefiore.run.jahmm.ObservationReal;
@@ -224,15 +228,70 @@ public abstract class HmmHunter {
 	
 	abstract protected void trainHmm() throws IOException;
 	
-	abstract protected void decodeHmm();
+	abstract protected void decodeHmm() throws Exception;
 	
-	abstract protected void segmentHmmState();
-	
-	//reorder state from low mean methy to high mean methy
-	protected Hmm<? extends Observation> reorderStateByMeanMethy(Hmm<? extends Observation> hmm){
+	protected void segmentHmmState(GenomeLocus[] loci, Double[] methyState, int[] hiddenState, ForwardBackwardScaledCalculator nfbsc, Hmm<? extends Observation> hmm) throws Exception{
 
-		return hmm;
 		
+		if(sigTest == sigTestMode.permutation){
+			segmentHmmStateByRandomPermutation(loci, methyState, hiddenState, nfbsc,hmm);
+		}else if(sigTest == sigTestMode.binomial){
+			segmentHmmStateByBinomialTestWithFBSC(loci, methyState, hiddenState, nfbsc,hmm);
+		}else if(sigTest == sigTestMode.fisher){
+			segmentHmmStateByFisherTest(loci, methyState, hiddenState, nfbsc,hmm);
+		}else if(sigTest == sigTestMode.betaDiff){
+			segmentHmmStateByBetaDiffTest(loci, methyState, hiddenState, nfbsc,hmm);
+		}else{
+			throw new Exception("Not such a sigTestMode");
+		}
+	}
+	
+	protected void segmentHmmState(GenomeLocus[] loci, Double[] methyState, int[] hiddenState, BbForwardBackwardScaledCalculator nfbsc, Hmm<? extends Observation> hmm) throws Exception{
+
+		
+		if(sigTest == sigTestMode.permutation){
+			segmentHmmStateByRandomPermutation(loci, methyState, hiddenState, nfbsc,hmm);
+		}else if(sigTest == sigTestMode.binomial){
+			segmentHmmStateByBinomialTestWithFBSC(loci, methyState, hiddenState, nfbsc,hmm);
+		}else if(sigTest == sigTestMode.fisher){
+			segmentHmmStateByFisherTest(loci, methyState, hiddenState, nfbsc,hmm);
+		}else if(sigTest == sigTestMode.betaDiff){
+			segmentHmmStateByBetaDiffTest(loci, methyState, hiddenState, nfbsc,hmm);
+		}else{
+			throw new Exception("Not such a sigTestMode");
+		}
+	}
+	
+	
+	
+	abstract protected void segmentHmmStateByRandomPermutation(GenomeLocus[] loci, Double[] methyState, int[] hiddenState, ForwardBackwardScaledCalculator nfbsc, Hmm<? extends Observation> hmm);
+
+	abstract protected void segmentHmmStateByBinomialTestWithFBSC(GenomeLocus[] loci, Double[] methyState, int[] hiddenState, ForwardBackwardScaledCalculator nfbsc, Hmm<? extends Observation> hmm);
+	
+	abstract protected void segmentHmmStateByFisherTest(GenomeLocus[] loci, Double[] methyState, int[] hiddenState, ForwardBackwardScaledCalculator nfbsc, Hmm<? extends Observation> hmm);
+	
+	abstract protected void segmentHmmStateByBetaDiffTest(GenomeLocus[] loci, Double[] methyState, int[] hiddenState, ForwardBackwardScaledCalculator nfbsc, Hmm<? extends Observation> hmm);
+	
+	abstract protected void segmentHmmStateByRandomPermutation(GenomeLocus[] loci, Double[] methyState, int[] hiddenState, BbForwardBackwardScaledCalculator nfbsc, Hmm<? extends Observation> hmm);
+
+	abstract protected void segmentHmmStateByBinomialTestWithFBSC(GenomeLocus[] loci, Double[] methyState, int[] hiddenState, BbForwardBackwardScaledCalculator nfbsc, Hmm<? extends Observation> hmm);
+	
+	abstract protected void segmentHmmStateByFisherTest(GenomeLocus[] loci, Double[] methyState, int[] hiddenState, BbForwardBackwardScaledCalculator nfbsc, Hmm<? extends Observation> hmm);
+	
+	abstract protected void segmentHmmStateByBetaDiffTest(GenomeLocus[] loci, Double[] methyState, int[] hiddenState, BbForwardBackwardScaledCalculator nfbsc, Hmm<? extends Observation> hmm);
+
+	
+	protected double getRandomPermutatedPvalue(double value, double[] randomScoreDistribution, boolean reverse){
+		int rank = 0;
+		for(int i = 0; i < randomScoreDistribution.length; i++){
+			if(randomScoreDistribution[i] >= value){
+				rank++;
+			}
+		}
+		if(reverse)
+			return (double)rank/(double)randomScoreDistribution.length;
+		else
+			return 1 - (double)rank/(double)randomScoreDistribution.length;
 	}
 	
 	protected double getBinomialSigTest(int k, int n, double pSucess, boolean reverseP){

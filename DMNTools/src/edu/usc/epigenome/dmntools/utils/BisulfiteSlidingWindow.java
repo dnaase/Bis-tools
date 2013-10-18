@@ -23,6 +23,14 @@ public class BisulfiteSlidingWindow {
 		private int segHmmState;
 		
 		
+		public BisulfiteSlidingWindow(int minCT, int minGch, long minLen){
+			windowList = new LinkedList<BisulfiteGenomicLocHmm>();
+			this.minCT = minCT;
+			this.minGch = minGch;
+			this.minLen = minLen;
+			
+		}
+		
 		public BisulfiteSlidingWindow(int minCT, int minGch, long minLen, int segHmmState){
 			windowList = new LinkedList<BisulfiteGenomicLocHmm>();
 			this.minCT = minCT;
@@ -30,6 +38,10 @@ public class BisulfiteSlidingWindow {
 			this.minLen = minLen;
 			this.segHmmState = segHmmState;
 			
+		}
+		
+		public void setSegHmmState(int segHmmState){
+			this.segHmmState = segHmmState;
 		}
 		
 		public void addLast(BisulfiteGenomicLocHmm data){
