@@ -138,6 +138,7 @@ public class OpdfBeta implements Opdf<ObservationReal> {
 	 */
 	@Override
 	public void fit(Collection<? extends ObservationReal> co, double[] weights) {
+		//System.err.println(co.size() + "\t" + weights.length);
 		if (co.isEmpty() || co.size() != weights.length)
 			throw new IllegalArgumentException();
 		
