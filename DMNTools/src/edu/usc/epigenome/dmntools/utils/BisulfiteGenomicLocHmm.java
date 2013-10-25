@@ -17,6 +17,7 @@ import be.ac.ulg.montefiore.run.jahmm.ObservationReal;
  */
 public class BisulfiteGenomicLocHmm{
 	public ObservationReal value;
+	public GenomeLocus position;
 	public String contig;
 	public int start;
 	public int end;
@@ -53,6 +54,7 @@ public class BisulfiteGenomicLocHmm{
 		this.numCT = numCT;
 		this.numC = numC;
 		this.hmmState = hmmState;
+		this.position = new GenomeLocus(contig, start,end);
 	}
 	
 	public BisulfiteGenomicLocHmm(String contig, int start, int end, int numCT, int numC){
