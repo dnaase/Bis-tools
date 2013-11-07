@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.LinkedList;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.math.MathException;
 import org.apache.commons.math.distribution.BinomialDistributionImpl;
@@ -80,8 +81,8 @@ public abstract class HmmHunter {
 	public boolean kmeans = false;
 	
 	//options to calculate p value for each segment	
-	@Option(name="-sigTestMode",usage="The mode to calculate segment p value [permutation, binomial, fisher, betaDiff]. default: betaDiff")
-	public Enum sigTest = sigTestMode.binomial;
+	@Option(name="-sigTestMode",usage="The mode to calculate segment p value [1:permutation, 2:binomial, 3:fisher, 4:betaDiff]. default: 2")
+	public int sigTest = 2;
 	
 	@Option(name="-gap",usage="max gap size between two GCH/HCG. If two GCH distrance are more than -gap, it will restart a new segment, rather than estimate a transition probability, default: 10000")
 	public int gap = 10000;
@@ -109,6 +110,8 @@ public abstract class HmmHunter {
 	private final static int MINIMUM_DATA_POINTS = 2;
 	final private static int PURGE_INTERVAL = 1000000; // interval to show the progress.
 	
+	private static long startTime = -1;
+	
 	public ArrayList<ArrayList<ObservationMethy>> methyObj;
 	public ArrayList<ArrayList<ObservationReal>> methyValue;
 	public ArrayList<ArrayList<GenomeLocus>> position;
@@ -120,6 +123,10 @@ public abstract class HmmHunter {
 	protected FileWriter hmmWriter = null;
 	
 	protected void initiate(String prefix) throws IOException{
+		startTime = System.currentTimeMillis();
+		//System.out.println("HmmHunter started at : " + startTime);
+		//System.out.println();
+		
 		String hmmStateSeqFile = prefix + ".HMMstates.txt";
 		String marFile = prefix + ".segment.txt";
 
@@ -151,6 +158,12 @@ public abstract class HmmHunter {
 			stateWriter.close();
 			segWriter.close();
 		}
+		long endTime   = System.currentTimeMillis();
+		long totalTime = endTime - startTime;
+		//System.out.println();
+		//System.out.println("HmmHunter finshed at : " + endTime);
+		System.out.println();
+		System.out.println("HmmHunter's running time is: " + TimeUnit.DAYS.toHours(totalTime));
 		
 	}
 	
@@ -274,13 +287,13 @@ public abstract class HmmHunter {
 	protected void segmentHmmState(GenomeLocus[] loci, ObservationMethy[] methyState, int[] hiddenState, NdrForwardBackwardScaledCalculator nfbsc, Hmm<? extends Observation> hmm) throws Exception{
 
 		
-		if(sigTest == sigTestMode.permutation){
+		if(sigTest == 1){
 			segmentHmmStateByRandomPermutation(loci, methyState, hiddenState, nfbsc,hmm);
-		}else if(sigTest == sigTestMode.binomial){
+		}else if(sigTest == 2){
 			segmentHmmStateByBinomialTestWithFBSC(loci, methyState, hiddenState, nfbsc,hmm);
-		}else if(sigTest == sigTestMode.fisher){
+		}else if(sigTest == 3){
 			segmentHmmStateByFisherTest(loci, methyState, hiddenState, nfbsc,hmm);
-		}else if(sigTest == sigTestMode.betaDiff){
+		}else if(sigTest == 4){
 			segmentHmmStateByBetaDiffTest(loci, methyState, hiddenState, nfbsc,hmm);
 		}else{
 			throw new Exception("Not such a sigTestMode");
@@ -290,13 +303,13 @@ public abstract class HmmHunter {
 	protected void segmentHmmState(GenomeLocus[] loci, ObservationMethy[] methyState, int[] hiddenState, BbForwardBackwardScaledCalculator nfbsc, Hmm<? extends Observation> hmm) throws Exception{
 
 		
-		if(sigTest == sigTestMode.permutation){
+		if(sigTest == 1){
 			segmentHmmStateByRandomPermutation(loci, methyState, hiddenState, nfbsc,hmm);
-		}else if(sigTest == sigTestMode.binomial){
+		}else if(sigTest == 2){
 			segmentHmmStateByBinomialTestWithFBSC(loci, methyState, hiddenState, nfbsc,hmm);
-		}else if(sigTest == sigTestMode.fisher){
+		}else if(sigTest == 3){
 			segmentHmmStateByFisherTest(loci, methyState, hiddenState, nfbsc,hmm);
-		}else if(sigTest == sigTestMode.betaDiff){
+		}else if(sigTest == 4){
 			segmentHmmStateByBetaDiffTest(loci, methyState, hiddenState, nfbsc,hmm);
 		}else{
 			throw new Exception("Not such a sigTestMode");
@@ -309,7 +322,7 @@ public abstract class HmmHunter {
 
 	abstract protected void segmentHmmStateByBinomialTestWithFBSC(GenomeLocus[] loci, ObservationMethy[] methyState, int[] hiddenState, NdrForwardBackwardScaledCalculator nfbsc, Hmm<? extends Observation> hmm);
 	
-	abstract protected void segmentHmmStateByFisherTest(GenomeLocus[] loci, ObservationMethy[] methyState, int[] hiddenState, ForwardBackwardScaledCalculator nfbsc, Hmm<? extends Observation> hmm);
+	abstract protected void segmentHmmStateByFisherTest(GenomeLocus[] loci, ObservationMethy[] methyState, int[] hiddenState, NdrForwardBackwardScaledCalculator nfbsc, Hmm<? extends Observation> hmm);
 	
 	abstract protected void segmentHmmStateByBetaDiffTest(GenomeLocus[] loci, ObservationMethy[] methyState, int[] hiddenState, ForwardBackwardScaledCalculator nfbsc, Hmm<? extends Observation> hmm);
 	

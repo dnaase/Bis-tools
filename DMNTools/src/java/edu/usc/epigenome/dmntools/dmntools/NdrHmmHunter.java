@@ -460,14 +460,185 @@ public class NdrHmmHunter extends HmmHunter{
 		}
 
 
+		/*******************Fisher exact Test to do segmentation *************************/
 		/* (non-Javadoc)
 		 * @see edu.usc.epigenome.dmntools.dmntools.HmmHunter#segmentHmmStateByFisherTest(edu.usc.epigenome.dmntools.utils.GenomeLocus[], edu.usc.epigenome.dmntools.hmm.ObservationMethy[], int[], be.ac.ulg.montefiore.run.jahmm.ForwardBackwardScaledCalculator, be.ac.ulg.montefiore.run.jahmm.Hmm)
 		 */
 		@Override
-		protected void segmentHmmStateByFisherTest(GenomeLocus[] loci, ObservationMethy[] methyState, int[] hiddenState, ForwardBackwardScaledCalculator nfbsc, Hmm<? extends Observation> hmm) {
-			// TODO Auto-generated method stub
+		protected void segmentHmmStateByFisherTest(GenomeLocus[] loci, ObservationMethy[] methyState, int[] hiddenState, NdrForwardBackwardScaledCalculator nfbsc, Hmm<? extends Observation> hmm) {
+			//TODO: find the way for multi-state
 			
+			double maxMean = Math.max(((OpdfBeta)hmm.getOpdf(1)).mean(), ((OpdfBeta)hmm.getOpdf(0)).mean());
+
+			for(int i=0; i<hmm.nbStates(); i++){
+				if(((OpdfBeta)hmm.getOpdf(i)).mean() >= maxMean){
+					segmentHmmStateByFisherExactTestWithFBSCInSingleState(loci, methyState, hiddenState, nfbsc, hmm, i, true);
+				}else{
+					segmentHmmStateByFisherExactTestWithFBSCInSingleState(loci, methyState, hiddenState, nfbsc, hmm, i, false);
+				}
+				
+			}
 		}
+		
+		protected void segmentHmmStateByFisherExactTestWithFBSCInSingleState(GenomeLocus[] loci, ObservationMethy[] observationMethyState, int[] hiddenState, NdrForwardBackwardScaledCalculator nfbsc, Hmm<? extends Observation> hmm, int hmmState,boolean reverseP){
+			double[] methyState = new double[observationMethyState.length];
+			int[] numCTState = new int[observationMethyState.length];
+			int[] numCState = new int[observationMethyState.length];
+			for(int i=0; i< observationMethyState.length; i++ ){
+				numCTState[i] = observationMethyState[i].coverage;
+				numCState[i] = (int)(numCTState[i] * observationMethyState[i].value);
+				methyState[i] = (double)numCState[i]/(double)numCTState[i];
+			}
+			
+			
+			String chr = null;
+			int start = -1;
+			int end = -1;
+			double score = 0;
+			GenomeLocus preLoc = null;
+			int preState = -1; //record the previous loci's state
+			boolean passNprSeg = false;
+			int dataPoint = 0; //number of GCH in the segments
+
+			int numGch_pre = 0;
+			int numC_pre = 0;
+			int numT_pre = 0;
+			int numGch_after = 0;
+			int numC_after = 0;
+			int numT_after = 0;
+			int numC_npr = 0;
+			int numT_npr = 0;
+			
+			GenomeLocus startLoc = null;
+			GenomeLocus oneBeforeStartLoc = null;
+			
+			GenomeLocus endLoc = null;
+			GenomeLocus oneAfterEndLoc = null;
+
+			
+			double preWeight = 0;
+			double postWeight = 0;
+			
+			for(int i=0; i < hiddenState.length; i++){
+				if(preState == -1){
+					preState = hiddenState[i]; 
+					if(preState == hmmState){  //begin with hmm state
+						chr = loci[i].getChr();
+						start = loci[i].getStart();
+						startLoc = loci[i];
+						oneBeforeStartLoc = loci[i];
+						score = methyState[i];
+						dataPoint=1;
+						numC_npr = numCState[i];
+						numT_npr = numCTState[i]-numCState[i];
+					}	
+					else{ //begin with no hmm state
+						numGch_pre=1;
+						numC_pre = numCState[i];
+						numT_pre = numCTState[i]-numCState[i];
+					}
+				}
+				else{ //there are preLoc already
+					if(preState != hmmState){  
+						if(hiddenState[i] == hmmState){ //enter into the state segment
+							if(passNprSeg){  //if we already pass the 1st hmm state segment, enter into the next same hmm state segment
+								double pValue = getFisherPvalue(numC_npr, numT_npr, numC_pre+numC_after, numT_pre+numT_after, reverseP);
+								List<Object> tmp = new LinkedList<Object>();
+
+								tmp.add(hmmState);
+								tmp.add(String.format("%.2f",100*score/dataPoint));
+								tmp.add(dataPoint);
+								tmp.add(numC_npr);
+								tmp.add((numC_npr+numT_npr));
+								tmp.add((numC_pre+numC_after));
+								tmp.add((numC_pre+numC_after+numT_pre+numT_after));
+								tmp.add(start - oneBeforeStartLoc.getStart());//distance of segment start point to the previous GCH, 
+								tmp.add(startLoc.getStart() - start);//distance of segment start point to the next GCH, 
+								tmp.add(end - endLoc.getEnd());//distance of segment end point to the previous GCH, 
+								tmp.add(oneAfterEndLoc.getEnd() - end);//distance of segment end point to the next GCH, 
+								tmp.add(String.format("%.3f",1-preWeight));
+								tmp.add(String.format("%.3f",1-postWeight));
+								tmp.add(String.format("%.6f",pValue));
+
+								if((numC_npr+numT_npr) >= minCT && (numC_pre+numC_after+numT_pre+numT_after) >= minCT){
+									bedObject bedLine = new bedObject(chr, start, end, (List)tmp);
+									segWriter.add(bedLine);
+								}
+								
+
+								//renew for the second same hmm state segment
+								passNprSeg = false;
+								chr = loci[i].getChr();
+								start = loci[i].getStart();
+								startLoc = loci[i];
+								oneBeforeStartLoc = preLoc;
+								score = methyState[i];
+								numC_npr = numCState[i];
+								numT_npr = numCTState[i]-numCState[i];
+								dataPoint=1;
+								numGch_pre = numGch_after;
+								numC_pre = numC_after;
+								numT_pre = numT_after;
+								numC_after = 0;
+								numT_after = 0;
+								numGch_after = 0;
+								
+							}
+							else{  //just enter into the first hmm state segment
+								chr = loci[i].getChr();
+								start = loci[i].getStart();
+								preWeight = 1 - nfbsc.getAlpha(hmm, i, preState, hiddenState[i]);
+								start =(int)( (loci[i].getStart() - preLoc.getStart()) * preWeight + preLoc.getStart()) ;
+								startLoc = loci[i];
+								oneBeforeStartLoc = preLoc;
+								numC_npr = numCState[i];
+								numT_npr =  numCTState[i]-numCState[i];
+								score = methyState[i];
+								dataPoint = 1;
+							}
+						}
+						else{ //continue the segment outside hmm state segment
+							if(passNprSeg){ //already passed one hmm state segemnt
+								numGch_after++;
+								numC_after += numCState[i];
+								numT_after += (numCTState[i]-numCState[i]);
+							}
+							else{ //not passed one hmm state segment
+								numGch_pre++;
+								numC_pre += numCState[i];
+								numT_pre += (numCTState[i]-numCState[i]);
+							}
+						}
+						
+					}
+					else{ //previous loci is inside hmm state segment
+						if(hiddenState[i] == hmmState){ //continue inside hmm state segment
+							numC_npr += (int)(numCTState[i] * methyState[i]);
+							numT_npr += (int)(numCTState[i] * (1-methyState[i]));
+							score += methyState[i];
+							dataPoint++;
+						}
+						else{ //go outside of hmm state segment
+							passNprSeg = true;
+							postWeight = 1 - nfbsc.getAlpha(hmm, i, preState, hiddenState[i]); 
+							end =(int)( (loci[i].getEnd() - preLoc.getEnd()) * postWeight + preLoc.getEnd()) ;
+							endLoc = preLoc;
+							oneAfterEndLoc = loci[i];
+							numGch_after=1;
+							numC_after = numCState[i];
+							numT_after +=numCTState[i]-numCState[i];
+							
+						}
+					}
+					preState = hiddenState[i];
+				}
+				preLoc = loci[i];
+			}
+		
+		}
+			
+			//private void getNPRSegmentByLocalCompar(int[] hiddenState, double[] methyState, GenomeLoc[] loci, int[] numCTState, int nprState, bedObjectWriterImp writer, boolean reverseP){
+				
 
 		/* (non-Javadoc)
 		 * @see edu.usc.epigenome.dmntools.dmntools.HmmHunter#segmentHmmStateByBetaDiffTest(edu.usc.epigenome.dmntools.utils.GenomeLocus[], edu.usc.epigenome.dmntools.hmm.ObservationMethy[], int[], be.ac.ulg.montefiore.run.jahmm.ForwardBackwardScaledCalculator, be.ac.ulg.montefiore.run.jahmm.Hmm)
@@ -497,20 +668,21 @@ public class NdrHmmHunter extends HmmHunter{
 			
 		}
 
-		/* (non-Javadoc)
-		 * @see edu.usc.epigenome.dmntools.dmntools.HmmHunter#segmentHmmStateByFisherTest(edu.usc.epigenome.dmntools.utils.GenomeLocus[], edu.usc.epigenome.dmntools.hmm.ObservationMethy[], int[], edu.usc.epigenome.dmntools.hmm.BbForwardBackwardScaledCalculator, be.ac.ulg.montefiore.run.jahmm.Hmm)
-		 */
-		@Override
-		protected void segmentHmmStateByFisherTest(GenomeLocus[] loci, ObservationMethy[] methyState, int[] hiddenState, BbForwardBackwardScaledCalculator nfbsc, Hmm<? extends Observation> hmm) {
-			// TODO Auto-generated method stub
-			
-		}
 
 		/* (non-Javadoc)
 		 * @see edu.usc.epigenome.dmntools.dmntools.HmmHunter#segmentHmmStateByBetaDiffTest(edu.usc.epigenome.dmntools.utils.GenomeLocus[], edu.usc.epigenome.dmntools.hmm.ObservationMethy[], int[], edu.usc.epigenome.dmntools.hmm.BbForwardBackwardScaledCalculator, be.ac.ulg.montefiore.run.jahmm.Hmm)
 		 */
 		@Override
 		protected void segmentHmmStateByBetaDiffTest(GenomeLocus[] loci, ObservationMethy[] methyState, int[] hiddenState, BbForwardBackwardScaledCalculator nfbsc, Hmm<? extends Observation> hmm) {
+			// TODO Auto-generated method stub
+			
+		}
+
+		/* (non-Javadoc)
+		 * @see edu.usc.epigenome.dmntools.dmntools.HmmHunter#segmentHmmStateByFisherTest(edu.usc.epigenome.dmntools.utils.GenomeLocus[], edu.usc.epigenome.dmntools.hmm.ObservationMethy[], int[], edu.usc.epigenome.dmntools.hmm.BbForwardBackwardScaledCalculator, be.ac.ulg.montefiore.run.jahmm.Hmm)
+		 */
+		@Override
+		protected void segmentHmmStateByFisherTest(GenomeLocus[] loci, ObservationMethy[] methyState, int[] hiddenState, BbForwardBackwardScaledCalculator nfbsc, Hmm<? extends Observation> hmm) {
 			// TODO Auto-generated method stub
 			
 		}
