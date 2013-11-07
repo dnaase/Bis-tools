@@ -80,6 +80,9 @@ public abstract class HmmHunter {
 	@Option(name="-kmeans",usage="use k means method rather than randomly to initiate the best initial parameters, when number of GCH/HCG is very large, it is not efficient to do it. default: not enabled")
 	public boolean kmeans = false;
 	
+	@Option(name="-bedFormat",usage="input bed format. 1: 6plus2 bed format. 2: standard bed format, default: 1")
+	public int bedFormat = 1;
+	
 	//options to calculate p value for each segment	
 	@Option(name="-sigTestMode",usage="The mode to calculate segment p value [1:permutation, 2:binomial, 3:fisher, 4:betaDiff]. default: 2")
 	public int sigTest = 2;
@@ -180,17 +183,32 @@ public abstract class HmmHunter {
 		ArrayList<GenomeLocus> positionIsland = new ArrayList<GenomeLocus>();
 
 		while( (line = br.readLine()) != null){
+			if(!line.startsWith("chr"))
+				continue;
 			String[] splitin = line.split("\t");
-			if(splitin.length != 8)
-				throw new Exception("Not 6plus2 bed format! 6plus2 bed file format should be like: \n chr\tstart\tend\tname\tscore\tstrand\tmethylation(%)\tnum_CT_coverage\nchr1\t1001\t1002\t.\t750\t+\t75.0\t10\nchr1\t1005\t1006\t.\t200\t-\t20.0\t2\n");
-			double tmp = Double.parseDouble(splitin[6])/100.0;
+			double tmp = Double.NaN;
+			int coverage = Integer.MIN_VALUE;
+			if(bedFormat == 1){
+				if(splitin.length != 8)
+					throw new Exception("Not 6plus2 bed format! 6plus2 bed file format should be like: \n chr\tstart\tend\tname\tscore\tstrand\tmethylation(%)\tnum_CT_coverage\nchr1\t1001\t1002\t.\t750\t+\t75.0\t10\nchr1\t1005\t1006\t.\t200\t-\t20.0\t2\n");
+				tmp = Double.parseDouble(splitin[6])/100.0;
+				coverage = Integer.parseInt(splitin[7]);
+				
+			}else if(bedFormat == 2){
+				if(splitin.length < 6)
+					throw new Exception("Not standard bed format! 6plus2 bed file format should be like: \n chr\tstart\tend\tname\tscore\tstrand\n");
+				tmp = Double.parseDouble(splitin[3])/100.0;
+				coverage = Integer.parseInt(splitin[4]);
+			}else{
+				throw new Exception("Not such a bed format allowed\n");
+			}
 			if(tmp == 1.0){
 				tmp-=(Math.random())/1000000000;
 			}
 			if(tmp == 0.0){
 				tmp+=(Math.random())/1000000000;
 			}
-			int coverage = Integer.parseInt(splitin[7]);
+			
 			GenomeLocus loc = new GenomeLocus(splitin[0], Integer.parseInt(splitin[1]), Integer.parseInt(splitin[2]));
 			ObservationReal methyTmp = new ObservationReal(tmp);
 			ObservationMethy methyObjTmp = new ObservationMethy(tmp);
@@ -245,7 +263,7 @@ public abstract class HmmHunter {
 			}
 			
 		}
-		
+		br.close();
 	}
 
 	

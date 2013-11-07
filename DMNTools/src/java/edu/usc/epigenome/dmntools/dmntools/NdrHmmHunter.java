@@ -569,7 +569,9 @@ public class NdrHmmHunter extends HmmHunter{
 								//renew for the second same hmm state segment
 								passNprSeg = false;
 								chr = loci[i].getChr();
-								start = loci[i].getStart();
+								preWeight = 1 - nfbsc.getAlpha(hmm, i, preState, hiddenState[i]);
+								start =(int)( (loci[i].getStart() - preLoc.getStart()) * preWeight + preLoc.getStart()) ;
+
 								startLoc = loci[i];
 								oneBeforeStartLoc = preLoc;
 								score = methyState[i];
@@ -586,7 +588,6 @@ public class NdrHmmHunter extends HmmHunter{
 							}
 							else{  //just enter into the first hmm state segment
 								chr = loci[i].getChr();
-								start = loci[i].getStart();
 								preWeight = 1 - nfbsc.getAlpha(hmm, i, preState, hiddenState[i]);
 								start =(int)( (loci[i].getStart() - preLoc.getStart()) * preWeight + preLoc.getStart()) ;
 								startLoc = loci[i];
