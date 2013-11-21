@@ -152,7 +152,7 @@ public class NdrHmmHunter extends HmmHunter{
 			double distance = Double.MAX_VALUE;
 			int i = 0;
 			// Incrementally improve the solution
-			while(Math.abs(distance) >= tol){
+			while(Math.abs(distance) >= tol && i < iteration){
 				i++;
 				
 				try {
@@ -168,6 +168,10 @@ public class NdrHmmHunter extends HmmHunter{
 				distance = klc.distance(prevHmm, hmm);
 				System.out.println("Distance at iteration " + i + ": " +
 						distance);
+				if(Double.isNaN(distance)){
+					System.out.println("Random initiaton this time does not work. Restart at the new random point...");
+					hmm = buildInitHmmRandomlyByBeta(methyValue);
+				}
 			}  
 
 			System.out.println("Resulting HMM:\n" + hmm);

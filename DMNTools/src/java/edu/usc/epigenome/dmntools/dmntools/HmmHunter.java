@@ -71,8 +71,8 @@ public abstract class HmmHunter {
 	@Option(name="-tol",usage="tolerence level for the converge, default: 1e-5")
 	public double tol = 1e-5;
 	
-	@Option(name="-iteration",usage="maximum number of iteration for HMM model converge, default: 20")
-	public int iteration = 20;
+	@Option(name="-iteration",usage="maximum number of iteration for HMM model converge, default: 50")
+	public int iteration = 50;
 
 	@Option(name="-beta",usage="using beta model rather than beta binomial model in the decoding step and output segments, default: not enabled")
 	public boolean beta = false;
@@ -191,14 +191,30 @@ public abstract class HmmHunter {
 			if(bedFormat == 1){
 				if(splitin.length != 8)
 					throw new Exception("Not 6plus2 bed format! 6plus2 bed file format should be like: \n chr\tstart\tend\tname\tscore\tstrand\tmethylation(%)\tnum_CT_coverage\nchr1\t1001\t1002\t.\t750\t+\t75.0\t10\nchr1\t1005\t1006\t.\t200\t-\t20.0\t2\n");
-				tmp = Double.parseDouble(splitin[6])/100.0;
-				coverage = Integer.parseInt(splitin[7]);
+				try  
+				  {  
+					tmp = Double.parseDouble(splitin[6])/100.0;
+					coverage = Integer.parseInt(splitin[7]); 
+				  }  
+				  catch(NumberFormatException nfe)  
+				  {  
+				    continue;  
+				  } 
+				
 				
 			}else if(bedFormat == 2){
 				if(splitin.length < 6)
 					throw new Exception("Not standard bed format! 6plus2 bed file format should be like: \n chr\tstart\tend\tname\tscore\tstrand\n");
-				tmp = Double.parseDouble(splitin[3])/100.0;
-				coverage = Integer.parseInt(splitin[4]);
+				try  
+				  {  
+					tmp = Double.parseDouble(splitin[3])/100.0;
+					coverage = Integer.parseInt(splitin[4]); 
+				  }  
+				  catch(NumberFormatException nfe)  
+				  {  
+				    continue;  
+				  } 
+				
 			}else{
 				throw new Exception("Not such a bed format allowed\n");
 			}
