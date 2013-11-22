@@ -118,7 +118,7 @@ public class NdrHmmHunter extends HmmHunter{
 			if(!onlyTrain){
 				decodeHmm();
 				//close writer
-				finished();
+				finished(arguments.get(0));
 			}
 
 		}

@@ -3,14 +3,27 @@
  */
 package edu.usc.epigenome.dmntools.utils;
 
+import java.math.BigDecimal;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Arrays;
+
+
 /**
- * @author yaping
- * @contact lyping1986@gmail.com
- * @time Oct 16, 2013 9:57:56 PM
- * 
+ * ************************************************************************
+ * BenjaminiHochbergFDR.java:  Steven Maere & Karel Heymans (c) March 2005
+ * ------------------------
+ * <p/>
+ * Class implementing the Benjamini and Hochberg FDR correction algorithm.
+ * <p/>
+ * ************************************************************************
  */
+
+
 public class BenjaminiHochbergFDR {
-	/*--------------------------------------------------------------
+
+    /*--------------------------------------------------------------
     FIELDS.
     --------------------------------------------------------------*/
 
@@ -57,7 +70,6 @@ public class BenjaminiHochbergFDR {
     // Keep track of progress for monitoring:
 
     private int maxValue;
-    private TaskMonitor taskMonitor = null;
     private boolean interrupted = false;
    
 
@@ -72,16 +84,52 @@ public class BenjaminiHochbergFDR {
      * @param alpha             String with the desired significance level.
      */
 
-    public BenjaminiHochbergFDR(double[] pvalue) {
-
+    public BenjaminiHochbergFDR(HashMap golabelstopvalues, String alpha) {
+        //Get all the go labels and their corresponding pvalues from the map
+           
+        Iterator iteratorGoLabelsSet = golabelstopvalues.keySet().iterator();
+        HashEntry [] hash = new HashEntry [golabelstopvalues.size()];
+        String [] pvalues = new String [golabelstopvalues.size()];
+        String [] goLabels = new String [golabelstopvalues.size()];
+        for (int i = 0; iteratorGoLabelsSet.hasNext(); i++) {
+            goLabels[i] = iteratorGoLabelsSet.next().toString() ;   
+            pvalues[i] = golabelstopvalues.get(new Integer(goLabels[i])).toString();
+            hash[i] = new HashEntry(goLabels[i], pvalues[i]) ;
+        }
+        this.hash = hash ;
+        this.pvalues = pvalues;
+        this.goLabels = goLabels;
+        this.alpha = new BigDecimal(alpha);
+        this.m = pvalues.length;
         this.adjustedPvalues = new String[m];
+        this.correctionMap = null;
 
+        this.maxValue = pvalues.length;
     }
- 
+
     
+    class HashEntry{
+        public String key;
+        public String value;
+        
+        public HashEntry(String k, String v){
+            this.key = k ;
+            this.value = v ;
+        }
+    } 
+    
+    class HashComparator implements java.util.Comparator{
+       /* public HashComparator(){        
+        }*/
+        public int compare(Object o1, Object o2){
+            return (new BigDecimal(((HashEntry) o1).value)).compareTo(new BigDecimal(((HashEntry) o2).value)) ;
+        }
+        /*public boolean equals(Object o){
+         return ((Object)this).equals(o) ; 
+        }*/
+    }
     /*--------------------------------------------------------------
-    * METHODS. adapted from cytoscape software: 
-    * https://code.google.com/p/clusterviz-cytoscape/source/browse/trunk/src/clusterviz/BiNGO/BiNGO/BenjaminiHochbergFDR.java?r=33
+    METHODS.
     --------------------------------------------------------------*/
 
     /**
@@ -179,33 +227,7 @@ public class BenjaminiHochbergFDR {
         calculate();
     }
 
-    /**
-     * Non-blocking call to interrupt the task.
-     */
-    public void halt() {
-        this.interrupted = true;
-    }
 
-    /**
-     * Sets the Task Monitor.
-     *
-     * @param taskMonitor TaskMonitor Object.
-     */
-    public void setTaskMonitor(TaskMonitor taskMonitor) {
-        if (this.taskMonitor != null) {
-            throw new IllegalStateException("Task Monitor is already set.");
-        }
-        this.taskMonitor = taskMonitor;
-    }
-
-    /**
-     * Gets the Task Title.
-     *
-     * @return human readable task title.
-     */
-    public String getTitle() {
-        return new String("Calculating FDR correction");
-    }
 
 
 }

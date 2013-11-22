@@ -9,28 +9,28 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.lang.reflect.Array;
+import java.io.PrintStream;
+
 import java.util.ArrayList;
-import java.util.LinkedList;
+import java.util.HashMap;
+
 import java.util.concurrent.TimeUnit;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.math.MathException;
 import org.apache.commons.math.distribution.BinomialDistributionImpl;
-import org.broadinstitute.sting.commandline.Argument;
-import org.broadinstitute.sting.utils.GenomeLoc;
-import org.broadinstitute.sting.utils.GenomeLocParser;
+
 import org.kohsuke.args4j.Option;
 
 import edu.usc.epigenome.dmntools.distribution.OpdfBeta;
 import edu.usc.epigenome.dmntools.distribution.OpdfBetaFactory;
 import edu.usc.epigenome.dmntools.hmm.BbForwardBackwardScaledCalculator;
-import edu.usc.epigenome.dmntools.hmm.BbViterbiCalculator;
+
 import edu.usc.epigenome.dmntools.hmm.NdrForwardBackwardScaledCalculator;
 import edu.usc.epigenome.dmntools.hmm.ObservationMethy;
-import edu.usc.epigenome.dmntools.utils.BisulfiteGenomicLocHmm;
+import edu.usc.epigenome.dmntools.utils.BenjaminiHochbergFDR;
 import edu.usc.epigenome.dmntools.utils.FisherExactTest;
 import edu.usc.epigenome.dmntools.utils.GenomeLocus;
-import edu.usc.epigenome.uecgatk.bissnp.writer.bedObject;
 import edu.usc.epigenome.uecgatk.bissnp.writer.bedObjectWriterImp;
 
 
@@ -47,16 +47,26 @@ import be.ac.ulg.montefiore.run.jahmm.learn.KMeansLearner;
  * @time Oct 16, 2013 6:26:03 PM
  * 
  */
+//TODO: should merge short segment of MAR first, then calculate p value..
 public abstract class HmmHunter {
 	
 	/**
 	 * @param args
 	 */
+	@Option(name="-L",usage="genomic contig name to do decoding or training.\n e.g. -L chr1. it will only go through chr1 in training and decoding step.  -L chr1:1-1000 it will only go through 1 to 1000 region in chr1 (1 based coordinate) \n default: null (it means the program will go over the whole genome)")
+	public String region = null;
+	
+	@Option(name="-fdr",usage="False Discovery Rate (FDRs) criteria to call significant segment, default: 0.01")
+	public double fdr = 0.01;
+	
+	@Option(name="-minGCH",usage="minimum number of GCH in the significant NDR or Nucleosome occupied regions, default: 2")
+	public int minGCH = 2;
+	
 	@Option(name="-minCT",usage="minimum CT read coverage required to be count in methylation level, default: 1")
 	public int minCT = 1;
 
 	//options for HMM model
-	@Option(name="-onlyTrain",usage="only enable the training mode and output HMM parameter, default: not enabled")
+	@Option(name="-onlyTrain",usage="only enable the training mode and output HMM parameter (In training, if -L is not specified, it will only do training on autosome + chrX), default: not enabled")
 	public boolean onlyTrain = false;
 	
 	@Option(name="-onlyDecode",usage="only enable the decoding step and output segments, default: not enabled")
@@ -71,15 +81,6 @@ public abstract class HmmHunter {
 	@Option(name="-tol",usage="tolerence level for the converge, default: 1e-5")
 	public double tol = 1e-5;
 	
-	@Option(name="-iteration",usage="maximum number of iteration for HMM model converge, default: 50")
-	public int iteration = 50;
-
-	@Option(name="-beta",usage="using beta model rather than beta binomial model in the decoding step and output segments, default: not enabled")
-	public boolean beta = false;
-
-	@Option(name="-kmeans",usage="use k means method rather than randomly to initiate the best initial parameters, when number of GCH/HCG is very large, it is not efficient to do it. default: not enabled")
-	public boolean kmeans = false;
-	
 	@Option(name="-bedFormat",usage="input bed format. 1: 6plus2 bed format. 2: standard bed format, default: 1")
 	public int bedFormat = 1;
 	
@@ -87,6 +88,16 @@ public abstract class HmmHunter {
 	@Option(name="-sigTestMode",usage="The mode to calculate segment p value [1:permutation, 2:binomial, 3:fisher, 4:betaDiff]. default: 2")
 	public int sigTest = 2;
 	
+	@Option(name="-iteration",usage="maximum number of iteration for HMM model converge, default: 20")
+	public int iteration = 20;
+
+	//@Option(name="-beta",usage="using beta model rather than beta binomial model in the decoding step and output segments, default: not enabled")
+	public boolean beta = true;
+
+	@Option(name="-kmeans",usage="use k means method rather than randomly to initiate the best initial parameters, when number of GCH/HCG is very large, it is not efficient to do it. default: not enabled")
+	public boolean kmeans = false;
+	
+
 	@Option(name="-gap",usage="max gap size between two GCH/HCG. If two GCH distrance are more than -gap, it will restart a new segment, rather than estimate a transition probability, default: 10000")
 	public int gap = 10000;
 	
@@ -109,6 +120,24 @@ public abstract class HmmHunter {
 	
 	@Option(name = "-gchInAdjWindow", usage = "in the binomial mode, minimum number of GCH in the window, default: 10")
 	public int gchInWindow = 10;
+	
+	@Option(name = "-ndrLen", usage = "MARs > ndrLen are defined as NDRs, default: 100")
+	public int ndrLen = 100;
+	
+	@Option(name = "-linkerLen", usage = "MARs <= ndrLen are defined as Linkers, default: 100")
+	public int linkerLen = 100;
+	
+	@Option(name = "-monoNucLenUpLimit", usage = "MPRs < monoNucLenUpLimit are defined as Mono-Nucleosome, default: 200")
+	public int monoNucLenUpLimit = 200;
+	
+	@Option(name = "-monoNucLenDownLimit", usage = "MPRs > monoNucLenDownLimit are defined as Mono-Nucleosome, default: 100")
+	public int monoNucLenDownLimit = 100;
+	
+	@Option(name = "-sprLen", usage = "MPRs <= sprLen are defined as Short Protected Regions (SPRs, such as TFBS), default: 60")
+	public int sprLen = 60;
+	
+	@Option(name = "-boundLenLimit", usage = "the maximum distance between two GCH in the boundary, it used to limit the flexibility of NDR/MPR length because of GCH non-uniform distribution., default: 20")
+	public int boundLenLimit = 20;
 	
 	private final static int MINIMUM_DATA_POINTS = 2;
 	final private static int PURGE_INTERVAL = 1000000; // interval to show the progress.
@@ -156,10 +185,13 @@ public abstract class HmmHunter {
 	
 	
 	
-	protected void finished() throws IOException{
+	protected void finished(String prefix) throws IOException{
 		if(!onlyTrain){
 			stateWriter.close();
 			segWriter.close();
+			System.out.println("\n\nCalculate Benjamini-Hochberg corrected p value for each segment ... ");
+			calculateFDRAndOutputSigNdrMpr(prefix);
+			
 		}
 		long endTime   = System.currentTimeMillis();
 		long totalTime = endTime - startTime;
@@ -181,11 +213,49 @@ public abstract class HmmHunter {
 		ArrayList<ObservationMethy> methyObjIsland = new ArrayList<ObservationMethy>();
 		ArrayList<ObservationReal> methyValueIsland = new ArrayList<ObservationReal>();
 		ArrayList<GenomeLocus> positionIsland = new ArrayList<GenomeLocus>();
-
+		
+		//test if in the valid region
+		String requestChr = null;
+		int requestStart = -1;
+		int requestEnd = -1;
+		if(region != null && region.startsWith("chr")){
+			String[] regionsInfo = region.split(":");
+			if(regionsInfo.length > 1){
+				requestChr = regionsInfo[0];
+				String[] segInfo = regionsInfo[1].split("-");
+				if(segInfo.length == 2){
+					requestStart = Integer.parseInt(segInfo[0]);
+					requestEnd = Integer.parseInt(segInfo[1]);
+				}else{
+					throw new Exception("Not valid -L parameter. please specify it like -L chr1 or -L chr1:1-1000");
+				}
+				
+			}else{
+				requestChr = region;
+			}
+		}
+		
 		while( (line = br.readLine()) != null){
 			if(!line.startsWith("chr"))
 				continue;
+			if(onlyTrain && (line.matches("chr(.*)_") || line.startsWith("chrY") || line.startsWith("chrM")))
+				continue;
 			String[] splitin = line.split("\t");
+			if(requestChr != null ){
+				if(!splitin[0].equalsIgnoreCase(requestChr)){
+					continue;
+				}else{
+					if(requestStart != -1 && requestEnd != -1){
+						if(Integer.parseInt(splitin[2]) < requestStart || Integer.parseInt(splitin[1]) > requestEnd){
+							continue;
+						}//else{
+							//System.err.println(requestChr + "\t" + requestStart + "\t" + requestEnd + "\t" + splitin[2] + "\t" + splitin[1]);
+						//}
+							
+					}
+				}
+					
+			}
 			double tmp = Double.NaN;
 			int coverage = Integer.MIN_VALUE;
 			if(bedFormat == 1){
@@ -421,6 +491,99 @@ public abstract class HmmHunter {
 			}
 			 
 		 return pValue;
+	}
+	
+	protected void calculateFDRAndOutputSigNdrMpr(String prefix) throws IOException {
+		
+		HashMap<Integer, String> rawPvalueAndLabel = readRawPvalue(prefix);
+		BenjaminiHochbergFDR bh = new BenjaminiHochbergFDR (rawPvalueAndLabel, String.valueOf(fdr));
+		bh.run();
+		HashMap<Integer, String> correctPvalueAndLabel = bh.getCorrectionMap();
+		String segFile = prefix + ".segment.txt";
+		BufferedReader br = new BufferedReader(new FileReader(segFile));
+		String line;
+		int i = 0;
+		System.out.println("Output Methyltransferase Accessible Regions (MARs), Methyltransferase Protected Regions (MPRs), NDRs, Linker, Short Protect Regions (SPRs) and Mono-Nucleosome files... ");
+		String header = "#chr\tstart\tend\tstate_of_segment\tave_methy(%)\tnum_GCH\ttotal_num_methy_C_in_segment\ttotal_num_CT_in_segment\ttotal_num_methy_C_in_adj_segment\ttotal_num_CT_in_adj_segment\tstart_bound_dist_to_pre_GCH\t" +
+				"start_bound_dist_to_next_GCH\tend_bound_dist_to_pre_GCH\tend_bound_dist_to_next_GCH\ttransition_probability_to_segment\ttransition_probability_out_segment\tp_value\tFDR\n";
+		
+		PrintStream marWriter = new PrintStream(new File(new String(prefix + ".MAR.txt")));
+		marWriter.print(header);
+		
+		PrintStream mprWriter = new PrintStream(new File(new String(prefix + ".MPR.txt")));
+		mprWriter.print(header);
+		
+		PrintStream ndrWriter = new PrintStream(new File(new String(prefix + ".NDR.fdr" + fdr + ".txt")));
+		ndrWriter.print(header);
+		
+		PrintStream linkerWriter = new PrintStream(new File(new String(prefix + ".Linker.fdr" + fdr + ".txt")));
+		linkerWriter.print(header);
+		
+		PrintStream sprWriter = new PrintStream(new File(new String(prefix + ".SPR.fdr" + fdr + ".txt")));
+		sprWriter.print(header);
+		
+		PrintStream nucleosomeWriter = new PrintStream(new File(new String(prefix + ".Mono-Nucleosome.fdr" + fdr + ".txt")));
+		nucleosomeWriter.print(header);
+		
+		while( (line = br.readLine()) != null){
+			if(!line.startsWith("chr"))
+				continue;
+			String[] splitin = line.split("\t");
+			double correctP = Double.parseDouble(correctPvalueAndLabel.get(String.valueOf(i)));
+			int state = Integer.parseInt(splitin[3]);
+			int len = Integer.parseInt(splitin[2]) - Integer.parseInt(splitin[1]);
+			int startBound = Integer.parseInt(splitin[10]) + Integer.parseInt(splitin[11]);
+			int endBound = Integer.parseInt(splitin[12]) + Integer.parseInt(splitin[13]);
+			int numGch = Integer.parseInt(splitin[5]);
+			String newLine = StringUtils.chomp(line) + "\t" + correctP;
+			if(state == 0){ //All MAR
+				marWriter.println(newLine);
+				if(len > ndrLen && numGch >= minGCH && startBound < boundLenLimit && endBound < boundLenLimit && correctP < fdr){  //significant NDRs
+					ndrWriter.println(newLine);
+				}else if(len <= linkerLen && numGch >= minGCH && startBound < boundLenLimit && endBound < boundLenLimit && correctP < fdr){ //significant Linkers
+					linkerWriter.println(newLine);
+				}
+				
+			}else{ //All MPR
+				mprWriter.println(StringUtils.chomp(line) + "\t" + correctP);
+				if(len > monoNucLenDownLimit && len <= monoNucLenUpLimit && numGch >= minGCH && startBound < boundLenLimit && endBound < boundLenLimit && correctP < fdr){  //significant Mono-Nucleosome
+					nucleosomeWriter.println(newLine);
+				}else if(len <= sprLen && numGch >= minGCH && startBound < boundLenLimit && endBound < boundLenLimit && correctP < fdr){ //significant SPRs
+					sprWriter.println(newLine);
+				}
+				
+			}
+			
+			i++;
+		}
+		br.close();
+		marWriter.close();
+		ndrWriter.close();
+		linkerWriter.close();
+		mprWriter.close();
+		nucleosomeWriter.close();
+		sprWriter.close();
+		File originalSeg = new File(segFile);
+		if (originalSeg.exists()){
+			originalSeg.delete();
+		}
+	}
+	
+	private HashMap<Integer, String> readRawPvalue(String prefix) throws IOException{
+		String segFile = prefix + ".segment.txt";
+		BufferedReader br = new BufferedReader(new FileReader(segFile));
+		HashMap<Integer, String> pvalueAndLabel = new HashMap<Integer, String>();
+		String line;
+		int i = 0;
+		while( (line = br.readLine()) != null){
+			if(!line.startsWith("chr"))
+				continue;
+			String[] splitin = line.split("\t");
+			pvalueAndLabel.put(i, splitin[16]);
+			i++;
+		}
+		br.close();
+		return pvalueAndLabel;
 	}
 	
 	protected enum sigTestMode{
