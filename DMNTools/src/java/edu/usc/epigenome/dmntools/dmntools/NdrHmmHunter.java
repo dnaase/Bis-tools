@@ -426,7 +426,12 @@ public class NdrHmmHunter extends HmmHunter{
 							int numCT_back = numCtLeftBound.get(startLoc) + numCtRightBound.get(preLoc);
 							double pValue = getBinomialSigTest(numC_npr, numCT_npr, (double)numC_back/(double)numCT_back, reverseP);
 							List<Object> tmp = new LinkedList<Object>();
-							tmp.add(hmmState);
+							if(reverseP){
+								tmp.add(0); //MARs
+							}else{
+								tmp.add(1); //MPRs
+							}
+							
 							tmp.add(String.format("%.2f",100*score/dataPoint));
 							tmp.add(dataPoint);
 							tmp.add(numC_npr);
@@ -548,8 +553,11 @@ public class NdrHmmHunter extends HmmHunter{
 							if(passNprSeg){  //if we already pass the 1st hmm state segment, enter into the next same hmm state segment
 								double pValue = getFisherPvalue(numC_npr, numT_npr, numC_pre+numC_after, numT_pre+numT_after, reverseP);
 								List<Object> tmp = new LinkedList<Object>();
-
-								tmp.add(hmmState);
+								if(reverseP){
+									tmp.add(0); //MARs
+								}else{
+									tmp.add(1); //MPRs
+								}
 								tmp.add(String.format("%.2f",100*score/dataPoint));
 								tmp.add(dataPoint);
 								tmp.add(numC_npr);
