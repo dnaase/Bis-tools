@@ -7,7 +7,10 @@
 	<classpathentry kind="lib" path="lib/picard-1.99.jar"/>
 	<classpathentry kind="lib" path="lib/trove-3.0.3.jar"/>
 	<classpathentry kind="lib" path="lib/sam-1.99.jar"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/gatk"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/picard"/>
+	<classpathentry kind="lib" path="lib/AnalyzeCovariates-1.5-3-gbb2c10b.jar"/>
+	<classpathentry kind="lib" path="lib/GenomeAnalysisTK-1.5-3-gbb2c10b.jar"/>
+	<classpathentry kind="lib" path="lib/StingUtils-1.5-3-gbb2c10b.jar"/>
+	<classpathentry kind="lib" path="lib/tribble-53.jar"/>
+	<classpathentry kind="lib" path="lib/jacksum.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

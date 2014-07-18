@@ -19,7 +19,8 @@ import net.sf.samtools.SAMRecord;
 import org.broadinstitute.sting.gatk.contexts.AlignmentContext;
 import org.broadinstitute.sting.gatk.contexts.ReferenceContext;
 
-import org.broadinstitute.sting.utils.genotyper.DiploidGenotype;
+//import org.broadinstitute.sting.utils.genotyper.DiploidGenotype;
+import org.broad.tribble.annotation.DiploidGenotype;
 import org.broadinstitute.sting.utils.BaseUtils;
 import org.broadinstitute.sting.utils.GenomeLoc;
 import org.broadinstitute.sting.utils.exceptions.UserException;
@@ -27,8 +28,8 @@ import org.broadinstitute.sting.utils.pileup.PileupElement;
 import org.broadinstitute.sting.utils.pileup.ReadBackedPileup;
 
 import org.broadinstitute.sting.utils.sam.GATKSAMRecord;
-import org.broadinstitute.variant.variantcontext.Genotype;
-import org.broadinstitute.variant.variantcontext.VariantContext;
+import org.broadinstitute.sting.utils.variantcontext.Genotype;
+import org.broadinstitute.sting.utils.variantcontext.VariantContext;
 
 
 
@@ -158,7 +159,7 @@ public class BisSNPUtils {
 				Genotype tmp = it.next();
 				if (tmp.isHom())
 					return false;
-				if (tmp.hasExtendedAttribute(BisulfiteVCFConstants.BEST_C_PATTERN)) {
+				if (tmp.hasAttribute(BisulfiteVCFConstants.BEST_C_PATTERN)) {
 					byte[] bases = tmp.getAttributeAsString(BisulfiteVCFConstants.BEST_C_PATTERN, ".").getBytes();
 					if (bases.length < 2)
 						return false;
@@ -178,7 +179,7 @@ public class BisSNPUtils {
 			while (it.hasNext()) {
 				Genotype tmp = it.next();
 				if (tmp.isHom()) {
-					if (tmp.hasExtendedAttribute(BisulfiteVCFConstants.BEST_C_PATTERN)) {
+					if (tmp.hasAttribute(BisulfiteVCFConstants.BEST_C_PATTERN)) {
 						byte[] bases = tmp.getAttributeAsString(BisulfiteVCFConstants.BEST_C_PATTERN, ".").getBytes();
 						if (bases.length < 2)
 							return false;
@@ -200,7 +201,7 @@ public class BisSNPUtils {
 				Genotype tmp = it.next();
 				if (tmp.isHom())
 					return false;
-				if (tmp.hasExtendedAttribute(BisulfiteVCFConstants.BEST_C_PATTERN)) {
+				if (tmp.hasAttribute(BisulfiteVCFConstants.BEST_C_PATTERN)) {
 					byte[] bases = tmp.getAttributeAsString(BisulfiteVCFConstants.BEST_C_PATTERN, ".").getBytes();
 					if (bases.length < 2)
 						return false;
