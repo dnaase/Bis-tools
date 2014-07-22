@@ -3,6 +3,7 @@
  */
 package edu.usc.epigenome.dmntools.utils;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 
 
@@ -64,14 +65,14 @@ public class BisulfiteSlidingWindow {
 			
 		}
 		
-		public LinkedList<BisulfiteGenomicLocHmm> addLast(BisulfiteGenomicLocHmm data, boolean automateRemoveFirstBatch){
-			LinkedList<BisulfiteGenomicLocHmm> dataList = new LinkedList<BisulfiteGenomicLocHmm>();
+		public ArrayList<BisulfiteGenomicLocHmm> addLast(BisulfiteGenomicLocHmm data, boolean automateRemoveFirstBatch){
+			ArrayList<BisulfiteGenomicLocHmm> dataList = new ArrayList<BisulfiteGenomicLocHmm>();
 			addLast(data);
 			while(getGchNum() > minGch && getLength() > minLen && getCtReadsNum() > minCT){
-				dataList.offerLast(removeFirst());
+				dataList.add(removeFirst());
 			}
 			if(!dataList.isEmpty()){
-				addFirst(dataList.pollLast());
+				addFirst(dataList.remove(dataList.size()-1));
 			}
 			
 			return dataList;

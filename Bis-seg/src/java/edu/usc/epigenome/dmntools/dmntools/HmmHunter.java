@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import java.util.concurrent.TimeUnit;
+import java.util.zip.DataFormatException;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.math.MathException;
@@ -194,11 +195,14 @@ public abstract class HmmHunter {
 			
 		}
 		long endTime   = System.currentTimeMillis();
-		long totalTime = endTime - startTime;
+		double totalTime = endTime - startTime;
+		totalTime /= 1000;
+		double totalTimeMins = totalTime/60;
+		double totalTimeHours = totalTime/3600;
 		//System.out.println();
 		//System.out.println("HmmHunter finshed at : " + endTime);
 		System.out.println();
-		System.out.println("HmmHunter's running time is: " + TimeUnit.DAYS.toHours(totalTime));
+		System.out.println("HmmHunter's running time is: " + String.format("%.2f",totalTime) + " secs, " + String.format("%.2f",totalTimeMins) +  " mins, " + String.format("%.2f",totalTimeHours) +  " hours");
 		
 	}
 	
@@ -227,7 +231,7 @@ public abstract class HmmHunter {
 					requestStart = Integer.parseInt(segInfo[0]);
 					requestEnd = Integer.parseInt(segInfo[1]);
 				}else{
-					throw new Exception("Not valid -L parameter. please specify it like -L chr1 or -L chr1:1-1000");
+					throw new IllegalArgumentException("Not valid -L parameter. please specify it like -L chr1 or -L chr1:1-1000");
 				}
 				
 			}else{
@@ -264,7 +268,7 @@ public abstract class HmmHunter {
 			int coverage = Integer.MIN_VALUE;
 			if(bedFormat == 1){
 				if(splitin.length != 8)
-					throw new Exception("Not 6plus2 bed format! 6plus2 bed file format should be like: \n chr\tstart\tend\tname\tscore\tstrand\tmethylation(%)\tnum_CT_coverage\nchr1\t1001\t1002\t.\t750\t+\t75.0\t10\nchr1\t1005\t1006\t.\t200\t-\t20.0\t2\n");
+					throw new DataFormatException("Not 6plus2 bed format! 6plus2 bed file format should be like: \n chr\tstart\tend\tname\tscore\tstrand\tmethylation(%)\tnum_CT_coverage\nchr1\t1001\t1002\t.\t750\t+\t75.0\t10\nchr1\t1005\t1006\t.\t200\t-\t20.0\t2\n");
 				try  
 				  {  
 					tmp = Double.parseDouble(splitin[6])/100.0;
@@ -279,7 +283,7 @@ public abstract class HmmHunter {
 				
 			}else if(bedFormat == 2){
 				if(splitin.length < 6)
-					throw new Exception("Not standard bed format! 6plus2 bed file format should be like: \n chr\tstart\tend\tname\tscore\tstrand\n");
+					throw new DataFormatException("Not standard bed format! standard bed format should be like: \n chr\tstart\tend\tname\tscore\tstrand\n");
 				try  
 				  {  
 					tmp = Double.parseDouble(splitin[3])/100.0;
@@ -291,7 +295,7 @@ public abstract class HmmHunter {
 				  } 
 				
 			}else{
-				throw new Exception("Not such a bed format allowed\n");
+				throw new DataFormatException("Not such a bed format allowed\n");
 			}
 			if(tmp == 1.0){
 				tmp-=(Math.random())/1000000000;
@@ -584,7 +588,7 @@ public abstract class HmmHunter {
 			int startBound = Integer.parseInt(splitin[10]) + Integer.parseInt(splitin[11]);
 			int endBound = Integer.parseInt(splitin[12]) + Integer.parseInt(splitin[13]);
 			int numGch = Integer.parseInt(splitin[5]);
-			String newLine = StringUtils.chomp(line) + "\t" + correctP;
+			String newLine = StringUtils.chomp(line) + "\t" + String.format("%.6f",correctP);
 			if(state == 0){ //All MAR
 				marWriter.println(newLine);
 				if(len > ndrLen && numGch >= minGCH && startBound < boundLenLimit && endBound < boundLenLimit && correctP < fdr){  //significant NDRs

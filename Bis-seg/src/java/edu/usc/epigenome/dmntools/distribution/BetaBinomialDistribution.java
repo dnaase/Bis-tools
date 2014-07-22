@@ -1,5 +1,6 @@
 /**
- * 
+ * it mainly from edu.ucla.stat.SOCR.distributions
+ * copied here: https://code.google.com/p/socr/source/browse/trunk/SOCR2.0/src/edu/ucla/stat/SOCR/distributions/BetaBinomialDistribution.java?spec=svn86&r=86
  */
 package edu.usc.epigenome.dmntools.distribution;
 
@@ -38,8 +39,15 @@ public class BetaBinomialDistribution implements RandomDistribution {
      */
     private double beta;
     
+    
+    private double mu;
+    
+    private double sigma;
+    
+    private BetaBinomial bb;
+    
     public BetaBinomialDistribution() {
-    	this(10, 0.2, 0.8);
+    	this(10, 1.0, 2.0);
 	}
 	
 	public BetaBinomialDistribution(int n, double a, double b) {
@@ -50,6 +58,9 @@ public class BetaBinomialDistribution implements RandomDistribution {
 	        trials = n;
 	        alpha = a;
 	        beta = b;
+	        mu = alpha/(alpha + beta);
+			sigma = Math.sqrt(alpha * beta/((alpha + beta)*(alpha + beta)*(alpha + beta + 1)));
+			bb = new BetaBinomial(mu,  sigma,  trials);
 	}
 
 	/* (non-Javadoc)
@@ -65,24 +76,28 @@ public class BetaBinomialDistribution implements RandomDistribution {
 		//Binomial randomBinomial = new Binomial(trials, randomBeta.nextDouble(), new MersenneTwister64());
 		//return randomBinomial.nextInt();
 		
-		double mu = alpha/(alpha + beta);
-		double sigma = Math.sqrt(alpha * beta/((alpha + beta)*(alpha + beta)*(alpha + beta + 1)));
-		BetaBinomial bb = new BetaBinomial(mu,  sigma,  trials);
+		//double mu = alpha/(alpha + beta);
+		//double sigma = Math.sqrt(alpha * beta/((alpha + beta)*(alpha + beta)*(alpha + beta + 1)));
+		//BetaBinomial bb = new BetaBinomial(mu,  sigma,  trials);
 		return bb.random();
 		
 	//	return randomBinomial.nextDouble();
 	}
 
 	/* (non-Javadoc)
-	 * @see be.ac.ulg.montefiore.run.distributions.RandomDistribution#probability(double)
+	 * @see be.ac.ulg.montefiore.run.distributions.RandomDistribution#probability(double) bb density function
 	 */
 	@Override
 	public double probability(double x) {
-		int k = (int) Math.rint(x);
+		//int k = (int) Math.rint(x);
 		
-        if (k < 0 | k > trials) return 0;
-        return (gamma(k+alpha)*gamma(trials-k+beta)*gamma(alpha+beta)*gamma(trials+2))/
-        	((trials+1)*gamma(alpha+beta+trials)*gamma(alpha)*gamma(beta)*gamma(k+1)*gamma(trials-k+1));
+        //if (k < 0 | k > trials) return 0;
+        //return (gamma(k+alpha)*gamma(trials-k+beta)*gamma(alpha+beta)*gamma(trials+2))/
+        //	((trials+1)*gamma(alpha+beta+trials)*gamma(alpha)*gamma(beta)*gamma(k+1)*gamma(trials-k+1));
+		//double mu = alpha/(alpha + beta);
+		//double sigma = Math.sqrt(alpha * beta/((alpha + beta)*(alpha + beta)*(alpha + beta + 1)));
+		//BetaBinomial bb = new BetaBinomial(mu,  sigma,  trials);
+		return bb.density(x, false);
 
 	}
 	

@@ -6,9 +6,11 @@ package edu.usc.epigenome.dmntools.dmntools;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import org.broad.tribble.annotation.Strand;
+import org.broadinstitute.sting.utils.GenomeLoc;
 
 
 import org.kohsuke.args4j.Argument;
@@ -34,15 +36,11 @@ import edu.usc.epigenome.dmntools.hmm.ObservationMethy;
 import edu.usc.epigenome.dmntools.hmm.OpdfBetaBinomReader;
 import edu.usc.epigenome.dmntools.hmm.OpdfBetaReader;
 import edu.usc.epigenome.dmntools.hmm.OpdfBetaWriter;
-import edu.usc.epigenome.dmntools.utils.BisulfiteGenomicLocHmm;
+
 import edu.usc.epigenome.dmntools.utils.BisulfiteSlidingWindow;
 import edu.usc.epigenome.dmntools.utils.GenomeLocus;
 import edu.usc.epigenome.dmntools.distribution.OpdfBeta;
 import edu.usc.epigenome.dmntools.distribution.OpdfBetaBinomial;
-
-
-
-
 
 import edu.usc.epigenome.uecgatk.bissnp.writer.bedObject;
 import gnu.trove.map.hash.THashMap;
@@ -252,7 +250,10 @@ public class NdrHmmHunter extends HmmHunter{
 			for(int i=0; i<hmm.nbStates(); i++){
 				if(((OpdfBeta)hmm.getOpdf(i)).mean() >= maxMean){
 					segmentHmmStateByBinomialTestWithFBSCInSingleState(loci, methyState, hiddenState, nfbsc, hmm, i, true);
+					//(int[] hiddenState, double[] methyState, GenomeLocus[] loci, int[] numCTState, int[] numCState, int nprState, boolean reverseP, Hmm<ObservationReal> hmm, NdrForwardBackwardScaledCalculator nfbsc)
+					//getNPRSegmentByHalfLocalComparFBSC(loci, methyState, hiddenState, nfbsc, hmm, i, true);
 				}else{
+					//getNPRSegmentByHalfLocalComparFBSC(loci, methyState, hiddenState, nfbsc, hmm, i, false);
 					segmentHmmStateByBinomialTestWithFBSCInSingleState(loci, methyState, hiddenState, nfbsc, hmm, i, false);
 				}
 				
@@ -262,19 +263,25 @@ public class NdrHmmHunter extends HmmHunter{
 		}
 		
 		protected void segmentHmmStateByBinomialTestWithFBSCInSingleState(GenomeLocus[] loci, ObservationMethy[] methyState, int[] hiddenState, NdrForwardBackwardScaledCalculator nfbsc, Hmm<? extends Observation> hmm, int hmmState,boolean reverseP){
-			THashMap<GenomeLocus, Integer> numCtLeftBound = new THashMap<GenomeLocus, Integer>();
-			THashMap<GenomeLocus, Integer> numCLeftBound = new THashMap<GenomeLocus, Integer>();
-			THashMap<GenomeLocus, Integer> numCtRightBound = new THashMap<GenomeLocus, Integer>();
-			THashMap<GenomeLocus, Integer> numCRightBound = new THashMap<GenomeLocus, Integer>();
-			
+			int intialCapacity=loci.length*4/3;
+			float loadFactor = 0.75F;
+			HashMap<GenomeLocus, Integer> numCtLeftBound = new HashMap<GenomeLocus, Integer>(intialCapacity, loadFactor);
+			HashMap<GenomeLocus, Integer> numCLeftBound = new HashMap<GenomeLocus, Integer>(intialCapacity, loadFactor);
+			HashMap<GenomeLocus, Integer> numCtRightBound = new HashMap<GenomeLocus, Integer>(intialCapacity, loadFactor);
+			HashMap<GenomeLocus, Integer> numCRightBound = new HashMap<GenomeLocus, Integer>(intialCapacity, loadFactor);
+
+			//System.err.println("begine:" + "\t" + hmmState + "\t" + reverseP);
+			//System.err.println("getAdjacentWindowCtStatusAtEachPos");
 			getAdjacentWindowCtStatusAtEachPos(numCtLeftBound, numCLeftBound, numCtRightBound, numCRightBound, hmmState, loci, methyState, hiddenState,nfbsc);
+			//System.err.println("getSegmentAndPvalue");
 			getSegmentAndPvalue(numCtLeftBound, numCLeftBound, numCtRightBound, numCRightBound, hmmState, loci, methyState, hiddenState,nfbsc, reverseP);
+			//System.err.println(hmmState + "\t" + reverseP);
 		}
 		
-		private void getAdjacentWindowCtStatusAtEachPos(THashMap<GenomeLocus, Integer> numCtLeftBound, THashMap<GenomeLocus, Integer> numCLeftBound, THashMap<GenomeLocus, Integer> numCtRightBound, THashMap<GenomeLocus, Integer> numCRightBound, 
+		private void getAdjacentWindowCtStatusAtEachPos(HashMap<GenomeLocus, Integer> numCtLeftBound, HashMap<GenomeLocus, Integer> numCLeftBound, HashMap<GenomeLocus, Integer> numCtRightBound, HashMap<GenomeLocus, Integer> numCRightBound, 
 				int hmmState, GenomeLocus[] loci, ObservationMethy[] observationMethyState, int[] hiddenState, NdrForwardBackwardScaledCalculator nfbsc){
-			BisulfiteSlidingWindow slidingWindowLeft = new BisulfiteSlidingWindow(ctInWindow, gchInWindow, window, hmmState);
-			BisulfiteSlidingWindow slidingWindowRight = new BisulfiteSlidingWindow(ctInWindow, gchInWindow, window, hmmState);
+			SlidingWindow slidingWindowLeft = new SlidingWindow(ctInWindow, gchInWindow, window, hmmState);
+			SlidingWindow slidingWindowRight = new SlidingWindow(ctInWindow, gchInWindow, window, hmmState);
 			double[] methyState = new double[observationMethyState.length];
 			int[] numCTState = new int[observationMethyState.length];
 			for(int i=0; i< observationMethyState.length; i++ ){
@@ -283,9 +290,11 @@ public class NdrHmmHunter extends HmmHunter{
 			}
 			
 			for(int z=0; z < hiddenState.length; z++){
-				BisulfiteGenomicLocHmm data = new BisulfiteGenomicLocHmm(loci[z].getChr(),loci[z].getStart(), loci[z].getEnd(), new ObservationMethy(methyState[z]),numCTState[z], (int)(numCTState[z]*methyState[z]),hiddenState[z]);
+				BisulfiteGenomicLocHmm data = new BisulfiteGenomicLocHmm(loci[z].getChr(),loci[z].getStart(), loci[z].getEnd(), new ObservationMethy(methyState[z]),numCTState[z], (int)Math.round(numCTState[z]*methyState[z]),hiddenState[z]);
+				//System.err.println("z:" + z);
 				if(slidingWindowLeft.getLength() < window || slidingWindowLeft.getGchNum() < gchInWindow || slidingWindowLeft.getCtReadsNum() < ctInWindow){ // in the beginning of the chromosome
 					slidingWindowLeft.addLast(data);
+					//System.err.println("choice1:" + slidingWindowLeft.getLength());
 					if(z==hiddenState.length-1){
 						int numC = slidingWindowLeft.getCReadsNum();
 						int numCt = slidingWindowLeft.getCtReadsNum();
@@ -299,6 +308,7 @@ public class NdrHmmHunter extends HmmHunter{
 					
 				}
 				else if(slidingWindowRight.windowList.isEmpty()){
+					//System.err.println("choice2:" + slidingWindowLeft.getLength());
 					int numC = slidingWindowLeft.getCReadsNum();
 					int numCt = slidingWindowLeft.getCtReadsNum();
 					for(int j = 0; j < z; j++){
@@ -316,7 +326,7 @@ public class NdrHmmHunter extends HmmHunter{
 				}
 				else if(slidingWindowRight.getLength() < window || slidingWindowRight.getGchNum() < gchInWindow || slidingWindowRight.getCtReadsNum() < ctInWindow){
 					slidingWindowRight.addLast(data);
-					
+					//System.err.println("choice3:" + slidingWindowRight.getLength());
 					numCLeftBound.put(data.position, slidingWindowRight.getCReadsNum());
 					numCtLeftBound.put(data.position, slidingWindowRight.getCtReadsNum());
 					numCRightBound.put(data.position, 0);
@@ -333,9 +343,10 @@ public class NdrHmmHunter extends HmmHunter{
 					
 				}
 				else{
+					//System.err.println("choice4:");
 					int numC = slidingWindowRight.getCReadsNum();
 					int numCt = slidingWindowRight.getCtReadsNum();
-					LinkedList<BisulfiteGenomicLocHmm> tmpValue = slidingWindowRight.addLast(data, true);
+					ArrayList<BisulfiteGenomicLocHmm> tmpValue = slidingWindowRight.addLast(data, true);
 					numCLeftBound.put(data.position, slidingWindowRight.getCReadsNum());
 					numCtLeftBound.put(data.position, slidingWindowRight.getCtReadsNum());
 					numCRightBound.put(data.position, 0);
@@ -349,6 +360,10 @@ public class NdrHmmHunter extends HmmHunter{
 						numCtRightBound.put(tmpData.position, numCt);
 
 					}
+					//System.err.println("choice4:" + numCLeftBound.capacity());
+					//System.err.println("choice4:" + numCtLeftBound.capacity());
+					//System.err.println("choice4:" + numCRightBound.capacity());
+					//System.err.println("choice4:" + numCtRightBound.capacity());
 					// first add CT reads number when new value add into slidingWindowRight, it will be updated when they are popped out.
 
 				}
@@ -357,7 +372,7 @@ public class NdrHmmHunter extends HmmHunter{
 			
 		}
 		
-		private void getSegmentAndPvalue(THashMap<GenomeLocus, Integer> numCtLeftBound, THashMap<GenomeLocus, Integer> numCLeftBound, THashMap<GenomeLocus, Integer> numCtRightBound, THashMap<GenomeLocus, Integer> numCRightBound,
+		private void getSegmentAndPvalue(HashMap<GenomeLocus, Integer> numCtLeftBound, HashMap<GenomeLocus, Integer> numCLeftBound, HashMap<GenomeLocus, Integer> numCtRightBound, HashMap<GenomeLocus, Integer> numCRightBound,
 				int hmmState, GenomeLocus[] loci, ObservationMethy[] observationMethyState, int[] hiddenState, NdrForwardBackwardScaledCalculator nfbsc, boolean reverseP){
 			
 			double[] methyState = new double[observationMethyState.length];
@@ -365,7 +380,7 @@ public class NdrHmmHunter extends HmmHunter{
 			int[] numCState = new int[observationMethyState.length];
 			for(int i=0; i< observationMethyState.length; i++ ){
 				numCTState[i] = observationMethyState[i].coverage;
-				numCState[i] = (int)(numCTState[i] * observationMethyState[i].value);
+				numCState[i] = (int)Math.round(numCTState[i] * observationMethyState[i].value);
 				methyState[i] = (double)numCState[i]/(double)numCTState[i];
 			}
 			
@@ -468,7 +483,243 @@ public class NdrHmmHunter extends HmmHunter{
 				preLoc = loci[i];
 			}
 		}
+		
+		//GenomeLocus[] loci, ObservationMethy[] methyState, int[] hiddenState, NdrForwardBackwardScaledCalculator nfbsc, Hmm<? extends Observation> hmm, int hmmState,boolean reverseP
+		//boundary not by viterbi decoding, but by forward and backward scaled calculator
+		/*		
+		private void getNPRSegmentByHalfLocalComparFBSC(GenomeLocus[] loci, ObservationMethy[] methyState, int[] hiddenState, NdrForwardBackwardScaledCalculator nfbsc, Hmm<? extends Observation> hmm, int nprState,boolean reverseP){
+					//hash the ct reads in the adjacent window information
+					
+				
+					HashMap<GenomeLocus, Integer> numCtLeftBound = new HashMap<GenomeLocus, Integer>();
+					HashMap<GenomeLocus, Integer> numCLeftBound = new HashMap<GenomeLocus, Integer>();
+					HashMap<GenomeLocus, Integer> numCtRightBound = new HashMap<GenomeLocus, Integer>();
+					HashMap<GenomeLocus, Integer> numCRightBound = new HashMap<GenomeLocus, Integer>();
+					//System.err.println(numCTState.length + "\t" + numCState.length);
+					SlidingWindow slidingWindowLeft = new SlidingWindow(ctInWindow, gchInWindow, window, nprState);
+					SlidingWindow slidingWindowRight = new SlidingWindow(ctInWindow, gchInWindow, window, nprState);
+					
 
+					int[] numCTState = new int[methyState.length];
+					int[] numCState = new int[methyState.length];
+					for(int i=0; i< methyState.length; i++ ){
+						numCTState[i] = methyState[i].coverage;
+						numCState[i] = (int) Math.round(numCTState[i] * methyState[i].value);
+						//if(loci[i].getEnd()==9416185 || loci[i].getEnd()==9416217){
+							//System.err.println(numCTState[i] + "\t" + numCState[i] + "\t" + methyState[i].value);
+						//}
+					}
+					//System.err.println("start count");
+					for(int z=0; z < hiddenState.length; z++){
+						BisulfiteGenomicLocHmm data = new BisulfiteGenomicLocHmm(loci[z],methyState[z],numCTState[z],numCState[z],hiddenState[z]);
+					///	if(loci[z].getStart() == 2007766)
+					//		System.err.println(numCRightBound.size() + "\t" + slidingWindowRight.getCReadsNum() + "\t" + slidingWindowRight.getLength() + "\t" + slidingWindowLeft.getLength() + "\t" + z);
+						if(slidingWindowLeft.getLength() < window || slidingWindowLeft.getGchNum() < gchInWindow || slidingWindowLeft.getCtReadsNum() < ctInWindow){ // in the beginning of the chromosome
+							slidingWindowLeft.addLast(data);
+							if(z==hiddenState.length-1){
+								int numC = slidingWindowLeft.getCReadsNum();
+								int numCt = slidingWindowLeft.getCtReadsNum();
+								for(int j = 0; j <= z; j++){
+									numCLeftBound.put(loci[j], numC);
+									numCtLeftBound.put(loci[j], numCt);
+									numCRightBound.put(loci[j], 0);
+									numCtRightBound.put(loci[j], 0);
+								}
+							}
+							
+						//	System.err.println("left: " + slidingWindowLeft.getLength() + "\t" + data.position);
+						}
+						else if(slidingWindowRight.windowList.isEmpty()){
+							int numC = slidingWindowLeft.getCReadsNum();
+							int numCt = slidingWindowLeft.getCtReadsNum();
+							for(int j = 0; j < z; j++){
+								numCLeftBound.put(loci[j], numC);
+								numCtLeftBound.put(loci[j], numCt);
+								numCRightBound.put(loci[j], 0);
+								numCtRightBound.put(loci[j], 0);
+							}
+							slidingWindowRight.addLast(data);
+							numCLeftBound.put(data.position, numC);
+							numCtLeftBound.put(data.position, numCt);
+							numCRightBound.put(data.position, 0);
+							numCtRightBound.put(data.position, 0);
+						}
+						else if(slidingWindowRight.getLength() < window || slidingWindowRight.getGchNum() < gchInWindow || slidingWindowRight.getCtReadsNum() < ctInWindow){
+							slidingWindowRight.addLast(data);
+							numCLeftBound.put(data.position, slidingWindowRight.getCReadsNum());
+							numCtLeftBound.put(data.position, slidingWindowRight.getCtReadsNum());
+							numCRightBound.put(data.position, 0);
+							numCtRightBound.put(data.position, 0);
+							if(z==hiddenState.length-1){
+								int numC = slidingWindowRight.getCReadsNum();
+								int numCt = slidingWindowRight.getCtReadsNum();
+								for(int j = z - slidingWindowRight.windowList.size(); j <= z; j++){
+									numCRightBound.put(loci[j], numC);
+									numCtRightBound.put(loci[j], numCt);
+								}
+							}
+							
+						//	System.err.println("right: " + slidingWindowRight.getLength() + "\t" + data.position);
+						}
+						else{
+							int numC = slidingWindowRight.getCReadsNum();
+							int numCt = slidingWindowRight.getCtReadsNum();
+							ArrayList<BisulfiteGenomicLocHmm> tmpValue = slidingWindowRight.addLast(data, true);
+							numCLeftBound.put(data.position, slidingWindowRight.getCReadsNum());
+							numCtLeftBound.put(data.position, slidingWindowRight.getCtReadsNum());
+							numCRightBound.put(data.position, 0);
+							numCtRightBound.put(data.position, 0);
+							for(BisulfiteGenomicLocHmm tmpData: tmpValue){
+								
+								numCLeftBound.put(tmpData.position, slidingWindowLeft.getCReadsNum());
+								numCtLeftBound.put(tmpData.position, slidingWindowLeft.getCtReadsNum());
+								slidingWindowLeft.addLast(tmpData, true);
+								numCRightBound.put(tmpData.position, numC);
+								numCtRightBound.put(tmpData.position, numCt);
+								//numC -= tmpData.numC;
+								//numCt -= tmpData.numCT;
+								
+
+								
+							}
+							// first add CT reads number when new value add into slidingWindowRight, it will be updated when they are popped out.
+							
+							
+						//	System.err.println("left: " + slidingWindowLeft.getLength() + "\t" + data.position + "\t" + slidingWindowLeft.getCReadsNum() + "\t" + slidingWindowLeft.getCtReadsNum() + "\t" + numC);
+						//	System.err.println("right: " + slidingWindowRight.getLength() + "\t" + data.position + "\t" + slidingWindowRight.getCReadsNum() + "\t" + slidingWindowRight.getCtReadsNum() + "\t" + numCt);
+						}
+					}
+					for(GenomeLocus loc : numCtRightBound.keySet()){
+						Integer ct = numCtRightBound.get(loc);
+						Integer c = numCRightBound.get(loc);
+						if(ct < c || c <0 || ct <0)
+							System.err.println(c + "\t" + ct + "\t" + loc);
+					}
+					
+					//System.err.println("finish count");
+					
+					String chr = null;
+					int start = -1;
+					int end = -1;
+					double score = 0;
+					int dataPoint = 0; //number of GCH in the segments
+					int numC_npr = 0;
+					int numCT_npr = 0;
+					//double sumMethy_Gch_back = 0;
+					//int numGch_back = 0;
+					//int numC_back = 0;
+					//int numT_back = 0;
+					
+					GenomeLocus startLoc = null;
+					GenomeLocus preLoc = null;
+					GenomeLocus oneBeforeStartLoc = null;
+					int preState = -1; //record the previous loci's state
+					
+					double preWeight = -1;
+					double postWeight = -1;
+					
+					for(int i=0; i < hiddenState.length; i++){
+						if(preState == -1){
+							preState = hiddenState[i]; 
+							if(preState == nprState){
+								chr = loci[i].getChr();
+								//start = loci[i].getStart()-1;
+								start = loci[i].getStart()-1;
+								startLoc = loci[i];
+								oneBeforeStartLoc = loci[i];
+								score = methyState[i].value;
+								dataPoint=1;
+								numC_npr = numCState[i];
+								numCT_npr = numCTState[i];
+
+							}	
+							
+						}
+						else{
+							if(preState != nprState){
+								if(hiddenState[i] == nprState){
+										chr = loci[i].getChr();
+										preWeight = 1 - nfbsc.getAlpha(hmm, i, preState, hiddenState[i]);
+										//double weight = hmm.getAij(preState, hiddenState[i]);
+										//start =(int)((loci[i].getStart() + preLoc.getStart())/2) ;
+										start =(int)( (loci[i].getStart() - preLoc.getStart()) * preWeight + preLoc.getStart()) ;
+										//start =preLoc.getStart() ;
+										startLoc = loci[i];
+										oneBeforeStartLoc = preLoc;
+										numC_npr = numCState[i];
+										numCT_npr = numCTState[i] ;
+										score = methyState[i].value;
+										dataPoint = 1;
+								}
+
+							}
+							else{
+								if(hiddenState[i] == nprState){
+									numC_npr += numCState[i];
+									numCT_npr += numCTState[i];
+									score += methyState[i].value;
+									dataPoint++;
+								}
+								else{
+								//	System.err.println(preLoc);
+									//end = (int)((loci[i].getStart() + preLoc.getStart())/2);
+									//if(i < hiddenState.length -1){
+										postWeight = 1 - nfbsc.getAlpha(hmm, i, preState, hiddenState[i]);
+									//}
+									//else{
+									//	postWeight = 1;
+									//}
+									//double weight = hmm.getAij(preState, hiddenState[i]);
+									end =(int)( (loci[i].getStart() - preLoc.getStart()) * postWeight + preLoc.getStart()) ;
+									//end =preLoc.getStart();
+									//int numGch_back = backGround.numCLeftBound.size();
+									
+								//	System.err.println(startLoc);
+								//	System.err.println(numCLeftBound.size());
+								//	System.err.println(numCRightBound.size());
+								//	System.err.println(numCLeftBound.get(startLoc));
+								//	System.err.println(numCtLeftBound.get(startLoc));
+								//	System.err.println(numCRightBound.get(preLoc));
+								//	System.err.println(numCtRightBound.get(preLoc)); 
+									int numC_back = numCLeftBound.get(startLoc) + numCRightBound.get(preLoc);
+									int numCT_back = numCtLeftBound.get(startLoc) + numCtRightBound.get(preLoc);
+									double pValue = getBinomialSigTest(numC_npr, numCT_npr, (double)numC_back/(double)numCT_back, reverseP);
+									List<Object> tmp = new ArrayList<Object>();
+									if(reverseP){
+										tmp.add(0); //MARs
+									}else{
+										tmp.add(1); //MPRs
+									}
+									
+									tmp.add(String.format("%.2f",100*score/dataPoint));
+									tmp.add(dataPoint);
+									tmp.add(numC_npr);
+									tmp.add(numCT_npr);
+									tmp.add(numC_back);
+									tmp.add(numCT_back);
+									tmp.add(start - oneBeforeStartLoc.getStart());//distance of segment start point to the previous GCH, 
+									tmp.add(startLoc.getStart() - start);//distance of segment start point to the next GCH, 
+									tmp.add(end - preLoc.getEnd());//distance of segment end point to the previous GCH, 
+									tmp.add(loci[i].getEnd() - end);//distance of segment end point to the next GCH, 
+									tmp.add(String.format("%.3f",1-preWeight));
+									tmp.add(String.format("%.3f",1-postWeight));
+									tmp.add(String.format("%.6f",pValue));
+
+									if(numCT_npr >= minCT && numCT_back >= minCT){
+										bedObject bedLine = new bedObject(chr, start, end, (List)tmp);
+										segWriter.add(bedLine);
+									}
+								//	}
+								}
+							}
+							preState = hiddenState[i];
+						}
+						preLoc = loci[i];
+					}
+						
+							
+				}
+				*/
 		/* (non-Javadoc)
 		 * @see edu.usc.epigenome.dmntools.dmntools.HmmHunter#segmentHmmStateByRandomPermutation(edu.usc.epigenome.dmntools.utils.GenomeLocus[], edu.usc.epigenome.dmntools.hmm.ObservationMethy[], int[], be.ac.ulg.montefiore.run.jahmm.ForwardBackwardScaledCalculator, be.ac.ulg.montefiore.run.jahmm.Hmm)
 		 */
@@ -1048,6 +1299,165 @@ public class NdrHmmHunter extends HmmHunter{
 		}
 		*/
 		
+		public class SlidingWindow{
+			public LinkedList<BisulfiteGenomicLocHmm> windowList;
+			private int numC = 0;
+			private int numCT = 0;
+			private int minCT;
+			private int minGch;
+			private long minLen;
+			private int segHmmState;
+			
+			
+			public SlidingWindow(int minCT, int minGch, long minLen, int segHmmState){
+				windowList = new LinkedList<BisulfiteGenomicLocHmm>();
+				this.minCT = minCT;
+				this.minGch = minGch;
+				this.minLen = minLen;
+				this.segHmmState = segHmmState;
+				
+			}
+			
+			public void addLast(BisulfiteGenomicLocHmm data){
+				windowList.offerLast(data);
+				if(data.hmmState != segHmmState){
+					numCT += data.numCT;
+					numC += data.numC;
+				}
+				
+				
+			}
+			
+			public void addFirst(BisulfiteGenomicLocHmm data){
+				windowList.offerFirst(data);
+				if(data.hmmState != segHmmState){
+					numCT += data.numCT;
+					numC += data.numC;
+				}
+				
+				
+			}
+			
+			public ArrayList<BisulfiteGenomicLocHmm> addLast(BisulfiteGenomicLocHmm data, boolean automateRemoveFirstBatch){
+				ArrayList<BisulfiteGenomicLocHmm> dataList = new ArrayList<BisulfiteGenomicLocHmm>();
+				addLast(data);
+				while(getGchNum() > minGch && getLength() > minLen && getCtReadsNum() > minCT){
+					dataList.add(removeFirst());
+				}
+				if(!dataList.isEmpty()){
+					addFirst(dataList.remove(dataList.size()-1));
+				}
+				
+				return dataList;
+			}
+			
+			public BisulfiteGenomicLocHmm removeLast(){
+				BisulfiteGenomicLocHmm data = windowList.pollLast();
+				if(data.hmmState != segHmmState){
+					numCT -= data.numCT;
+					numC -= data.numC;
+				}
+				
+				return data;
+			}
+			
+			public BisulfiteGenomicLocHmm removeFirst(){
+				BisulfiteGenomicLocHmm data = windowList.pollFirst();
+				if(data.hmmState != segHmmState){
+					numCT -= data.numCT;
+					numC -= data.numC;
+				}
+				
+				return data;
+			}
+			
+			public double getMean(){
+				
+				return (double)numC/(double)numCT;
+			}
+			
+			public int getGchNum(){
+				return windowList.size();
+			}
+			
+			public int getLength(){
+				if(!windowList.isEmpty()){
+					return windowList.peekLast().position.distance(windowList.peekFirst().position);
+				}
+				return 0;
+			}
+			
+			public int getCtReadsNum(){
 
+				return numCT;
+			}
+			
+			public int getCReadsNum(){
+				
+				return numC;
+			}
+			
+		}
+		
+		
+		public class BisulfiteGenomicLocHmm{
+			public ObservationMethy value;
+			public GenomeLocus position;
+			public String contig;
+			public int start;
+			public int end;
+			public ObservationMethy methy;
+			public int numCT;
+			public int numC;
+			public int hmmState;
+
+			public BisulfiteGenomicLocHmm(String contig, int start, int end, ObservationMethy value, int numCT){
+				this.contig = contig;
+				this.start = start;
+				this.end = end;
+				this.value = value;
+				this.numCT = numCT;
+				
+			}
+			
+			public BisulfiteGenomicLocHmm(String contig, int start, int end, ObservationMethy value, int numCT, int numC){
+				this.contig = contig;
+				this.start = start;
+				this.end = end;
+				this.value = value;
+				this.numCT = numCT;
+				this.numC = numC;
+				this.methy = new ObservationMethy(value.value);
+				methy.setCoverage(numCT);
+			}
+			
+			public BisulfiteGenomicLocHmm(String contig, int start, int end, ObservationMethy value, int numCT, int numC, int hmmState){
+				this.contig = contig;
+				this.start = start;
+				this.end = end;
+				this.value = value;
+				this.numCT = numCT;
+				this.numC = numC;
+				this.hmmState = hmmState;
+				this.position = new GenomeLocus(contig, start,end);
+			}
+			
+			public BisulfiteGenomicLocHmm(GenomeLocus position, ObservationMethy value, int numCT, int numC, int hmmState){
+				this.position = position;
+				this.contig = position.getChr();
+				this.start = position.getStart();
+				this.end = position.getEnd();
+				this.value = value;
+				this.numCT = numCT;
+				this.numC = numC;
+				this.hmmState = hmmState;
+			}
+			
+			public BisulfiteGenomicLocHmm(String contig, int start, int end, int numCT, int numC){
+				ObservationMethy v = new ObservationMethy((double)numC/(double)numCT);
+				new BisulfiteGenomicLocHmm(contig,  start,  end,  v,  numCT,  numC);
+			}
+
+		}
 		
 }

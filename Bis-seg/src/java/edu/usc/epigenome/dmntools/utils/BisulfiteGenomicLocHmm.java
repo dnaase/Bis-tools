@@ -57,6 +57,17 @@ public class BisulfiteGenomicLocHmm{
 		this.position = new GenomeLocus(contig, start,end);
 	}
 	
+	public BisulfiteGenomicLocHmm(GenomeLocus position, ObservationMethy value, int numCT, int numC, int hmmState){
+		this.position = position;
+		this.contig = position.getChr();
+		this.start = position.getStart();
+		this.end = position.getEnd();
+		this.value = value;
+		this.numCT = numCT;
+		this.numC = numC;
+		this.hmmState = hmmState;
+	}
+	
 	public BisulfiteGenomicLocHmm(String contig, int start, int end, int numCT, int numC){
 		ObservationMethy v = new ObservationMethy((double)numC/(double)numCT);
 		new BisulfiteGenomicLocHmm(contig,  start,  end,  v,  numCT,  numC);
