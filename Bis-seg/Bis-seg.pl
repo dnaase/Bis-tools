@@ -27,7 +27,7 @@ sub usage {
 	print STDERR "  --mem NUM : Specify the number of gigabytes in the memory to use (Default: 15).\n";
 	print STDERR "  --bed_format NUM : Specify the input bed format. 1: 6plus2 bed format. 2: standard bed format. (Default: 1).\n";
 	print STDERR "  --L FILE/STR: Specify the region for the training/decoding (Default: -L chr21 ).\n";
-	print STDERR "  --sig_test NUM: Specify the significant test used for p value calculation. 1: One way Binomial test. 2:Fisher exact test (Default: -sig_test 1).\n";
+	print STDERR "  --sig_test NUM: Specify the significant test used for p value calculation.1. permutation test 2: One way Binomial test. 3:Fisher exact test (Default: -sig_test 2).\n";
 	print STDERR "  --fdr NUM: False Discovery Rate (FDRs) criteria to call significant segment (Default: 0.01).\n\n";
 			
     exit(1);
@@ -44,7 +44,7 @@ chomp($result_dir);
 my $mem=15;
 my $region="chr21";
 my $bed_format=1;
-my $sig_test=1;
+my $sig_test=2;
 my $fdr=0.01;
 
 GetOptions( 
@@ -61,13 +61,14 @@ GetOptions(
 ##STEP 1: check parameters
 check_parameter(@ARGV);
 
-if($mode == 1 || $mode == 2){
+if($mode == 1){
+	training_decoding_hmm(@ARGV);
+}elsif($mode == 2){
 	training_hmm(@ARGV);
-}
-
-if($mode == 1 || $mode == 3){
+}elsif($mode == 3){
 	decoding_hmm(@ARGV);
 }
+
 
 
 ##########################################All Subroutines###############################################################
@@ -100,5 +101,14 @@ sub decoding_hmm{
 	$prefix = $result_dir."/$prefix";
 	my $cmd="java -Xmx${mem}g -jar $bistools_path/Bis-seg/NdrHmmHunter.jar $prefix $input -hmmFile $hmm -onlyDecode -sigTestMode $sig_test -L $region -bedFormat $bed_format -fdr $fdr -adjWindow 1000000 -minGCH 1 -beta\n";
 	system($cmd)==0 || die "Unexpected stop when decoding HMM: $! \n";
+}
+
+sub training_decoding_hmm{
+	my $prefix=shift @_;
+	my $input=shift @_;
+	my $hmm= $result_dir."/${prefix}.trainedHMM.model.txt";
+	$prefix = $result_dir."/$prefix";	
+	my $cmd="java -Xmx${mem}g -jar $bistools_path/Bis-seg/NdrHmmHunter.jar $prefix $input -hmmFile $hmm -sigTestMode $sig_test -L $region -bedFormat $bed_format -fdr $fdr -adjWindow 1000000 -minGCH 1 -beta\n";
+	system($cmd)==0 || die "Unexpected stop when training HMM: $! \n";
 }
 
