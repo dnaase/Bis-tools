@@ -24,26 +24,47 @@ chomp($bistools_path);
 if($bistools_path eq ""){
 	my $dir = `pwd`;
 	chomp($dir);
-	if( -e $ENV{"HOME"}."/.bash_profile"){
-		my $check=check_bistools_bash();
-		if( $check == 0){
-			my $cmd = "echo \$BISTOOLS\n";
-			$cmd = "echo \"export BISTOOLS=$dir\" >> ~/.bash_profile\n";
+	my $shell=$ENV{SHELL};
+	print "$shell\n";
+	if($shell=~/bash$/){
+		my $bash=$ENV{"HOME"}."/.bash_profile";
+		if( -e $bash){
+			my $check=check_bistools_bash($bash);
+			if( $check == 0){
+				my $cmd = "echo \$BISTOOLS\n";
+				$cmd = "echo \"export BISTOOLS=$dir\" >> $bash\n";
+				run_cmd($cmd);
+			}
+		}else{
+			my $cmd = "echo \"export BISTOOLS=$dir\" > $bash\n";
 			run_cmd($cmd);
 		}
-		
-		
-
-	}else{
-		my $cmd = "echo \"export BISTOOLS=$dir\" > ~/.bash_profile\n";
-		run_cmd($cmd);
+		print STDERR "please run command:  source ~/.bash_profile\n";
+	}elsif($shell=~/tcsh$/){
+		my $bash=$ENV{"HOME"}."/.tcshrc";
+		if( -e $bash){
+			my $check=check_bistools_bash($bash);
+			if( $check == 0){
+				my $cmd = "echo \$BISTOOLS\n";
+				$cmd = "echo \"setenv BISTOOLS \"$dir\"\" >> $bash\n";
+				run_cmd($cmd);
+			}
+		}else{
+			my $cmd = "echo \"setenv BISTOOLS \"$dir\"\" > $bash\n";
+			run_cmd($cmd);
+		}
+		print STDERR "please run command:  source ~/.tcshrc\n";
 	}
+	
+	
 	#my $cmd = "chmod 755 $ENV{\"HOME\"}/.bash_profile\n";
 	#run_cmd($cmd);
 	#$cmd = "/bin/bash $ENV{\"HOME\"}/.bash_profile\n";
 	#run_cmd($cmd);
-	print "please run command:  source ~/.bash_profile\n";
 	
+	
+}else{
+	print STDERR "Bis-tools has already been installed at $bistools_path\n";
 }
 #$bistools_path=`echo \$BISTOOLS`;
 #chomp($bistools_path);
@@ -70,6 +91,7 @@ sub run_cmd{
 }
 
 sub check_bistools_bash{
+	my $bash=shift @_;
 	open(FH,"< $ENV{\"HOME\"}/.bash_profile") or die "can't open .bash_profile files:$!\n";
 	while(<FH>){
 		chomp;
