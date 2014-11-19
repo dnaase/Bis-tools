@@ -25,28 +25,33 @@ if($bistools_path eq ""){
 	my $dir = `pwd`;
 	chomp($dir);
 	if( -e $ENV{"HOME"}."/.bash_profile"){
-		my $cmd = "echo \$BISTOOLS\n";
-		$cmd = "echo \"export BISTOOLS=$dir\" >> ~/.bash_profile\n";
-		print STDERR $cmd;
-		system($cmd)==0 || die "can't add BISTOOLS variable into bash profile:$!\n";
+		my $check=check_bistools_bash();
+		if( $check == 0){
+			my $cmd = "echo \$BISTOOLS\n";
+			$cmd = "echo \"export BISTOOLS=$dir\" >> ~/.bash_profile\n";
+			run_cmd($cmd);
+		}
+		
 		
 
 	}else{
 		my $cmd = "echo \"export BISTOOLS=$dir\" > ~/.bash_profile\n";
-		print STDERR $cmd;
-		system($cmd)==0 || die "can't write BISTOOLS variable into bash profile:$!\n";
+		run_cmd($cmd);
 	}
-	my $cmd = "source $ENV{\"HOME\"}/.bash_profile\n";
-	print STDERR $cmd;
-	system($cmd)==0 || die "can't excute bash profile:$!\n";
+	#my $cmd = "chmod 755 $ENV{\"HOME\"}/.bash_profile\n";
+	#run_cmd($cmd);
+	#$cmd = "/bin/bash $ENV{\"HOME\"}/.bash_profile\n";
+	#run_cmd($cmd);
+	print "please run command:  source ~/.bash_profile\n";
+	
 }
-$bistools_path=`echo \$BISTOOLS`;
-chomp($bistools_path);
+#$bistools_path=`echo \$BISTOOLS`;
+#chomp($bistools_path);
 ### chmod the script to be excutable
 
 
 ##########install dependent external software
-install_fastqmcf();
+#install_fastqmcf();
 
 
 sub install_fastqmcf{
@@ -58,3 +63,22 @@ sub install_fastqmcf{
 	#`PREFIX=$bistools_path/External_tools/ea-utils/ make install`;
 }
 
+sub run_cmd{
+	my $cmd=shift @_;
+	print STDERR $cmd;
+	system($cmd)==0 || die "can't excute command $cmd : $!\n";
+}
+
+sub check_bistools_bash{
+	open(FH,"< $ENV{\"HOME\"}/.bash_profile") or die "can't open .bash_profile files:$!\n";
+	while(<FH>){
+		chomp;
+		if($_=~/export BISTOOLS/){
+			print STDERR "BISTOOLS variable has already been specified!\n";
+			print STDERR "$_\n";
+			return 1;
+		}
+	}
+	close(FH);
+	return 0;
+}
