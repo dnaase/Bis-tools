@@ -1,5 +1,6 @@
 package edu.usc.epigenome.uecgatk.bissnp.writer;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.broad.tribble.annotation.Strand;
@@ -17,7 +18,12 @@ public class bedObject implements genomeObject {
 		this.chr = chr;
 		this.start = start;
 		this.end = end;
-		this.values = values;
+		if(values == null){
+			this.values = new ArrayList<Object>();
+		}else{
+			this.values = values;
+		}
+		
 
 	}
 
@@ -26,8 +32,12 @@ public class bedObject implements genomeObject {
 		this.chr = chr;
 		this.start = start;
 		this.end = end;
-		this.values = values;
 		this.strand = strand;
+		if(values == null){
+			this.values = new ArrayList<Object>();
+		}else{
+			this.values = values;
+		}
 	}
 
 	@Override
@@ -60,6 +70,10 @@ public class bedObject implements genomeObject {
 	public List<Object> getValueObject() {
 		// TODO Auto-generated method stub
 		return values;
+	}
+	
+	public void addValue(Object v) {
+		values.add(v);
 	}
 
 }

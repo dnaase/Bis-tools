@@ -276,8 +276,8 @@ public abstract class HmmHunter {
 				  }  
 				  catch(NumberFormatException nfe)  
 				  {  
-					  throw new Exception("NumberFormatException\n");
-					 // continue;  
+					  //throw new Exception("NumberFormatException\n");
+					  continue;  
 				  } 
 				
 				
