@@ -72,8 +72,24 @@ public class bedObject implements genomeObject {
 		return values;
 	}
 	
+	public void setValueObject(List<Object> values) {
+		// TODO Auto-generated method stub
+		 this.values = values;
+	}
+	
 	public void addValue(Object v) {
 		values.add(v);
+	}
+	
+	public String toString() {
+		String line = chr + "\t" + start + "\t" + end + "\t" + strand;
+		if(values.size()>0){
+			for(Object o : values){
+				line = line + "\t" + o.toString();
+			}
+		}
+		line += "\n";
+		return line;
 	}
 
 }
