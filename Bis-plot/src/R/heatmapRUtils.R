@@ -132,6 +132,8 @@ plotMultiWigToHeatmapPlusAveInSingleLoc<-function(files, sampleNames, prefix="te
 	#heatMapCols<-heatMapCols[-fileNumToOrder]
 	for(i in 1:length(dataSummaryFrame$name)){
 		tmpColor<-heatMapCols[-fileNumToOrder]
+		tmpUpLimit<-capUpLimit[-fileNumToOrder]
+		tmpDownLimit<-capDownLimit[-fileNumToOrder]
 		##plot title
 		plot.new()
 		par(mar=c(0.5, 0.5, 0.5, 0.5),usr=c(0,1,0,1))
@@ -144,7 +146,7 @@ plotMultiWigToHeatmapPlusAveInSingleLoc<-function(files, sampleNames, prefix="te
 		
 		##plot average plot
 		if(addAverage){
-			plotAverage(dataSummaryFrame$average, i, xAxisScale=c(-scale,scale),xStep=scale,yAxisScale=c(capDownLimit[i],capUpLimit[i]),yStep=(capUpLimit[i]-capDownLimit[i])/2)
+			plotAverage(dataSummaryFrame$average, i, xAxisScale=c(-scale,scale),xStep=scale,yAxisScale=c(tmpDownLimit[i],tmpUpLimit[i]),yStep=(tmpUpLimit[i]-tmpDownLimit[i])/2)
 		}
 		
 	}
@@ -215,6 +217,8 @@ plotMultiWigToHeatmapPlusAveInSingleLoc<-function(files, sampleNames, prefix="te
 	#heatMapCols<-heatMapCols[-fileNumToOrder]
 	for(i in 1:length(dataSummaryFrame$name)){
 		tmpColor<-heatMapCols[-fileNumToOrder]
+		tmpUpLimit<-capUpLimit[-fileNumToOrder]
+		tmpDownLimit<-capDownLimit[-fileNumToOrder]
 		##plot title
 		plot.new()
 		par(mar=c(0.5, 0.5, 0.5, 0.5),usr=c(0,1,0,1))
@@ -227,7 +231,7 @@ plotMultiWigToHeatmapPlusAveInSingleLoc<-function(files, sampleNames, prefix="te
 		
 		##plot average plot
 		if(addAverage){
-			plotAverage(dataSummaryFrame$average, i, xAxisScale=c(-scale,scale),xStep=scale, yAxisScale=c(capDownLimit[i],capUpLimit[i]),yStep=(capUpLimit[i]-capDownLimit[i])/2)
+			plotAverage(dataSummaryFrame$average, i, xAxisScale=c(-scale,scale),xStep=scale, yAxisScale=c(tmpDownLimit[i],tmpUpLimit[i]),yStep=(tmpUpLimit[i]-tmpDownLimit[i])/2)
 		}
 		
 	}
@@ -738,7 +742,7 @@ plotHeatmap<-function(x, categoryNum,addNumber=FALSE, xAxisScale=c(-5000,5000), 
 ##TODO: need to make plot multiple sidebar possible...
 plotSideBar<-function(subClusterOrder,rowOrder, horizontal=TRUE){
 	par(mar=c(1.5,0,1.5,0),usr=c(0,1,0,1))
-	subClusterColors<-c("red","blue","cyan","orange","black","cyan","purple","palegreen3","yellow","lightpink2","ivory4")
+	subClusterColors<-c("red","blue","orange","black","cyan","purple","palegreen3","yellow","lightpink2","ivory4")
 	subClusterColBar=subClusterColors[subClusterOrder]
 	names(subClusterColBar)=names(subClusterOrder)
 	subClusterColBar=subClusterColBar[rowOrder]
@@ -762,7 +766,7 @@ plotSideBar<-function(subClusterOrder,rowOrder, horizontal=TRUE){
 
 plotMultipleSideBar<-function(subClusterOrder,rowOrder, horizontal=TRUE, heatmap_anno=NULL, heatmap_anno_col=c("black"), heatmap_anno_name="test",maxGap=1){
 	par(mar=c(1.5,0,1.5,0),usr=c(0,1,0,1))
-	subClusterColors<-c("red","blue","cyan","orange","black","purple","green","palegreen3","yellow","lightpink2","ivory4")
+	subClusterColors<-c("red","blue","orange","black","cyan","purple","palegreen3","yellow","lightpink2","ivory4")
 	subClusterColBar=subClusterColors[subClusterOrder]
 	names(subClusterColBar)=names(subClusterOrder)
 	subClusterColBar=subClusterColBar[rowOrder]
@@ -856,7 +860,7 @@ plotKey<-function(zlim,col=colorRampPalette(white2red)(100), title="Density"){
 }
 
 plotAverage<-function(x, categoryNum, xAxisScale=c(-5000,5000), xStep=5000, yAxisScale=c(0,100),yStep=50, label=TRUE, heatmap_autoscale=FALSE,
-		subClusterColors=c("red","blue","cyan","orange","black","purple","palegreen3","yellow","lightpink2","ivory4")){
+		subClusterColors=c("red","blue","orange","black","cyan","purple","palegreen3","yellow","lightpink2","ivory4")){
 	
 	axisSeqForPlot<-seq(xAxisScale[1], xAxisScale[2], by=xStep)	
 	d<-x[categoryNum,,]
