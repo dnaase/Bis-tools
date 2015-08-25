@@ -133,16 +133,7 @@ my $location_after_adjust_center = "";
 my @motif_freq = ();
 my $auto_scale = "";
 my $mask_matrix = "";
-<<<<<<< HEAD
 my $mask_overlap_interval = "";
-my $r_script = "~/compbio/code/mytools/R/MultipleWigPatternOverBedPlot.R";
-my $heatmap_r_script = "~/compbio/code/mytools/R/calcHeatmapForAlignWig2Bed.R";
-my $heatmap_with_reps_r_script ="~/compbio/code/mytools/R/MultipleWigToHeatmapPlusAve.R";
-#my $heatmap_with_reps_r_script ="/home/rcf-40/yapingli/storage/code/mytools/R/MultipleWigToHeatmapPlusAve.PaperFigure1.R";
-my $densitybar_r_script = "~/compbio/code/mytools/R/MultipleWigToDensityBar.2.R";
-my $ucsc_script = "~/compbio/software/UCSC_tools/bigWigSummary";
-my $sort_perl_script = "~/compbio/code/mytools/perl/sortByRefAndCor.pl";
-=======
 my $r_script = "$bistools_path/Bis-plot/src/R/MultipleWigPatternOverBedPlot.R";
 my $heatmap_r_script = "$bistools_path/Bis-plot/src/R/calcHeatmapForAlignWig2Bed.R";
 my $heatmap_with_reps_r_script ="$bistools_path/Bis-plot/src/R/MultipleWigToHeatmapPlusAve.R";
@@ -150,7 +141,6 @@ my $heatmap_with_reps_r_script ="$bistools_path/Bis-plot/src/R/MultipleWigToHeat
 my $densitybar_r_script = "$bistools_path/Bis-plot/src/R/MultipleWigToDensityBar.2.R";
 my $ucsc_script = "$bistools_path/External_tools/ucsc_tools/bigWigSummary";
 my $sort_perl_script = "$bistools_path/utils/sortByRefAndCor.pl";
->>>>>>> 2ba5cc4df983733d88aca5d53d12556729042a3b
 my $result_dir = `pwd`;
 chomp($result_dir);
 $result_dir.="/";
