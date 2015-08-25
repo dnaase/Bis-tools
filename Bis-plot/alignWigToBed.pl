@@ -13,7 +13,7 @@
 ##pure NOME-seq
 ##perl /home/rcf-40/yapingli/storage/code/mytools/perl/alignWigToBed.pl --result_dir /export/uec-gs1/laird/users/yaping/code/NOMeseq/MethyPatternFeatureWalker/HCT116_hg19/MethyPatternResult/ /export/uec-gs1/laird/users/yaping/code/NOMeseq/MethyPatternFeatureWalker/HCT116_hg19/MethyPatternResult/tss_all/Cluster4.heatmap.NONCGI_TSS.knownGene-tss-UCSC062409-unique.non_irizarry2009_cgi.DKO1_merge_C118BACXX_C18G4ACXX_C1F6FACXX.alignedTo.knownGene.1200.GCH.txt.bed testHeatmap /export/uec-gs1/laird/users/yaping/data/Fides/bam/HCT116/merge_C118BACXX_C18FYACXX_C18G4ACXX_C1F6FACXX/DKO1_merge_C118BACXX_C18G4ACXX_C1F6FACXX.hg19_rCRSchrm.fa.mdups.realign.recal.clean.cytosine.filtered.sort.BisSNP-0.81.GCH.bw /export/uec-gs1/laird/users/yaping/data/Fides/bam/HCT116/merge_C118BACXX_C18FYACXX_C18G4ACXX_C1F6FACXX/DKO1_merge_C118BACXX_C18G4ACXX_C1F6FACXX.hg19_rCRSchrm.fa.mdups.realign.recal.clean.cytosine.filtered.sort.BisSNP-0.81.HCG.bw /export/uec-gs1/laird/users/yaping/data/Fides/bam/HCT116/merge_C118BACXX_C18FYACXX_C18G4ACXX_C1F6FACXX/HCT116_merge_C118BACXX_C18FYACXX_D1W2BACXX.fastq-mcf.hg19.mdups.header.clean.realign.recal.cytosine.filtered.sort.BisSNP-0.81.1.GCH.bw /export/uec-gs1/laird/users/yaping/data/Fides/bam/HCT116/merge_C118BACXX_C18FYACXX_C18G4ACXX_C1F6FACXX/HCT116_merge_C118BACXX_C18FYACXX_D1W2BACXX.fastq-mcf.hg19.mdups.header.clean.realign.recal.cytosine.filtered.sort.BisSNP-0.81.1.HCG.bw --nomeseq --heatmap --omit_align_step --heatmap_anno /export/uec-gs1/laird/users/yaping/code/NOMeseq/NDR/HMM/HCT116_hg19/merge_C118BACXX_C18FYACXX_C18G4ACXX_C1F6FACXX/methy_plot/DKO1_NDR.fdr0.01.MARsMergedIn80bp.sort.bed --heatmap_anno /export/uec-gs1/laird/users/yaping/code/NOMeseq/NDR/HMM/HCT116_hg19/merge_C118BACXX_C18FYACXX_C18G4ACXX_C1F6FACXX/methy_plot/HCT116_NDR.fdr0.01.MARsMergedIn80bp.sort.bed --heatmap_anno_col blue --heatmap_anno_col red --heatmap_anno_name Cluster --heatmap_anno_name DKO1_NDR --heatmap_anno_name HCT116_NDR
 #NOME-seq as clustering order, then plot chip-seq heatmap
-##perl /home/rcf-40/yapingli/storage/code/mytools/perl/alignWigToBed.pl --result_dir /export/uec-gs1/laird/users/yaping/code/NOMeseq/MethyPatternFeatureWalker/HCT116_hg19/MethyPatternResult/ /export/uec-gs1/laird/users/yaping/code/NOMeseq/MethyPatternFeatureWalker/HCT116_hg19/MethyPatternResult/tss_all/Cluster4.heatmap.NONCGI_TSS.knownGene-tss-UCSC062409-unique.non_irizarry2009_cgi.DKO1_merge_C118BACXX_C18G4ACXX_C1F6FACXX.alignedTo.knownGene.1200.GCH.txt.bed testHeatmap /export/uec-gs1/laird/users/yaping/data/Fides/bam/HCT116/merge_C118BACXX_C18FYACXX_C18G4ACXX_C1F6FACXX/DKO1_merge_C118BACXX_C18G4ACXX_C1F6FACXX.hg19_rCRSchrm.fa.mdups.realign.recal.clean.cytosine.filtered.sort.BisSNP-0.81.GCH.bw /export/uec-gs1/laird/users/yaping/data/Fides/chip_seq/wiggler_result/DKO1_H2AZ_D1ALAACXX_5_KEL656A210.bw /export/uec-gs1/laird/users/yaping/data/Fides/chip_seq/wiggler_result/DKO1_Input_D1GW4ACXX_5_KEL656A225.bw  --auto_scale --data_matrix_scale 5200 --plot_x_axis_scale 5000 --plot_x_axis_step 2500 --bin_size_align 20 --colors black --colors red --colors orange  --lengends DKO1_GCH --lengends DKO1_KEL656A239 --lengends DKO1_KEL656A210 --heatmap --heatmap_anno /export/uec-gs1/laird/users/yaping/code/NOMeseq/NDR/HMM/HCT116_hg19/merge_C118BACXX_C18FYACXX_C18G4ACXX_C1F6FACXX/methy_plot/DKO1_NDR.fdr0.01.MARsMergedIn80bp.sort.bed --heatmap_anno /export/uec-gs1/laird/users/yaping/code/NOMeseq/NDR/HMM/HCT116_hg19/merge_C118BACXX_C18FYACXX_C18G4ACXX_C1F6FACXX/methy_plot/HCT116_NDR.fdr0.01.MARsMergedIn80bp.sort.bed --heatmap_anno_col blue --heatmap_anno_col red --heatmap_anno_name Cluster --heatmap_anno_name DKO1_NDR --heatmap_anno_name HCT116_NDR  --omit_align_step --heatmap_capLimit F --heatmap_capLimit T --heatmap_capLimit T --heatmap_keys T --heatmap_keys T --heatmap_keys F --heatmap_ylab Accessibility --heatmap_ylab Tag_density --heatmap_ylab Tag_density --heatmap_col white2darkgreen --heatmap_col white2red --heatmap_col white2red  
+##perl /home/rcf-40/yapingli/storage/code/mytools/perl/alignWigToBed.pl --result_dir /export/uec-gs1/laird/users/yaping/code/NOMeseq/MethyPatternFeatureWalker/HCT116_hg19/MethyPatternResult/ /export/uec-gs1/laird/users/yaping/code/NOMeseq/MethyPatternFeatureWalker/HCT116_hg19/MethyPatternResult/tss_all/Cluster4.heatmap.NONCGI_TSS.knownGene-tss-UCSC062409-unique.non_irizarry2009_cgi.DKO1_merge_C118BACXX_C18G4ACXX_C1F6FACXX.alignedTo.knownGene.1200.GCH.txt.bed testHeatmap /export/uec-gs1/laird/users/yaping/data/Fides/bam/HCT116/merge_C118BACXX_C18FYACXX_C18G4ACXX_C1F6FACXX/DKO1_merge_C118BACXX_C18G4ACXX_C1F6FACXX.hg19_rCRSchrm.fa.mdups.realign.recal.clean.cytosine.filtered.sort.BisSNP-0.81.GCH.bw /export/uec-gs1/laird/users/yaping/data/Fides/chip_seq/wiggler_result/DKO1_H2AZ_D1ALAACXX_5_KEL656A210.bw /export/uec-gs1/laird/users/yaping/data/Fides/chip_seq/wiggler_result/DKO1_Input_D1GW4ACXX_5_KEL656A225.bw  --auto_scale --data_matrix_scale 5200 --plot_x_axis_scale 5000 --plot_x_axis_step 2500 --bin_size_align 20 --colors black --colors red --colors orange  --lengends DKO1_GCH --lengends DKO1_KEL656A239 --lengends DKO1_KEL656A210 --heatmap --heatmap_anno /export/uec-gs1/laird/users/yaping/code/NOMeseq/NDR/HMM/HCT116_hg19/merge_C118BACXX_C18FYACXX_C18G4ACXX_C1F6FACXX/methy_plot/DKO1_NDR.fdr0.01.MARsMergedIn80bp.sort.bed --heatmap_anno /export/uec-gs1/laird/users/yaping/code/NOMeseq/NDR/HMM/HCT116_hg19/merge_C118BACXX_C18FYACXX_C18G4ACXX_C1F6FACXX/methy_plot/HCT116_NDR.fdr0.01.MARsMergedIn80bp.sort.bed --heatmap_anno_col blue --heatmap_anno_col red --heatmap_anno_name Cluster --heatmap_anno_name DKO1_NDR --heatmap_anno_name HCT116_NDR  --omit_align_step --heatmap_capLimit F --heatmap_capLimit T --heatmap_capLimit T --heatmap_keys T --heatmap_keys T --heatmap_keys F --heatmap_ylab Accessibility --heatmap_ylab Tag_density --heatmap_ylab Tag_density --heatmap_col white2darkgreen --heatmap_col white2red --heatmap_col white2red
 #NOME-seq as clustering order, then plot motif frequency heatmap
 ##perl /home/rcf-40/yapingli/storage/code/mytools/perl/alignWigToBed.pl --result_dir /export/uec-gs1/laird/users/yaping/code/NOMeseq/MethyPatternFeatureWalker/HCT116_hg19/MethyPatternResult/ /export/uec-gs1/laird/users/yaping/code/NOMeseq/MethyPatternFeatureWalker/HCT116_hg19/MethyPatternResult/tss_all/Cluster4.heatmap.NONCGI_TSS.knownGene-tss-UCSC062409-unique.non_irizarry2009_cgi.DKO1_merge_C118BACXX_C18G4ACXX_C1F6FACXX.alignedTo.knownGene.1200.GCH.txt.bed testHeatmap /export/uec-gs1/laird/users/yaping/data/Fides/bam/HCT116/merge_C118BACXX_C18FYACXX_C18G4ACXX_C1F6FACXX/DKO1_merge_C118BACXX_C18G4ACXX_C1F6FACXX.hg19_rCRSchrm.fa.mdups.realign.recal.clean.cytosine.filtered.sort.BisSNP-0.81.GCH.bw /export/uec-gs1/laird/users/yaping/data/Fides/chip_seq/wiggler_result/DKO1_H2AZ_D1ALAACXX_5_KEL656A210.bw /export/uec-gs1/laird/users/yaping/code/NOMeseq/motifFreq/CG.frequency.hg19_rCRSchrm.fa.bw  --auto_scale --data_matrix_scale 5200 --plot_x_axis_scale 5000 --plot_x_axis_step 2500 --bin_size_align 20 --colors black --colors red --colors orange  --lengends DKO1_GCH --lengends DKO1_KEL656A239 --lengends CG_freq --heatmap --heatmap_anno /export/uec-gs1/laird/users/yaping/code/NOMeseq/NDR/HMM/HCT116_hg19/merge_C118BACXX_C18FYACXX_C18G4ACXX_C1F6FACXX/methy_plot/DKO1_NDR.fdr0.01.MARsMergedIn80bp.sort.bed --heatmap_anno /export/uec-gs1/laird/users/yaping/code/NOMeseq/NDR/HMM/HCT116_hg19/merge_C118BACXX_C18FYACXX_C18G4ACXX_C1F6FACXX/methy_plot/HCT116_NDR.fdr0.01.MARsMergedIn80bp.sort.bed --heatmap_anno_col blue --heatmap_anno_col red --heatmap_anno_name Cluster --heatmap_anno_name DKO1_NDR --heatmap_anno_name HCT116_NDR --heatmap_capLimit F --heatmap_capLimit T --heatmap_capLimit F --heatmap_keys T --heatmap_keys T --heatmap_keys T --heatmap_ylab Accessibility --heatmap_ylab Tag_density --heatmap_ylab CG_density --heatmap_col white2darkgreen --heatmap_col white2red --heatmap_col white2red --motif_freq 0 --motif_freq 0 --motif_freq 1 --heatmap_autoscale F --heatmap_autoscale T --heatmap_autoscale T --omit_align_step
 ##pure ChIP-seq. clustering/sorting by some of the files
@@ -29,24 +29,24 @@ sub usage {
     print STDERR "perl alignWigToBed.pl [Options] prefix input1.bw input2.bw ...\n\n";
 
     print STDERR " align big wig file in to genome feature bed file\n";
-   
+
     print STDERR " All the scripts should be put under the same directory. It requires R installed in your machine\n";
-	
+
 	print STDERR "  [Options]:\n\n";
  	print STDERR " #####General option:\n\n";
- 	
+
  	print STDERR "  --locs FILES: the genomic feature's location files, which the big wig files will be aligned to. It should be bed/gtf/gff/bedgraph format. It allows multiple input.(Required!)\n\n";
  	print STDERR "  --prefixs STR: the prefix name used for each of the --locs files. It allows multiple input.(Required!)\n\n";
  	print STDERR "  --coverages FILES: the coverage file, once it provided for alignment mode 4, it will adjusted value by coverage. use total_num_C/total_num_CT for mean value in that region. (should be the same order as input big wig files)\n";
  	print STDERR "                     the output line will be methy_perc, num_CT, num_cytosine_pattern \n\n";
- 	 		
+
  	print STDERR " #####Alignment options:\n\n";
 	print STDERR "  --nomeseq : when specified, it will automately generate legend and use default colors, GCH should be input first, HCG later\n\n";
 	print STDERR "  --low_coverage : when specified, it will eable the low coverage mode. input1.bw will be methy level, input2.bw will be number of total reads. then for each bin, it will pool all of C reads & total reads to calculate methy level\n\n";
 	print STDERR "  --standard_bed : when specified, it will output standard bed format with name and score column\n\n";
-	
+
 	print STDERR "  --include_no_data_line : when specified, it will output line with no data point completely\n\n";
-	
+
 	print STDERR "  --adjust_center NUM: when specified, it will automately using 40bp sliding window to detect the local lowest point to realign the value to the new lowest point as a center. NUM is the value of region range to detect lowest point\n\n";
 	print STDERR "  --adjust_to_highest: when specified, it will detect the local highest point rather than the lowest point \n\n";
 	print STDERR "  --adjust_center_window NUM:  the sliding window size to detect lowest point nearyby. (Default: 100)\n\n";
@@ -62,9 +62,9 @@ sub usage {
     print STDERR "  --result_dir DIR :   directory to store alignment matrix results and plots\n\n";
     print STDERR "  --smooth : enable smooth around bin_size region, e.g. each data point represent the avergae of methylation value around 20bp\n\n";
  	print STDERR "  --use_COMPARE : when specified, it will use COMPARE to correct the bias of average\n\n";
- 
+
  	print STDERR " #####Average plot options:\n\n";
- 	   
+
     print STDERR "  --data_matrix_scale NUM :   the maximum distance to the feature center/alignment start loci. e.g. 2000 means +/- 2kb around\n";
     print STDERR "                              (Default: plot_x_axis_scale + 10*bin_size)\n\n";
     print STDERR "  --bin_size NUM : bin size(bp) to average for each data point. (Default: 20)\n\n";
@@ -84,7 +84,7 @@ sub usage {
 	print STDERR "                         4) give the summary on the bed/gtf/gff file given region\n";
 	print STDERR "                         5) give the closest single value in the data_matrix defined region\n";
 	print STDERR "                         6) scale the data on the bed/gtf/gff file given region (like avgerage plot across gene body), it will seperate the region into data_matrix_scale/bin_size_align+1 data point and then extend to +/- data_matrix_scale/bin_size_align of this region\n\n";
-				
+
 	print STDERR " #####Heatmap options:\n\n";
 	print STDERR "  --heatmap : when specified, it will automately generate heatmap, the order will be the same as the first input.bw\n";
 	print STDERR "  --heatmap_anno FILE : provide the annotation file for heatmap side bar. file names could be mutliple, but need to be standard bed format\n";
@@ -96,7 +96,7 @@ sub usage {
 	print STDERR "  --preClustering : if specified, it will use both of samples to do clustering, if --twoStepClustering is not \n\n";
 	print STDERR "  --twoStepClustering : if specified, it will use DNA methylation data and Accessibility data in both of samples to do clustering\n\n";
 	print STDERR "  --multiSampleClustering NUM: if specified, it will use multiple samples to do clustering. It allow multiple input. --multiSampleClustering 1 --multiSampleClusterin 3 (Default: 1)\n\n";
-	
+
 	print STDERR " #####Heat density bar plot options:\n\n";
 	print STDERR "  --density_bar: when specified, it will automately generate heat density bar plotinput1.bw would become sample1.filelist.txt,sample2.filelist.txt.. each file list contain all the experiment in each sample, the location to store aligned matrix, the file data type(percentage, enrichment)\n\n";
 	print STDERR "  --category_names STR: names represent each location file, could be multiple\n\n";
@@ -107,13 +107,17 @@ sub usage {
 	print STDERR "  --logscale: when specified, it will apply log2 scale for enrichment type experiment (e.g. chip-seq). (Default: Not enabled)\n\n";
 	print STDERR "  --capLimit NUM: when specified, it will capLimit the up NUM part of the data to avoid the outlier for enrichment type experiment (e.g. chip-seq). (Default: -1)\n\n";
 	print STDERR "  --median : when specified, it will use median rather than mean value for enrichment type experiment (e.g. chip-seq). (Default: not enabled)\n\n";
-	
-	
-	
+
+
+
     exit(1);
 }
 
 ##default option setting
+my $bistools_path=`echo \$BISTOOLS`;
+chomp($bistools_path);
+
+
 my @locs=();
 my @prefixs=();
 my @coverages=();
@@ -129,13 +133,24 @@ my $location_after_adjust_center = "";
 my @motif_freq = ();
 my $auto_scale = "";
 my $mask_matrix = "";
-my $r_script = "/home/rcf-40/yapingli/storage/code/mytools/R/MultipleWigPatternOverBedPlot.R";
-my $heatmap_r_script = "/home/rcf-40/yapingli/storage/code/mytools/R/calcHeatmapForAlignWig2Bed.R";
-my $heatmap_with_reps_r_script ="/home/rcf-40/yapingli/storage/code/mytools/R/MultipleWigToHeatmapPlusAve.R";
+<<<<<<< HEAD
+my $mask_overlap_interval = "";
+my $r_script = "~/compbio/code/mytools/R/MultipleWigPatternOverBedPlot.R";
+my $heatmap_r_script = "~/compbio/code/mytools/R/calcHeatmapForAlignWig2Bed.R";
+my $heatmap_with_reps_r_script ="~/compbio/code/mytools/R/MultipleWigToHeatmapPlusAve.R";
 #my $heatmap_with_reps_r_script ="/home/rcf-40/yapingli/storage/code/mytools/R/MultipleWigToHeatmapPlusAve.PaperFigure1.R";
-my $densitybar_r_script = "/home/rcf-40/yapingli/storage/code/mytools/R/MultipleWigToDensityBar.2.R";
-my $ucsc_script = "/home/uec-00/shared/production/software/UCSC_Browser_Tools/default/bigWigSummary";
-my $sort_perl_script = "/home/rcf-40/yapingli/storage/code/mytools/perl/sortByRefAndCor.pl";
+my $densitybar_r_script = "~/compbio/code/mytools/R/MultipleWigToDensityBar.2.R";
+my $ucsc_script = "~/compbio/software/UCSC_tools/bigWigSummary";
+my $sort_perl_script = "~/compbio/code/mytools/perl/sortByRefAndCor.pl";
+=======
+my $r_script = "$bistools_path/Bis-plot/src/R/MultipleWigPatternOverBedPlot.R";
+my $heatmap_r_script = "$bistools_path/Bis-plot/src/R/calcHeatmapForAlignWig2Bed.R";
+my $heatmap_with_reps_r_script ="$bistools_path/Bis-plot/src/R/MultipleWigToHeatmapPlusAve.R";
+#my $heatmap_with_reps_r_script ="$bistools_path/Bis-plot/src/R/MultipleWigToHeatmapPlusAve.PaperFigure1.R";
+my $densitybar_r_script = "$bistools_path/Bis-plot/src/R/MultipleWigToDensityBar.2.R";
+my $ucsc_script = "$bistools_path/External_tools/ucsc_tools/bigWigSummary";
+my $sort_perl_script = "$bistools_path/utils/sortByRefAndCor.pl";
+>>>>>>> 2ba5cc4df983733d88aca5d53d12556729042a3b
 my $result_dir = `pwd`;
 chomp($result_dir);
 $result_dir.="/";
@@ -155,7 +170,7 @@ my $alignment_mode = 1;
 my $data_matrix_scale = $plot_x_axis_scale + 10*$bin_size;
 #my $data_matrix_scale = 2000;
 my @lengends=();
- 
+
 
 my $heatmap="";
 my $heatmap_with_reps="";
@@ -210,7 +225,7 @@ print STDERR "perl alignWigToBed.pl ";
 my $cmd_root=join " ", @ARGV;
 print STDERR "$cmd_root\n\n";
 
-GetOptions( 
+GetOptions(
 			"locs=s" => \@locs,
 			"prefixs=s" => \@prefixs,
 			"coverages=s" => \@coverages,
@@ -225,6 +240,7 @@ GetOptions(
 			"location_after_adjust_center=s" => \$location_after_adjust_center,
 			"motif_freq=i" => \@motif_freq,
 			"mask_matrix=s" => \$mask_matrix,
+      "mask_overlap_interval" => \$mask_overlap_interval,
 			"r_script=s" => \$r_script,
 			"ucsc_script=s" => \$ucsc_script,
 			"sort_perl_script=s" => \$sort_perl_script,
@@ -233,7 +249,7 @@ GetOptions(
 			"data_matrix_scale=i" => \$data_matrix_scale,
 			"bin_size=i" => \$bin_size,
 			"bin_size_align=i" => \$bin_size_align,
-			
+
 			"average" => \$average,
 			"auto_scale" => \$auto_scale,
 			"plot_x_axis_scale=i" => \$plot_x_axis_scale,
@@ -251,7 +267,7 @@ GetOptions(
 			"heatmap_anno_name=s" => \@heatmap_anno_name,
 			"heatmap_col=s" => \@heatmap_col,
 			"heatmap_cluster=i" => \@heatmap_cluster,
-			
+
 			"heatmap_with_reps" => \$heatmap_with_reps,
 			"addAverage" => \$addAverage,
 			"heatmap_keys=s" => \@heatmap_keys,
@@ -276,19 +292,19 @@ GetOptions(
 			"heatmap_clustering_bin_size_align=i" => \$heatmap_clustering_bin_size_align,
 			"heatmap_file_num_to_cluster=i" => \@heatmap_file_num_to_cluster,
 			"heatmap_normalization_by_mean" => \$heatmap_normalization_by_mean,
-			"heatmap_row_order=s" => \$heatmap_row_order, 
+			"heatmap_row_order=s" => \$heatmap_row_order,
 			"heatmap_max_occ_order" => \$heatmap_max_occ_order,
 			"multiSampleClustering=i" => \@multiSampleClustering,
 			"not_plot_index_matrix" => \$not_plot_index_matrix,
 			"heatmap_breaks=i" => \$heatmap_breaks,
 			"order_dendgram=i" => \@order_dendgram,
-			
+
 			"density_bar" => \$density_bar,
 			"category_names=s" => \@category_names,
 			"sample_names=s" => \@sample_names,
 			"experiment_names=s" => \@experiment_names,
 			"rep_num_experiments=i" => \@rep_num_experiments,
-			
+
 			"enrich_max=f" => \$enrich_max,
 			"logscale" => \$logscale,
 			"capLimit=f" => \$capLimit,
@@ -354,7 +370,7 @@ else{
 	for(my $z=0;$z<scalar(@locs);$z++){
 		for(my $ord=1;$ord<=scalar(@input_wigs);$ord++){
 					push(@heatmap_cluster, $tmp[$z]);
-		}	
+		}
 	}
 }
 
@@ -372,13 +388,13 @@ if($density_bar ne "" || $heatmap_with_reps ne ""){
 
 for(my $z=0;$z<scalar(@locs);$z++){
 	my $feature = $locs[$z];
-	my $prefix = $prefixs[$z];	
+	my $prefix = $prefixs[$z];
 	my @order=();
 	if($nomeseq ne ""){
 	##default setting for NOMe-seq average plot
 	my $step_tmp=4;
 	if($low_coverage ne ""){
-		$step_tmp=8;	
+		$step_tmp=8;
 	}
 	if(scalar(@order)<=0){
 		for(my $ord=1;$ord<=scalar(@input_wigs)*scalar(@locs);$ord+=$step_tmp){
@@ -392,14 +408,14 @@ for(my $z=0;$z<scalar(@locs);$z++){
 				push(@order, "GCH_cov");
 				push(@order, "GCH");
 				push(@order, "GCH_cov");
-				
+
 				}
 				else{
 				push(@order, "HCG");
 				push(@order, "HCG");
 				push(@order, "GCH");
 				push(@order, "GCH");
-				
+
 				}
 			}
 			else{
@@ -408,17 +424,17 @@ for(my $z=0;$z<scalar(@locs);$z++){
 				push(@order, "HCG_cov");
 				push(@order, "GCH");
 				push(@order, "GCH_cov");
-				
+
 				}
 				else{
 					push(@order, "HCG");
 					push(@order, "GCH");
-					
+
 				}
 			}
-			
-			
-			
+
+
+
 		}
 	}
 	if(scalar(@lengends)<=0){
@@ -435,14 +451,14 @@ for(my $z=0;$z<scalar(@locs);$z++){
 				push(@lengends, "");
 				push(@lengends, "GCH_${pre}");
 				push(@lengends, "");
-				
+
 				}
 				else{
 				push(@lengends, "HCG_${pre}");
 				push(@lengends, "HCG_${pre}");
 				push(@lengends, "GCH_${pre}");
 				push(@lengends, "GCH_${pre}");
-				
+
 				}
 			}
 			else{
@@ -451,16 +467,16 @@ for(my $z=0;$z<scalar(@locs);$z++){
 				push(@lengends, "");
 				push(@lengends, "GCH_${pre}");
 				push(@lengends, "");
-				
+
 				}
 				else{
 				push(@lengends, "HCG_${pre}");
 				push(@lengends, "GCH_${pre}");
-				
+
 				}
 			}
-			
-			
+
+
 		}
 	}
 	if(scalar(@colors)<=0){
@@ -475,7 +491,7 @@ for(my $z=0;$z<scalar(@locs);$z++){
 				push(@colors, "");
 				push(@colors, "#00CC99");
 				push(@colors, "");
-				
+
 				}
 				else{
 				push(@colors, "black");
@@ -490,15 +506,15 @@ for(my $z=0;$z<scalar(@locs);$z++){
 				push(@colors, "");
 				push(@colors, "#00CC99");
 				push(@colors, "");
-				
+
 				}
 				else{
 				push(@colors, "black");
 				push(@colors, "#00CC99");
 				}
 			}
-			
-			
+
+
 
 		}
 	}
@@ -534,14 +550,14 @@ for(my $z=0;$z<scalar(@locs);$z++){
 				push(@lty, $lt);
 				}
 			}
-			
+
 
 		}
 	}
-			
 
-				
-	
+
+
+
 	#if(scalar(@input_wigs) != scalar(@lengends)){
 	#	die "NOMe-seq mode should  have even number of input big wig files\n";
 	#}
@@ -591,8 +607,8 @@ if($heatmap ne ""){
 
 			$heatmap_regionToCluster_low=-240 if($heatmap_regionToCluster_low eq "");
 			$heatmap_regionToCluster_high=440 if($heatmap_regionToCluster_high eq "");
-		
-		
+
+
 	}
 	else{
 		if(scalar(@heatmap_col)<=0){
@@ -610,10 +626,10 @@ if($heatmap ne ""){
 					push(@heatmap_keys, "TRUE");
 			}
 		}
-		
+
 			$heatmap_regionToCluster_low=-200 if($heatmap_regionToCluster_low eq "");
 			$heatmap_regionToCluster_high=200 if($heatmap_regionToCluster_high eq "");
-		
+
 	}
 	if(scalar(@heatmap_ymin) <= 0){
 			for(my $ord=1;$ord<=scalar(@input_wigs)*scalar(@locs);$ord++){
@@ -625,7 +641,7 @@ if($heatmap ne ""){
 					push(@heatmap_ymax, 100);
 			}
 		}
-	
+
 	##add sepereation of color here..
 	#for(my $ord=0;$ord<scalar(@heatmap_col);$ord++){
 		#$heatmap_col[$ord].="\\(75\\)";
@@ -683,8 +699,8 @@ foreach my $input_wig(@input_wigs){
 	$input_prefix =~s/(\w+)\S+/$1/;
 	my $prefix_tmp = $prefix.".".$input_prefix;
 	my $suffix = basename($feature);
-	$suffix =~s/(\w+)\S+/$1/; 
-	
+	$suffix =~s/(\w+)\S+/$1/;
+
 	my $output_matrix = $result_dir."$prefix_tmp.alignedTo.$suffix.$data_matrix_scale.$order[$j].txt";
 	if($j == 0 and $preClustering eq "" and ($heatmap ne "" or $heatmap_with_reps ne "")){
 		$span = int(($heatmap_clustering_matrix*2)/$heatmap_clustering_bin_size_align+1);
@@ -694,20 +710,23 @@ foreach my $input_wig(@input_wigs){
 		$span = int(($data_matrix_scale*2)/$bin_size_align+1);
 	}
 
-	
+
 	if($motif_freq[$j]==1){
 		$output_matrix = $result_dir."$prefix_tmp.alignedTo.$suffix.$data_matrix_scale.$order[$j].motif_freq.txt";
 	}
 	push(@output_matrixs,$output_matrix);
-	
+
 	if($omit_align_step eq ""){
 		open(FH,"<$feature") or die "can't open $feature file: $!\n";
 		open(OUT, ">$output_matrix") or die "can't open $output_matrix file: $!\n";
 		if($location_after_adjust_center ne ""){
-			
+
 			open(LOC, ">$location_after_adjust_center") or die "can't open new location file, $location_after_adjust_center: $!\n";
 		}
 		my $line=1;
+    my $pre_chr="";
+    my $pre_start="";
+    my $pre_end="";
 		while(<FH>){
 			chomp;
 			next if($_=~/^track/ or $_ =~/^\#/);
@@ -725,7 +744,7 @@ foreach my $input_wig(@input_wigs){
 			else{
 				die "Not support such a format yet. Please use Bed format or GTF/GFF format!!!\n";
 			}
-			
+
 			my $chr;
 			my $start;
 			my $end;
@@ -735,7 +754,7 @@ foreach my $input_wig(@input_wigs){
 			if(scalar(@splitin) >= 6){
 					$strand=$splitin[5];
 					if($feature =~ /\.gtf$/ or $feature =~ /\.gff$/){
-						$strand=$splitin[6];	
+						$strand=$splitin[6];
 					}
 			}
 			if((!(scalar(@coverages) > 0 and $alignment_mode == 4)) and (scalar(@splitin) >= 6 && $splitin[5] eq '-' || (($feature =~ /\.gtf$/ or $feature =~ /\.gff$/) && $splitin[6] eq '-'))){
@@ -743,7 +762,7 @@ foreach my $input_wig(@input_wigs){
 					$cor1=$cor2;
 					$cor2=$tem;
 			}
-			
+
 			if($alignment_mode == 1 || $alignment_mode == 5){
 				$start=int(($cor1+$cor2)/2)-$data_matrix_scale;
 				$end=int(($cor1+$cor2)/2) + 1 + $data_matrix_scale;
@@ -751,7 +770,7 @@ foreach my $input_wig(@input_wigs){
 					$start=int(($cor1+$cor2)/2)-$heatmap_clustering_matrix;
 					$end=int(($cor1+$cor2)/2) + 1 + $heatmap_clustering_matrix;
 				}
-				
+
 			}
 			elsif($alignment_mode == 2){
 				$start=$cor1-$data_matrix_scale;
@@ -777,7 +796,7 @@ foreach my $input_wig(@input_wigs){
 				}else{
 					$span = int($data_matrix_scale/$bin_size_align+1);
 				}
-				
+
 				if(scalar(@coverages) > 0){
 					$span = $end - $start;
 				}
@@ -788,11 +807,11 @@ foreach my $input_wig(@input_wigs){
 			}
 
 
-			
-		
+
+
 			my $align_cmd="$ucsc_script $input_wig $chr $start $end $span 2>/dev/null |";
 			if($motif_freq[$j]==1){
-				$align_cmd="$ucsc_script $input_wig $chr $start $end $span -type=coverage 2>/dev/null |";	
+				$align_cmd="$ucsc_script $input_wig $chr $start $end $span -type=coverage 2>/dev/null |";
 			}
 			my $tmp="";
 			open(P, $align_cmd) or die;
@@ -801,7 +820,7 @@ foreach my $input_wig(@input_wigs){
   				$tmp = $_;
 			}
 			close(P);
-			
+
 			my $mask="";
 			if($mask_matrix ne ""){
 				my $mask_cmd="$ucsc_script $mask_matrix $chr $start $end $span 2>/dev/null |";
@@ -815,25 +834,25 @@ foreach my $input_wig(@input_wigs){
 				}
 				close(X);
 			}
-			
+
 			if($tmp ne ""){
 				my @data_array=split "\t",$tmp;
 				my @mask_array = ();
-				
+
 				##adjust the mean value by coverage in align mode 4
 				if(scalar(@coverages) > 0 and $alignment_mode == 4){
 					@data_array = &adjust_value_by_coverage($coverages[$j],$chr,$start,$end, $span, $tmp);
 				}
-				
+
 				##recenter to the lowest point, it can't work with mask matrix right now..
-				if($adjust_center ne ""){				
+				if($adjust_center ne ""){
 					my @new_data_array = &recenter($input_wig,$chr,$start,$end, $strand, $span, $tmp);
 					if(scalar(@new_data_array) == scalar(@data_array)){
 						@data_array = @new_data_array;
 					}
 				}
-				
-				
+
+
 				##if mask the data
 				if($mask_matrix ne "" && $mask ne ""){
 					@mask_array = split "\t",$mask;
@@ -846,22 +865,22 @@ foreach my $input_wig(@input_wigs){
 						}
 					}
 				}
-				
+
 				##if extend data for alignment_mode 6
 				if($alignment_mode == 6){
-					my @new_data_array = &alignment_extend($input_wig,$chr, $start,$end,int($data_matrix_scale/2),int($data_matrix_scale/($bin_size_align*2)), @data_array);
+					my @new_data_array = &alignment_extend($input_wig,$chr, $start,$end,int($data_matrix_scale/2),int($data_matrix_scale/($bin_size_align*2)), $pre_chr,$pre_start,$pre_end,@data_array);
 					@data_array = @new_data_array;
 				}
-				
+
 				if((!(scalar(@coverages) > 0 and $alignment_mode == 4)) and (scalar(@splitin) >= 6 && $splitin[5] eq '-' || (($feature =~ /\.gtf$/ or $feature =~ /\.gff$/) && $splitin[6] eq '-'))){
 					@data_array = reverse(@data_array);
 				}
-				
+
 				if($heatmap_normalization_by_mean ne ""){
 					my @new_data_array = &normalize($input_wig, @data_array);
 					@data_array = @new_data_array;
 				}
-				
+
 				$tmp=join "\t",@data_array;
 				if($alignment_mode == 5){
 					my $center=int(scalar(@data_array)/2);
@@ -883,9 +902,9 @@ foreach my $input_wig(@input_wigs){
 					}else{
 						next;
 					}
-					
+
 				}
-				
+
 				if($motif_freq[$j]==1){
 					#$tmp =~ s/[-]\d+[.\d+]/1/g;
 					$tmp =~ s/n\/a/0/g;
@@ -894,13 +913,13 @@ foreach my $input_wig(@input_wigs){
 				else{
 					$tmp =~ s/n\/a/NA/g;
 				}
-				
+
 				$tmp = "$chr\t$cor1\t$cor2\t$strand\t$tmp\n";
 				print OUT $tmp;
-				
+
 			}
 			elsif($include_no_data_line ne ""){
-				
+
 				if($motif_freq[$j]==1){
 					$tmp = join "\t", (0) x $span;
 				}
@@ -908,30 +927,33 @@ foreach my $input_wig(@input_wigs){
 					$tmp = join "\t", ("NA") x $span;
 				}
 				$tmp = "$chr\t$cor1\t$cor2\t$strand\t$tmp\n";
-				print OUT $tmp;	
+				print OUT $tmp;
 			}
 			$line++;
+      $pre_chr=$chr;
+      $pre_start=$cor1;
+      $pre_end=$cor2;
 			if($line % 1000 == 0){
 				print STDERR "Aligning $input_wig to line $line ... ...\t $total_line genomic features in total\n";
 			}
 		}
-		
-		
+
+
 		if($location_after_adjust_center ne ""){
-			close(LOC);	
+			close(LOC);
 		}
 		close(FH);
 		close(OUT);
-		
+
 	}
-	$j++;	
+	$j++;
 }
 
 }
 if($omit_plot_step eq ""){
 	##make average plot
 	if($average ne ""){
-		my $r_cmd = "R --no-restore --no-save --args wd=$result_dir prefix=$prefixs[0] step=$bin_size bin_size_align=$bin_size_align scale=$plot_x_axis_scale axistep=$plot_x_axis_step smooth=$smooth ";	
+		my $r_cmd = "R --no-restore --no-save --args wd=$result_dir prefix=$prefixs[0] step=$bin_size bin_size_align=$bin_size_align scale=$plot_x_axis_scale axistep=$plot_x_axis_step smooth=$smooth ";
 	if($auto_scale ne ""){
 		$r_cmd .= "autoScale=TRUE ";
 	}
@@ -950,7 +972,7 @@ if($omit_plot_step eq ""){
 	}
 	foreach my $legend_name(@lengends){
 		$r_cmd .= "legendName=$legend_name ";
-	}	
+	}
 	foreach my $line_type(@lty){
 		$r_cmd .= "line_types=$line_type ";
 	}
@@ -959,11 +981,11 @@ if($omit_plot_step eq ""){
 	print STDERR $r_cmd;
 	system($r_cmd);
 	}
-	
-	
+
+
 	##do heatmap
 	if($heatmap ne ""){
-		
+
 		my $heatmap_cmd = "R --no-restore --no-save --args wd=$result_dir move_step=$bin_size bin_size_align=$bin_size_align scale=$plot_x_axis_scale  ";
 		#$heatmap_cmd .= "y_max=$plot_y_axis_max y_min=$plot_y_axis_min ";
 		my $breaks=scalar(@input_wigs);
@@ -987,19 +1009,19 @@ if($omit_plot_step eq ""){
 		foreach my $sampleNum(@multiSampleClustering){
 			$heatmap_cmd .= "multiSampleClustering=$sampleNum ";
 		}
-		
+
 		foreach my $output_matrix(@output_matrixs){
 			my $fn=basename($output_matrix);
 			$heatmap_cmd .= "inputFn=$fn ";
-		}	
+		}
 		foreach my $prefix(@prefixs){
 			$prefix="heatmap.$prefix";
 			foreach (1..scalar(@input_wigs)){
 				$heatmap_cmd .= "prefix=$prefix ";
 			}
-			
-		}	
-		
+
+		}
+
 		foreach my $clust(@heatmap_cluster){
 			$heatmap_cmd .= "clusterNum=$clust ";
 		}
@@ -1043,12 +1065,12 @@ if($omit_plot_step eq ""){
 				$heatmap_cmd .= "capDownLimit=$cap ";
 			}
 		}
-		
-		
+
+
 		if($heatmap_output_subCluster ne ""){
 			$heatmap_cmd .= "outputSubClusterCordinate=TRUE ";
 		}
-	
+
 
 
 		##if provide side bar..
@@ -1070,34 +1092,34 @@ if($omit_plot_step eq ""){
 
 		if($preClustering eq ""){
 			$heatmap_cmd .= "heatmap_clustering_scale=$heatmap_clustering_scale heatmap_clustering_bin_size=$heatmap_clustering_bin_size heatmap_clustering_bin_size_align=$heatmap_clustering_bin_size_align ";
-			
-			
+
+
 		}
-	
+
 		$heatmap_cmd .= "< $heatmap_r_script \n";
 		print STDERR $heatmap_cmd;
 		system($heatmap_cmd);
 	}
-	
+
 	##do heatmap_with_reps
 	if($heatmap_with_reps ne ""){
 		my $heatmap_cmd = "R --no-restore --no-save --args wd=$result_dir move_step=$bin_size bin_size_align=$bin_size_align scale=$plot_x_axis_scale ";
 		#$heatmap_cmd .= "y_max=$plot_y_axis_max y_min=$plot_y_axis_min ";
 		my $breaks=scalar(@input_wigs);
 		$heatmap_cmd .= "regionToClusterLow=$heatmap_regionToCluster_low regionToClusterHigh=$heatmap_regionToCluster_high fileNumToPrintSideBar=$fileNumToPrintSideBar breaks=$breaks ";
-		
+
 		foreach my $output_matrix(@output_matrixs){
 			my $fn=basename($output_matrix);
 			$heatmap_cmd .= "inputFn=$fn ";
-		}	
+		}
 		foreach my $prefix(@prefixs){
 			$prefix="heatmap.$prefix";
 			foreach (1..scalar(@input_wigs)){
 				$heatmap_cmd .= "prefix=$prefix ";
 			}
-			
-		}	
-		
+
+		}
+
 		foreach my $clust(@heatmap_cluster){
 			$heatmap_cmd .= "clusterNum=$clust ";
 		}
@@ -1120,17 +1142,17 @@ if($omit_plot_step eq ""){
 
 			$heatmap_cmd.= "categoryNames=$category_names[$i] ";
 		}
-		
+
 		foreach (1..scalar(@category_names)){
-			foreach my $experiment_name(@experiment_names){			
+			foreach my $experiment_name(@experiment_names){
 				$heatmap_cmd.= "sampleNames=$experiment_name ";
 
 			}
 		}
-		
+
 
 		$heatmap_cmd .= "heatmap_clustering_scale=$heatmap_clustering_scale heatmap_clustering_bin_size=$heatmap_clustering_bin_size heatmap_clustering_bin_size_align=$heatmap_clustering_bin_size_align ";
-		
+
 		if($addAverage ne ""){
 			$heatmap_cmd .= "addAverage=TRUE ";
 		}
@@ -1148,20 +1170,20 @@ sub recenter{
 		my $start=shift @_;
 		my $end=shift @_;
 		my $strand=shift @_;
-		my $span=shift @_; 
+		my $span=shift @_;
 		my $data=shift @_;
 		my @old_array=split "\t",$data;
 		my $old_loc=$chr.":".($start+$data_matrix_scale)."-".($end-$data_matrix_scale).":".$strand;
 		my $lowest="";
 		my $lowest_point="";
-		for(my $i=0+int(($data_matrix_scale-$adjust_center)/$bin_size_align);$i<=$#old_array-int(($data_matrix_scale-$adjust_center)/$bin_size_align);$i++){			
+		for(my $i=0+int(($data_matrix_scale-$adjust_center)/$bin_size_align);$i<=$#old_array-int(($data_matrix_scale-$adjust_center)/$bin_size_align);$i++){
 			my $sum=0;
 			my $count=0;
 			for(my $j=$i;$j<=$i+int($adjust_center_window/$bin_size_align);$j++){
 				if($old_array[$j] !~ /n\/a/){
 					$sum+=$old_array[$j];
 					$count++;
-				}	
+				}
 			}
 			if($count>0){
 				$sum/=$count;
@@ -1177,10 +1199,10 @@ sub recenter{
 						$lowest=$sum;
 						$lowest_point=$start+$i*$bin_size_align+$adjust_center_window/2;
 					}
-					
+
 				}
 			}
-			
+
 		}
 		if($lowest_point ne ""){
 			$start=$lowest_point-$data_matrix_scale;
@@ -1196,7 +1218,7 @@ sub recenter{
 			if($location_after_adjust_center ne ""){
 				my $new_start=$lowest_point;
 				my $new_end = $lowest_point+1;
-			
+
 				print LOC "$chr\t$new_start\t$new_end\t$old_loc\t.\t$strand\n";
 			}
 			my @new_array=split "\t",$tmp;
@@ -1205,7 +1227,7 @@ sub recenter{
 		else{
 			return -1;
 		}
-		
+
 }
 
 
@@ -1215,20 +1237,20 @@ sub recenter_by_2_highest_center{
 		my $start=shift @_;
 		my $end=shift @_;
 		my $strand=shift @_;
-		my $span=shift @_; 
+		my $span=shift @_;
 		my $data=shift @_;
 		my @old_array=split "\t",$data;
 		my $old_loc=$chr.":".($start+$data_matrix_scale)."-".($end-$data_matrix_scale).":".$strand;
 		my $lowest="";
 		my $lowest_point="";
-		for(my $i=0+int(($data_matrix_scale-$adjust_center)/$bin_size_align);$i<=$#old_array-int(($data_matrix_scale-$adjust_center)/$bin_size_align);$i++){			
+		for(my $i=0+int(($data_matrix_scale-$adjust_center)/$bin_size_align);$i<=$#old_array-int(($data_matrix_scale-$adjust_center)/$bin_size_align);$i++){
 			my $sum=0;
 			my $count=0;
 			for(my $j=$i;$j<=$i+int($adjust_center_window/$bin_size_align);$j++){
 				if($old_array[$j] !~ /n\/a/){
 					$sum+=$old_array[$j];
 					$count++;
-				}	
+				}
 			}
 			if($count>0){
 				$sum/=$count;
@@ -1244,10 +1266,10 @@ sub recenter_by_2_highest_center{
 						$lowest=$sum;
 						$lowest_point=$start+$i*$bin_size_align+$adjust_center_window/2;
 					}
-					
+
 				}
 			}
-			
+
 		}
 		if($lowest_point ne ""){
 			$start=$lowest_point-$data_matrix_scale;
@@ -1263,7 +1285,7 @@ sub recenter_by_2_highest_center{
 			if($location_after_adjust_center ne ""){
 				my $new_start=$lowest_point;
 				my $new_end = $lowest_point+1;
-			
+
 				print LOC "$chr\t$new_start\t$new_end\t$old_loc\t.\t$strand\n";
 			}
 			my @new_array=split "\t",$tmp;
@@ -1272,7 +1294,7 @@ sub recenter_by_2_highest_center{
 		else{
 			return -1;
 		}
-		
+
 }
 
 sub adjust_value_by_coverage{
@@ -1280,10 +1302,10 @@ sub adjust_value_by_coverage{
 		my $chr=shift @_;
 		my $start=shift @_;
 		my $end=shift @_;
-		my $span=shift @_; 
+		my $span=shift @_;
 		my $data=shift @_;
 		my @old_array=split "\t",$data;
-		
+
 		my $align_cmd="$ucsc_script $input $chr $start $end $span |";
 		my $tmp="";
 		open(P, $align_cmd) or die;
@@ -1292,7 +1314,7 @@ sub adjust_value_by_coverage{
   				$tmp = $_;
 		}
 		close(P);
-		
+
 		$tmp =~ s/n\/a/0/g;
 		my @coverag_array=split "\t",$tmp;
 		if(scalar(@old_array) != scalar(@coverag_array)){
@@ -1318,7 +1340,7 @@ sub adjust_value_by_coverage{
 
 
 sub make_density_bar_or_heatmap{
-	
+
 	my $sample_order=0;
 	my @file_name_lists=();
 	#$AoA[$i] = [ @tmp ];
@@ -1342,8 +1364,8 @@ sub make_density_bar_or_heatmap{
 				#push(@file_name_lists,$out_list);
 				$file_name_lists[$category_order][$sample_order]=$out_list;
 			}
-			
-			
+
+
 			open(OL,">$out_list") or die "cant write on file list: $out_list $!\n";
 
 			foreach my $in(@ins){
@@ -1363,10 +1385,10 @@ sub make_density_bar_or_heatmap{
 							}
 						}
 					}
-					
+
 					print OL "$output_matrix\t$data_type\n";
-					if($omit_align_step eq ""){						
-						&align_wig2loc($output_matrix,$loc, $file,$experiment_order);			
+					if($omit_align_step eq ""){
+						&align_wig2loc($output_matrix,$loc, $file,$experiment_order);
 					}
 				}else{
 					print OL "NA\t$data_type\n";
@@ -1385,9 +1407,9 @@ sub make_density_bar_or_heatmap{
 		if($heatmap_with_reps ne ""){
 			&plot_heatmap_reps(@file_name_lists);
 		}
-		
+
 	}
-		
+
 }
 
 sub plot_density_bar{
@@ -1396,16 +1418,16 @@ sub plot_density_bar{
 		foreach my $prefix(@prefixs){
 				$plot_prefix.=".$prefix";
 			}
-			
+
 		#$plot_prefix.=join ".",@sample_names;
 		#$plot_prefix.=join ".",@category_names;
-		my $r_cmd = "R --no-restore --no-save --args wd=$result_dir prefix=$plot_prefix step=$bin_size bin_size_align=$bin_size_align scale=$plot_x_axis_scale enrichScoreMax=$enrich_max capLimitPerc=$capLimit ";	
+		my $r_cmd = "R --no-restore --no-save --args wd=$result_dir prefix=$plot_prefix step=$bin_size bin_size_align=$bin_size_align scale=$plot_x_axis_scale enrichScoreMax=$enrich_max capLimitPerc=$capLimit ";
 		if($logscale eq ""){
 			 $r_cmd.= "logscale=F ";
 		}else{
 			$r_cmd.= "logscale=$logscale ";
 		}
-		
+
 		#foreach my $file_name_list(@file_name_lists){
 		#	$r_cmd.= "file_name_lists=$file_name_list ";
 		#}
@@ -1421,7 +1443,7 @@ sub plot_density_bar{
 		foreach my $experiment_name(@experiment_names){
 			$r_cmd.= "experiment_names=$experiment_name ";
 		}
-		
+
 		foreach my $rep_num_experiment(@rep_num_experiments){
 			$r_cmd.= "rep_num_experiment=$rep_num_experiment ";
 		}
@@ -1437,7 +1459,7 @@ sub plot_heatmap_reps{
 	foreach my $prefix(@prefixs){
 			$plot_prefix.=".$prefix";
 	}
-	
+
 	my $heatmap_cmd = "R --no-restore --no-save --args wd=$result_dir move_step=$bin_size bin_size_align=$bin_size_align scale=$plot_x_axis_scale ";
 		my $breaks=1;
 		$heatmap_cmd .= "regionToClusterLow=$heatmap_regionToCluster_low regionToClusterHigh=$heatmap_regionToCluster_high fileNumToPrintSideBar=$fileNumToPrintSideBar ";
@@ -1451,15 +1473,15 @@ sub plot_heatmap_reps{
 				$heatmap_cmd .= "capDownLimit=$cap ";
 			}
 		}
-		
+
 		if(scalar(@multiSampleClustering) > 0){
 			foreach my $c(@multiSampleClustering){
 				$heatmap_cmd .= "multiSampleClustering=$c ";
 			}
 		}
-		
+
 		my $category_order=0;
-		
+
 		foreach my $file_name_list(@file_name_lists){
 			open(F,"<$file_name_list") or die "cant open file name list : $file_name_list: $!\n ";
 			my @fin=<F>;
@@ -1492,22 +1514,22 @@ sub plot_heatmap_reps{
 			$breaks=$experiment_order;
 			$category_order++;
 		}
-		
+
 		if($heatmap_breaks == -1){
 			$heatmap_breaks = $breaks;
 		}
-		
-		
+
+
 		$heatmap_cmd .= "breaks=$heatmap_breaks heatmap_clustering_scale=$heatmap_clustering_scale heatmap_clustering_bin_size=$heatmap_clustering_bin_size heatmap_clustering_bin_size_align=$heatmap_clustering_bin_size_align ";
-		
+
 		if($addAverage ne ""){
 			$heatmap_cmd .= "addAverage=TRUE ";
 		}
 		if($not_plot_index_matrix ne ""){
 			$heatmap_cmd .= "notPlotIndexMatrix=TRUE ";
 		}
-		
-		
+
+
 		if(scalar(@heatmap_anno)>0){
 			foreach my $anno(@heatmap_anno){
 				$heatmap_cmd .= "heatmap_anno=$anno ";
@@ -1528,14 +1550,14 @@ sub plot_heatmap_reps{
 				$heatmap_cmd .= "order_dendgram=$order ";
 			}
 		}
-	
-	
+
+
 		$heatmap_cmd .= "< $heatmap_with_reps_r_script \n";
 		print STDERR $heatmap_cmd;
 		system($heatmap_cmd);
-		
 
-		
+
+
 }
 
 
@@ -1544,7 +1566,7 @@ sub align_wig2loc{
 	my $feature=shift @_;
 	my $wig=shift @_;
 	my $j=shift @_;
-	
+
 	my $total_line=`wc -l $feature`;
 	chomp($total_line);
 	$total_line =~ s/(\d+)\s+\S+/$1/;
@@ -1559,11 +1581,11 @@ sub align_wig2loc{
 	if($index ne "" and $preClustering eq "" and ($heatmap ne "" or $heatmap_with_reps ne "")){
 			$span = int(($heatmap_clustering_matrix*2)/$heatmap_clustering_bin_size_align+1);
 	}
-	
+
 	open(FH,"<$feature") or die "can't open $feature file: $!\n";
 		open(OUT, ">$output_matrix") or die "can't open $output_matrix file: $!\n";
 		if($location_after_adjust_center ne ""){
-			
+
 			open(LOC, ">$location_after_adjust_center") or die "can't open new location file, $location_after_adjust_center: $!\n";
 		}
 		my $line=1;
@@ -1584,7 +1606,7 @@ sub align_wig2loc{
 			else{
 				die "Not support such a format yet. Please use Bed format or GTF/GFF format!!!\n";
 			}
-			
+
 			my $chr;
 			my $start;
 			my $end;
@@ -1594,16 +1616,16 @@ sub align_wig2loc{
 			if(scalar(@splitin) >= 6){
 					$strand=$splitin[5];
 					if($feature =~ /\.gtf$/ or $feature =~ /\.gff$/){
-						$strand=$splitin[6];	
+						$strand=$splitin[6];
 					}
 			}
-			
+
 			if((!(scalar(@coverages) > 0 and $alignment_mode == 4)) and (scalar(@splitin) >= 6 && $splitin[5] eq '-' || (($feature =~ /\.gtf$/ or $feature =~ /\.gff$/) && $splitin[6] eq '-'))){
 					my $tem = $cor1;
 					$cor1=$cor2;
 					$cor2=$tem;
 				}
-			
+
 			if($alignment_mode == 1 || $alignment_mode == 5){
 				$start=int(($cor1+$cor2)/2)-$data_matrix_scale;
 				$end=int(($cor1+$cor2)/2) + 1 + $data_matrix_scale;
@@ -1611,7 +1633,7 @@ sub align_wig2loc{
 					$start=int(($cor1+$cor2)/2)-$heatmap_clustering_matrix;
 					$end=int(($cor1+$cor2)/2) + 1 + $heatmap_clustering_matrix;
 				}
-				
+
 			}
 			elsif($alignment_mode == 2){
 				$start=$cor1-$data_matrix_scale;
@@ -1635,7 +1657,7 @@ sub align_wig2loc{
 				if($alignment_mode == 4){
 					$span = 1;
 				}
-				
+
 				if(scalar(@coverages) > 0){
 					$span = $end - $start;
 				}
@@ -1645,10 +1667,10 @@ sub align_wig2loc{
 				exit(1);
 			}
 
-		
+
 			my $align_cmd="$ucsc_script $wig $chr $start $end $span |";
 			#if($motif_freq[$j]==1){
-			#	$align_cmd="$ucsc_script $wig $chr $start $end $span -type=coverage |";	
+			#	$align_cmd="$ucsc_script $wig $chr $start $end $span -type=coverage |";
 			#}
 			my $tmp="";
 			open(P, $align_cmd) or die;
@@ -1657,7 +1679,7 @@ sub align_wig2loc{
   				$tmp = $_;
 			}
 			close(P);
-			
+
 			my $mask="";
 			if($mask_matrix ne ""){
 				my $mask_cmd="$ucsc_script $mask_matrix $chr $start $end $span |";
@@ -1671,25 +1693,25 @@ sub align_wig2loc{
 				}
 				close(X);
 			}
-			
+
 			if($tmp ne ""){
 				my @data_array=split "\t",$tmp;
 				my @mask_array = ();
-				
+
 				##adjust the mean value by coverage in align mode 4
 				if(scalar(@coverages) > 0 and $alignment_mode == 4){
 					@data_array = &adjust_value_by_coverage($coverages[$j],$chr,$start,$end, $span, $tmp);
 				}
-				
+
 				##recenter to the lowest point, it can't work with mask matrix right now..
-				if($adjust_center ne ""){				
+				if($adjust_center ne ""){
 					my @new_data_array = &recenter($wig,$chr,$start,$end, $strand, $span, $tmp);
 					if(scalar(@new_data_array) == scalar(@data_array)){
 						@data_array = @new_data_array;
 					}
 				}
-				
-				
+
+
 				##if mask the data
 				if($mask_matrix ne "" && $mask ne ""){
 					@mask_array = split "\t",$mask;
@@ -1702,16 +1724,16 @@ sub align_wig2loc{
 						}
 					}
 				}
-				
+
 				if((!(scalar(@coverages) > 0 and $alignment_mode == 4)) and (scalar(@splitin) >= 6 && $splitin[5] eq '-' || (($feature =~ /\.gtf$/ or $feature =~ /\.gff$/) && $splitin[6] eq '-'))){
 					@data_array = reverse(@data_array);
 				}
-				
+
 				if($heatmap_normalization_by_mean ne ""){
 					my @new_data_array = &normalize($wig, @data_array);
 					@data_array = @new_data_array;
 				}
-				
+
 				$tmp=join "\t",@data_array;
 				if($alignment_mode == 5){
 					my $center=int(scalar(@data_array)/2);
@@ -1733,9 +1755,9 @@ sub align_wig2loc{
 					}else{
 						next;
 					}
-					
+
 				}
-				
+
 				#if($motif_freq[$j]==1){
 					#$tmp =~ s/[-]\d+[.\d+]/1/g;
 				#	$tmp =~ s/n\/a/0/g;
@@ -1744,13 +1766,13 @@ sub align_wig2loc{
 				#else{
 					$tmp =~ s/n\/a/NA/g;
 				#}
-				
+
 				$tmp = "$chr\t$cor1\t$cor2\t$strand\t$tmp\n";
 				print OUT $tmp;
-				
+
 			}
 			elsif($include_no_data_line ne ""){
-				
+
 				#if($motif_freq[$j]==1){
 				#	$tmp = 0;
 				#}
@@ -1758,23 +1780,23 @@ sub align_wig2loc{
 					$tmp = "NA";
 				#}
 				$tmp = "$chr\t$cor1\t$cor2\t$strand\t$tmp\n";
-				print OUT $tmp;	
+				print OUT $tmp;
 			}
 			$line++;
 			if($line % 1000 == 0){
 				print STDERR "Aligning $wig to line $line ... ...\t $total_line genomic features in total\n";
 			}
 		}
-		
-		
+
+
 		if($location_after_adjust_center ne ""){
-			close(LOC);	
+			close(LOC);
 		}
 		close(FH);
 		close(OUT);
-		
-	
-	
+
+
+
 }
 
 sub normalize{
@@ -1798,7 +1820,7 @@ sub normalize{
 			}else{
 				push(@out, "n/a");
 			}
-			
+
 		}
 		return @out;
 	}else{
@@ -1813,11 +1835,16 @@ sub alignment_extend{
 	my $end = shift @_;
 	my $len = shift @_;
 	my $span = shift @_;
+  my $pre_chr = shift @_;
+  my $pre_start = shift @_;
+  my $pre_end = shift @_;
 	my @data_array = @_;
 	my @new_array=();
 	##left_extend
 	my $left=$start-$len;
 	my $right=$start+1;
+  my $pre_right_bound=$pre_end>$pre_start ? $pre_end : $pre_start;
+  my $pre_left_bound=$pre_end>$pre_start ? $pre_start : $pre_end;
 	my $align_cmd="$ucsc_script $wig $chr $left $right $span |";
 	my $tmp_left="";
 	open(P, $align_cmd) or die;
@@ -1828,13 +1855,22 @@ sub alignment_extend{
 	close(P);
 	if($tmp_left ne ""){
 			@new_array=(split("\t",$tmp_left),@data_array);
+      if($mask_overlap_interval ne ""){
+        if($pre_chr eq $chr and $pre_right_bound > $left){ ##overlapped
+          my $overlapped_bins=int(($pre_right_bound-$left)/$bin_size_align);
+          #print "$overlapped_bins\t$chr\t$left\t$right\t$start\t$end\n";
+          foreach my $num(0..($overlapped_bins-1)){
+            $new_array[$num]="n/a";
+          }
+        }
+      }
 	}else{
 		@new_array=@data_array;
 		for ((1..$span)){
 			unshift(@new_array,"n/a");
 		}
 	}
-	
+
 	##right_extend
 	$left=$end-1;
 	$right=$end+$len;
@@ -1852,8 +1888,6 @@ sub alignment_extend{
 		for ((1..$span)){
 			push(@new_array,"n/a");
 		}
-	}	
+	}
 	return @new_array;
 }
-
-

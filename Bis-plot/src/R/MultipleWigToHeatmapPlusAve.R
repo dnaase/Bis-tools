@@ -9,7 +9,7 @@
 ## 4. label multiple matrix name, also cluster tree
 
 ###############################################################################
-source("/home/uec-00/yapingli/code/mytools/R/heatmapRUtils.R")
+source("/Users/yaping/Documents/workspace/code/github/bis-tools/Bis-tools/Bis-plot/src/R/heatmapRUtils.R")
 library(gplots)
 library(colorRamps)
 library(RColorBrewer)
@@ -43,6 +43,7 @@ heatmap_clustering_bin_size = 20
 heatmap_clustering_bin_size_align = 1
 
 fileNumToOrder=1
+multiSampleClustering=NULL
 regionToClusterLow=-500
 regionToClusterHigh=500
 addAverage=FALSE
@@ -92,10 +93,10 @@ for (e in commandArgs(TRUE)) {
 			capLimit<-c(capLimit, as.logical(ta[[1]][2]))
 		}
 		if(ta[[1]][1] == "capUpLimit"){
-			capUpLimit<- as.numeric(ta[[1]][2])
+			capUpLimit<-c(capUpLimit, as.numeric(ta[[1]][2]))
 		}
 		if(ta[[1]][1] == "capDownLimit"){
-			capDownLimit<- as.numeric(ta[[1]][2])
+			capDownLimit<-c(capDownLimit, as.numeric(ta[[1]][2]))
 		}
 		if(ta[[1]][1] == "fileNumToPrintSideBar"){
 			fileNumToOrder<-as.numeric(ta[[1]][2])
@@ -122,6 +123,12 @@ for (e in commandArgs(TRUE)) {
 		if(ta[[1]][1] == "breaks"){
 			breaks<-as.numeric(ta[[1]][2])
 		}
+		if(ta[[1]][1] == "notPlotIndexMatrix"){
+			notPlotIndexMatrix<-as.logical(ta[[1]][2])
+		}
+		if(ta[[1]][1] == "multiSampleClustering"){
+			multiSampleClustering<-c(multiSampleClustering, as.numeric(ta[[1]][2]))
+		}
 		
 	}
 }
@@ -129,18 +136,19 @@ for (e in commandArgs(TRUE)) {
 
 setwd(wd)
 
-regionToCluster<-c(regionToClusterLow,regionToClusterHigh)
-if(!is.null(capUpLimit)){
-	limit<-c(capDownLimit,capUpLimit)
+if(is.null(multiSampleClustering)){
+	multiSampleClustering=1
 }
+
+regionToCluster<-c(regionToClusterLow,regionToClusterHigh)
 
 for(i in seq(1,length(files),by=breaks)){ ##do it in multiple locations
 	start<-i
 	end<-i+breaks-1
 	filesInOneLoc<-files[start:end]
-	limit<-plotMultiWigToHeatmapPlusAveInSingleLoc(filesInOneLoc, sampleNames[start:end],prefix=prefix[start], limit=limit, fileNumToOrder=fileNumToOrder, regionToCluster=regionToCluster,numCluster=numCluster[start], 
+	limit<-plotMultiWigToHeatmapPlusAveInSingleLoc(filesInOneLoc, sampleNames[start:end],prefix=prefix[start], fileNumToOrder=multiSampleClustering, regionToCluster=regionToCluster,numCluster=numCluster[start], notPlotIndexMatrix=notPlotIndexMatrix, 
 			bin_size_align=bin_size_align,bin_size=bin_size, scale=scale,heatmap_clustering_bin_size_align=heatmap_clustering_bin_size_align, heatmap_clustering_bin_size=heatmap_clustering_bin_size,heatmap_clustering_scale=heatmap_clustering_scale,
-			capLimit=capLimit[start:end],logScale=logScale[start:end],heatMapCols=heatMapCols[start:end], addAverage=addAverage)
+			capLimit=capLimit[start:end],capUpLimit=capUpLimit[start:end], capDownLimit=capDownLimit[start:end],logScale=logScale[start:end],heatMapCols=heatMapCols[start:end], addAverage=addAverage)
 
 }
 
