@@ -3,19 +3,14 @@ package edu.usc.epigenome.uecgatk.bissnp;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
-
 import java.util.HashSet;
-
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
-
 import gnu.trove.map.hash.THashMap;
 import gnu.trove.set.hash.THashSet;
-
-
 import net.sf.samtools.SAMSequenceDictionary;
 
 import org.broad.tribble.bed.BEDFeature;
@@ -31,7 +26,6 @@ import org.broadinstitute.sting.gatk.filters.NotPrimaryAlignmentFilter;
 import org.broadinstitute.sting.gatk.filters.UnmappedReadFilter;
 import org.broadinstitute.sting.gatk.filters.FailsVendorQualityCheckFilter;
 import org.broadinstitute.sting.gatk.filters.MappingQualityZeroFilter;
-
 import org.broadinstitute.sting.gatk.refdata.RefMetaDataTracker;
 import org.broadinstitute.sting.gatk.walkers.By;
 import org.broadinstitute.sting.gatk.walkers.DataSource;
@@ -55,17 +49,15 @@ import org.broadinstitute.sting.utils.codecs.vcf.VCFInfoHeaderLine;
 import org.broadinstitute.sting.utils.collections.Pair;
 import org.broadinstitute.sting.utils.exceptions.UserException;
 import org.broadinstitute.sting.utils.pileup.PileupElement;
+import org.broadinstitute.sting.utils.variantcontext.Allele;
 
 import edu.usc.epigenome.uecgatk.bissnp.BisulfiteEnums.MethylSNPModel;
 import edu.usc.epigenome.uecgatk.bissnp.BisulfiteEnums.OUTPUT_MODE;
-
 import edu.usc.epigenome.uecgatk.bissnp.writer.FormatWriterBase;
-
 import edu.usc.epigenome.uecgatk.bissnp.writer.SortingTcgaVCFWriter;
 import edu.usc.epigenome.uecgatk.bissnp.writer.TcgaVCFWriter;
 import edu.usc.epigenome.uecgatk.bissnp.writer.cpgReads;
 import edu.usc.epigenome.uecgatk.bissnp.writer.cpgReadsWriterImp;
-
 import edu.usc.epigenome.uecgatk.bissnp.filters.BisulfiteIncompleteConvReadsFilter;
 import edu.usc.epigenome.uecgatk.bissnp.filters.NotProperPairedReadFilter;
 import edu.usc.epigenome.uecgatk.bissnp.filters.InvertedDupsReadFilter;
@@ -948,6 +940,8 @@ public class BisulfiteGenotyper extends LocusWalker<BisulfiteVariantCallContext,
 					refStrand = refStrand + "-";
 				}
 			}
+			Allele altAllele = value.getVariantContext().getAltAlleleWithHighestAlleleCount();
+			int i =0;
 			for (PileupElement p : rawContext.getBasePileup().getOverlappingFragmentFilteredPileup()) {
 
 				if (!BisSNPUtils.goodBaseInPileupElement(p, BAC, value.ref)) {
@@ -957,19 +951,40 @@ public class BisulfiteGenotyper extends LocusWalker<BisulfiteVariantCallContext,
 				
 				
 				
-				char base = (char) (p.getRead().getReadNegativeStrandFlag() ? BaseUtils.simpleComplement(p.getBase()) : p.getBase());
+				
+				
+				boolean negStrand = p.getRead().getReadNegativeStrandFlag();
+				boolean secondStrand = p.getRead().getProperPairFlag() && p.getRead().getSecondOfPairFlag();
+				byte base = negStrand ? BaseUtils.simpleComplement(p.getBase()) : p.getBase();
+				//if(value.ref.getLocus().getStart() == 10784192 && p.getRead().getReadName().equalsIgnoreCase("HWI-ST550_0181:5:2206:16865:54452")){
+				//	System.err.println((char)base + "\t" + (char)value.ref.getBase() + "\t" + (char)altAllele.getBases()[0] + "\t" + i + "\t" + privateWriter.toString());
+				//}
+				byte tmpBase = negStrand ? BaseUtils.simpleComplement(base) : base;
+				if(secondStrand){
+					tmpBase = BaseUtilsMore.iupacCodeComplement(tmpBase);
+				}
+				if(BaseUtils.basesAreEqual(value.ref.getBase(), tmpBase) || (altAllele.isCalled() && BaseUtils.basesAreEqual(altAllele.getBases()[0], tmpBase))){
+					base = tmpBase;
+				}else if(!BaseUtilsMore.isBisulfiteMismatch(value.ref.getBase(), base, negStrand, secondStrand)){
+					base = value.ref.getBase();
+				}else if(altAllele.isCalled() && !BaseUtilsMore.isBisulfiteMismatch(altAllele.getBases()[0], base, negStrand, secondStrand)){
+					base = altAllele.getBases()[0];
+				}else{
+					base = '.';
+				}
+				
 				cpgReads cr;
 				if(BAC.withRef){
-					cr = new cpgReads(rawContext.getContig(), rawContext.getLocation().getStart(), base, p.getQual(), strand,p.getRead().getReadName(), refStrand);
+					cr = new cpgReads(rawContext.getContig(), rawContext.getLocation().getStart(), (char)base, p.getQual(), strand,p.getRead().getReadName(), refStrand);
 					
 				}
 				else{
-					cr = new cpgReads(rawContext.getContig(), rawContext.getLocation().getStart(), base, p.getQual(), strand,
+					cr = new cpgReads(rawContext.getContig(), rawContext.getLocation().getStart(), (char)base, p.getQual(), strand,
 							p.getRead().getReadName());
 				} 
 				
-					readsWriter.add(cr);
-
+				privateWriter.add(cr);
+				i++;
 			}
 
 		}

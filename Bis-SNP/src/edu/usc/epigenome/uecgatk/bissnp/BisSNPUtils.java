@@ -369,6 +369,9 @@ public class BisSNPUtils {
 					matches++;
 				}
 			}
+			//if(refContext.getLocus().getStart()==10784184){
+			//	System.err.println(new String(bases) + "\t" + new String(refBytesRev) + "\t" + negStrand + "\t" + cytosinePattern + "\t" + matches);
+			//}
 			if (matches == bases.length)
 				return true;
 		} else {
@@ -389,6 +392,9 @@ public class BisSNPUtils {
 					matches++;
 				}
 			}
+			//if(refContext.getLocus().getStart()==10784184){
+			//	System.err.println(new String(bases) + "\t" + new String(refBytesFwd) + "\t" + negStrand + "\t" + cytosinePattern + "\t" + matches);
+			//}
 			if (matches == bases.length)
 				return true;
 		}

@@ -496,7 +496,7 @@ public class BisulfiteGenotyperEngine {
 			//	}
 				
 			
-			if(cytosineConfirmed.containsAll(cytosinePatternInRef)){
+			if(cytosineConfirmed.containsAll(cytosinePatternInRef) && cytosinePatternInRef.containsAll(cytosineConfirmed)){
 				attributes.put(BisulfiteVCFConstants.REF_C_PATTERN, 0);
 			}
 			else{

@@ -83,11 +83,9 @@ public class BisulfiteSNPGenotypeLikelihoodsCalculationModel {
 			THashMap<String, CytosineParameters> cytosineParametersStatus) {
 		String bestCytosinePattern = null;
 		
-		double maxRatioInCytosinePos = Double.NEGATIVE_INFINITY;
 		GenomeLoc location = pileup.getLocation();
 		String contig = location.getContig();
 		int position = location.getStart();
-		double maxRatio = Double.NEGATIVE_INFINITY;
 		double tmpMethy = FLAT_METHY_STATUS;
 
 		// check adjacent position likelihood
@@ -143,300 +141,277 @@ public class BisulfiteSNPGenotypeLikelihoodsCalculationModel {
 		tmpMethy = getMethyLevelFromPileup(pileup, ref);
 		BisulfiteDiploidSNPGenotypeLikelihoods tmpGL = new BisulfiteDiploidSNPGenotypeLikelihoods(tracker, ref, priors, BAC, tmpMethy);
 		tmpGL.setPriors(tracker, ref, BAC.heterozygosity, BAC.novelDbsnpHet, BAC.validateDbsnpHet, location);
-		boolean firstSeen = true;
+		//boolean firstSeen = true;
+		boolean cytosinePatternNegStrand = false;
+		boolean heterozygousPattern = false; // heterozygous at cytosine psoition
+		byte basesAlelleA = 'C';
+		byte basesAlelleB = 'C';
+		//check cytosine position first, determine the cytosine pattern strand
+		tmpGL.clearLikelihoods(tmpMethy);
+		
+		boolean notCytosinePos = false;
+		int nGoodBases = tmpGL.add(pileup, true, true);
+		if (nGoodBases == 0)
+			return bestCytosinePattern;
+		double[] posteriorNormalized = MathUtils.normalizeFromLog10(tmpGL.getPosteriors(), true, false);
+
+		getBestGenotypeFromPosterior(posteriorNormalized, cytosineAndAdjacent, 0, position);
+
+
+		methyStatus tmpMethyStatusCytosinePos = cytosineAndAdjacent.get(0);
+		if (tmpMethyStatusCytosinePos == null) {
+			notCytosinePos=true;
+		} else if (tmpMethyStatusCytosinePos.genotype == null) {
+			notCytosinePos=true;
+		} else if (tmpMethyStatusCytosinePos.genotype.isHet()) {
+			// for CpG, if C is heterozygous,then marked it here.
+			if (BaseUtilsMore.iupacCodeEqualNotConsiderMethyStatus(BaseUtils.C, tmpMethyStatusCytosinePos.genotype.base1)
+				|| BaseUtilsMore.iupacCodeEqualNotConsiderMethyStatus(BaseUtils.C, tmpMethyStatusCytosinePos.genotype.base2)) {
+
+				if (tmpMethyStatusCytosinePos.ratio < this.BAC.STANDARD_CONFIDENCE_FOR_CALLING) {
+					notCytosinePos=true;
+				}else{
+					heterozygousPattern = true;
+					cytosinePatternNegStrand = false;
+					basesAlelleA = tmpMethyStatusCytosinePos.genotype.base1;
+					basesAlelleB = tmpMethyStatusCytosinePos.genotype.base2;
+				}
+
+			} else if (BaseUtilsMore.iupacCodeEqualNotConsiderMethyStatus(BaseUtils.C, BaseUtilsMore.iupacCodeComplement(tmpMethyStatusCytosinePos.genotype.base1))
+				|| BaseUtilsMore.iupacCodeEqualNotConsiderMethyStatus(BaseUtils.C, BaseUtilsMore.iupacCodeComplement(tmpMethyStatusCytosinePos.genotype.base2))) {
+
+				if (tmpMethyStatusCytosinePos.ratio < this.BAC.STANDARD_CONFIDENCE_FOR_CALLING) {
+					notCytosinePos=true;
+				}else{
+					heterozygousPattern = true;
+					cytosinePatternNegStrand = true;
+					basesAlelleA = tmpMethyStatusCytosinePos.genotype.base1;
+					basesAlelleB = tmpMethyStatusCytosinePos.genotype.base2;
+				}
+
+			
+			} else {
+				notCytosinePos=true;
+			}
+
+		} else {
+
+			if (BaseUtilsMore.iupacCodeEqualNotConsiderMethyStatus(BaseUtils.C, tmpMethyStatusCytosinePos.genotype.base1)) {
+
+				if (tmpMethyStatusCytosinePos.ratio < this.BAC.STANDARD_CONFIDENCE_FOR_CALLING) {
+					notCytosinePos=true;
+				}else{
+					heterozygousPattern = false;
+					cytosinePatternNegStrand = false;
+				}
+				
+			
+			} else if (BaseUtilsMore.iupacCodeEqualNotConsiderMethyStatus(BaseUtils.C, BaseUtilsMore.iupacCodeComplement(tmpMethyStatusCytosinePos.genotype.base1))) {
+
+				if (tmpMethyStatusCytosinePos.ratio < this.BAC.STANDARD_CONFIDENCE_FOR_CALLING) {
+					notCytosinePos=true;
+				}else{
+					heterozygousPattern = false;
+					cytosinePatternNegStrand = true;
+				}
+				
+				
+			} else {
+				notCytosinePos=true;
+			}
+
+		}
+		//look at fwd or rvd for each cytosine type
+		
+		//pick up the longest pattern, rather than the max likelihood pattern, since some of the false positive may be due to uneven reads distribution...
+		
+		
+		
+		
 		//for (String cytosineType : BAC.cytosineDefined.getContextDefined().keySet()) {
 		for (Entry<String, CytosineParameters> cytosineTypeEntrySet : BAC.cytosineDefined.getContextDefined().entrySet()) {
 			String cytosineType = cytosineTypeEntrySet.getKey();
 			
-			boolean heterozygousPattern = false; // heterozygous at cytosine
-													// psoition
-			boolean heterozygousAtContext = false; // heterozygous at context
-													// psoition
 			
-			
-				
+			boolean heterozygousAtContext = false; // heterozygous at context	
 
 			int cytosinePos = cytosineTypeEntrySet.getValue().cytosinePosition;
 
-			double adjacentCytosineSeqLikelihood = 0;
-			double adjacentCytosineSeqLikelihoodReverseStrand = 0;
-			int i = 1;
-			int countMatchedOnFwd = 0;
-			int countMatchedOnRvd = 0;
-
-			// forward strand
-			byte[] basesAlelleAFwd = cytosineType.getBytes();
-			byte[] basesAlelleBFwd = cytosineType.getBytes();
-			byte[] refWindFwd = new byte[cytosineType.length()];
-			byte[] refWindRvd = new byte[cytosineType.length()];
-			
 			//check the reference cytosine pattern list
 			CytosineParameters cps = new CytosineParameters();
 			cps.isReferenceCytosinePattern = BisSNPUtils.isRefCytosinePattern(ref, cytosineType, cytosinePos);
-			//cps.isReferenceCytosinePattern = BaseUtilsMore.searchIupacPatternFromBases(cytosineType.getBytes(), refWindRvd, true) && BaseUtilsMore.searchIupacPatternFromBases(cytosineType.getBytes(), refWindFwd, false);
 			cytosineParametersStatus.put(cytosineType, cps);
-		//	if(cps.isReferenceCytosinePattern)
-		//	if(ref.getLocus().getStart() == 7021736)
-			//	System.err.println(ref.getLocus()+ "\t" + cytosineType + "\t" + BisSNPUtils.isRefCytosinePattern(ref, cytosineType, false) + "\t" + BisSNPUtils.isRefCytosinePattern(ref, cytosineType, true));
+			if(notCytosinePos)
+				continue;
 			
-			for (byte base : cytosineType.getBytes()) {
-				int pos = i - cytosinePos;
-				int index = i - 1;
-				refWindFwd[index] = refBytes[pos + maxCytosineLength];
-				i++;
-				if (pos == 0)
-					continue;
-				methyStatus tmpMethyStatus = cytosineAndAdjacent.get(pos);
-				if (tmpMethyStatus == null) {
-					break;
-				} else if (tmpMethyStatus.genotype == null) {
-					break;
-				} else {
-					if (tmpMethyStatus.ratio < this.BAC.STANDARD_CONFIDENCE_FOR_CALLING) {
-						break;
-					}
-
-					if (tmpMethyStatus.genotype.isHet()) {
-						if (BaseUtilsMore.iupacCodeEqualNotConsiderMethyStatus(base, tmpMethyStatus.genotype.base1)
-								&& BaseUtilsMore.iupacCodeEqualNotConsiderMethyStatus(base, tmpMethyStatus.genotype.base2)) {
-							countMatchedOnFwd++;
-							adjacentCytosineSeqLikelihood += tmpMethyStatus.ratio;
-							basesAlelleAFwd[index] = tmpMethyStatus.genotype.base1;
-							basesAlelleBFwd[index] = tmpMethyStatus.genotype.base2;
-						} else if (BaseUtilsMore.iupacCodeEqualNotConsiderMethyStatus(base, tmpMethyStatus.genotype.base1)
-								|| BaseUtilsMore.iupacCodeEqualNotConsiderMethyStatus(base, tmpMethyStatus.genotype.base2)) {
-							// isHeterozygousInContextPosition
-							heterozygousAtContext = true;
-							basesAlelleAFwd[index] = tmpMethyStatus.genotype.base1;
-							basesAlelleBFwd[index] = tmpMethyStatus.genotype.base2;
-							countMatchedOnFwd++;
-							adjacentCytosineSeqLikelihood += tmpMethyStatus.ratio;
-
-						}
-					} else {
-
-						if (BaseUtilsMore.iupacCodeEqualNotConsiderMethyStatus(base, tmpMethyStatus.genotype.base1)) {
-							countMatchedOnFwd++;
-							adjacentCytosineSeqLikelihood += tmpMethyStatus.ratio;
-						}
-
-					}
-				}
-
-				if (position == BAC.testLocus) {
-					System.err.println("base: " + (char) base + "\tgenotype: " + (char) tmpMethyStatus.genotype.base1 + "\tcytosinePos: " + cytosinePos + "\tratio: " + tmpMethyStatus.ratio
-							+ "\tadjacentCytosineSeqLikelihood: " + adjacentCytosineSeqLikelihood);
-				}
-
-			}
-			i = 1;
-
-			// reverse strand
+			int i = 1;
+			int countMatched = 1;
 			byte[] basesAlelleARev = cytosineType.getBytes();
 			byte[] basesAlelleBRev = cytosineType.getBytes();
+			byte[] basesAlelleAFwd = cytosineType.getBytes();
+			byte[] basesAlelleBFwd = cytosineType.getBytes();
 			
-			for (byte base : cytosineType.getBytes()) {
-				int pos = cytosinePos - i;
-				int index = i - 1;
-				refWindRvd[index] = refBytes[pos + maxCytosineLength];
-				i++;
+			if(cytosinePatternNegStrand){
+				// reverse strand
+				if(heterozygousPattern){
+					basesAlelleARev[cytosinePos-1] = basesAlelleA;
+					basesAlelleBRev[cytosinePos-1] = basesAlelleB;
+				}
+				for (byte base : cytosineType.getBytes()) {
+					int pos = cytosinePos - i;
+					int index = i - 1;
+					i++;
 
-				if (pos == 0)
-					continue;
-				methyStatus tmpMethyStatus = cytosineAndAdjacent.get(pos);
-				if (tmpMethyStatus == null) {
-					break;
-				} else if (tmpMethyStatus.genotype == null) {
-					break;
-				} else {
-					if (tmpMethyStatus.ratio < this.BAC.STANDARD_CONFIDENCE_FOR_CALLING) {
+					if (pos == 0) //cytosine position
+						continue;
+					methyStatus tmpMethyStatus = cytosineAndAdjacent.get(pos);
+					if (tmpMethyStatus == null) {
 						break;
-					}
-
-					if (tmpMethyStatus.genotype.isHet()) {
-						if (BaseUtilsMore.iupacCodeEqualNotConsiderMethyStatus(base, BaseUtilsMore.iupacCodeComplement(tmpMethyStatus.genotype.base1))
-								&& BaseUtilsMore.iupacCodeEqualNotConsiderMethyStatus(base, BaseUtilsMore.iupacCodeComplement(tmpMethyStatus.genotype.base2))) {
-							countMatchedOnRvd++;
-							adjacentCytosineSeqLikelihoodReverseStrand += tmpMethyStatus.ratio;
-							basesAlelleARev[index] = tmpMethyStatus.genotype.base1;
-							basesAlelleBRev[index] = tmpMethyStatus.genotype.base2;
-						} else if (BaseUtilsMore.iupacCodeEqualNotConsiderMethyStatus(base, BaseUtilsMore.iupacCodeComplement(tmpMethyStatus.genotype.base1))
-								|| BaseUtilsMore.iupacCodeEqualNotConsiderMethyStatus(base, BaseUtilsMore.iupacCodeComplement(tmpMethyStatus.genotype.base2))) {
-							heterozygousAtContext = true;
-							basesAlelleARev[index] = tmpMethyStatus.genotype.base1;
-							basesAlelleBRev[index] = tmpMethyStatus.genotype.base2;
-							countMatchedOnRvd++;
-							adjacentCytosineSeqLikelihoodReverseStrand += tmpMethyStatus.ratio;
-
-						}
+					} else if (tmpMethyStatus.genotype == null) {
+						break;
 					} else {
-
-						if (BaseUtilsMore.iupacCodeEqualNotConsiderMethyStatus(base, BaseUtilsMore.iupacCodeComplement(tmpMethyStatus.genotype.base1))) {
-							countMatchedOnRvd++;
-							adjacentCytosineSeqLikelihoodReverseStrand += tmpMethyStatus.ratio;
+						if (tmpMethyStatus.ratio < this.BAC.STANDARD_CONFIDENCE_FOR_CALLING) {
+							break;
 						}
 
+						if (tmpMethyStatus.genotype.isHet()) {
+							if (BaseUtilsMore.iupacCodeEqualNotConsiderMethyStatus(base, BaseUtilsMore.iupacCodeComplement(tmpMethyStatus.genotype.base1))
+									|| BaseUtilsMore.iupacCodeEqualNotConsiderMethyStatus(base, BaseUtilsMore.iupacCodeComplement(tmpMethyStatus.genotype.base2))) {
+								heterozygousAtContext = true;
+								basesAlelleARev[index] = tmpMethyStatus.genotype.base1;
+								basesAlelleBRev[index] = tmpMethyStatus.genotype.base2;
+								countMatched++;
+
+							}else{
+								break;
+							}
+						} else {
+
+							if (BaseUtilsMore.iupacCodeEqualNotConsiderMethyStatus(base, BaseUtilsMore.iupacCodeComplement(tmpMethyStatus.genotype.base1))) {
+								countMatched++;
+							}else{
+								break;
+							}
+
+						}
 					}
-				}
 
-				if (position == BAC.testLocus) {
-					System.err.println("base: " + (char) base + "\tgenotype: " + (char) BaseUtilsMore.iupacCodeComplement(tmpMethyStatus.genotype.base1) + "\treveser: " + (char) base
-							+ "\tcytosinePos: " + cytosinePos + "\tratio: " + tmpMethyStatus.ratio + "\tadjacentCytosineSeqLikelihoodReverseStrand: " + adjacentCytosineSeqLikelihoodReverseStrand);
 				}
+			}else{
+				// forward strand
+				if(heterozygousPattern){
+					basesAlelleAFwd[cytosinePos-1] = basesAlelleA;
+					basesAlelleBFwd[cytosinePos-1] = basesAlelleB;
+				}
+			//	if(cps.isReferenceCytosinePattern)
+			//	if(ref.getLocus().getStart() == 7021736)
+				//	System.err.println(ref.getLocus()+ "\t" + cytosineType + "\t" + BisSNPUtils.isRefCytosinePattern(ref, cytosineType, false) + "\t" + BisSNPUtils.isRefCytosinePattern(ref, cytosineType, true));
+				
+				for (byte base : cytosineType.getBytes()) {
+					int pos = i - cytosinePos;
+					int index = i - 1;
 
+					i++;
+					if (pos == 0)
+						continue;
+					methyStatus tmpMethyStatus = cytosineAndAdjacent.get(pos);
+					if (tmpMethyStatus == null) {
+						break;
+					} else if (tmpMethyStatus.genotype == null) {
+						break;
+					} else {
+						if (tmpMethyStatus.ratio < this.BAC.STANDARD_CONFIDENCE_FOR_CALLING) {
+							break;
+						}
+
+						if (tmpMethyStatus.genotype.isHet()) {
+							if (BaseUtilsMore.iupacCodeEqualNotConsiderMethyStatus(base, tmpMethyStatus.genotype.base1)
+									|| BaseUtilsMore.iupacCodeEqualNotConsiderMethyStatus(base, tmpMethyStatus.genotype.base2)) {
+								// isHeterozygousInContextPosition
+								heterozygousAtContext = true;
+								basesAlelleAFwd[index] = tmpMethyStatus.genotype.base1;
+								basesAlelleBFwd[index] = tmpMethyStatus.genotype.base2;
+								countMatched++;
+
+							}else{
+								break;
+							}
+						} else {
+
+							if (BaseUtilsMore.iupacCodeEqualNotConsiderMethyStatus(base, tmpMethyStatus.genotype.base1)) {
+								countMatched++;
+							}else{
+								break;
+							}
+
+						}
+					}
+
+					//if(position == 10784184 && cytosineType.equalsIgnoreCase("HCH")){
+					//	System.err.println(i + "\t" + pos + "\t" + tmpMethyStatus.ratio + "\t" + tmpMethyStatus.genotype.isHet() + "\t" + base + "\t" + tmpMethyStatus.genotype.base1 + "\t" + tmpMethyStatus.genotype.base2 + "\t" + countMatched);
+					//}
+
+				}
 			}
-			if ((countMatchedOnFwd < cytosineType.length() - 1) && (countMatchedOnRvd < cytosineType.length() - 1))
+
+			//if(position == 10784184 && cytosineType.equalsIgnoreCase("HCH")){
+			//	System.err.println(countMatched + "\t" + bestCytosinePattern + "\t" + cytosinePatternNegStrand + "\t" + cytosinePos);
+			//}
+			
+			if (countMatched < cytosineType.length() || heterozygousPattern ){
 				continue;
-
-			// check at cytosine position now
-			if (!firstSeen) {
-
-			} else {
-				firstSeen = false;
-
-				tmpGL.clearLikelihoods(tmpMethy);
-				if (position == BAC.testLocus) {
-					tmpGL.VERBOSE = true;
-					System.err.println("cytosineType: " + cytosineType);
+			}else{
+				if(bestCytosinePattern != null){
+					if(bestCytosinePattern.length() >= countMatched){
+						continue;
+					}
 				}
-
-				int nGoodBases = tmpGL.add(pileup, true, true);
-				if (nGoodBases == 0)
-					break;
-				double[] posteriorNormalized = MathUtils.normalizeFromLog10(tmpGL.getPosteriors(), true, false);
-
-				getBestGenotypeFromPosterior(posteriorNormalized, cytosineAndAdjacent, 0, position);
-			}
-
-			methyStatus tmpMethyStatus = cytosineAndAdjacent.get(0);
-			if (tmpMethyStatus == null) {
-				continue;
-			} else if (tmpMethyStatus.genotype == null) {
-				continue;
-			} else if (tmpMethyStatus.genotype.isHet()) {
-				// for CpG, if C is heterozygous,then marked it here.
-				if (BaseUtilsMore.iupacCodeEqualNotConsiderMethyStatus(BaseUtils.C, tmpMethyStatus.genotype.base1)
-						|| BaseUtilsMore.iupacCodeEqualNotConsiderMethyStatus(BaseUtils.C, tmpMethyStatus.genotype.base2)) {
-
-					if (tmpMethyStatus.ratio < this.BAC.STANDARD_CONFIDENCE_FOR_CALLING) {
-						continue;
-					}
-
-					heterozygousPattern = true;
-					basesAlelleAFwd[cytosinePos - 1] = tmpMethyStatus.genotype.base1;
-					basesAlelleBFwd[cytosinePos - 1] = tmpMethyStatus.genotype.base2;
-					countMatchedOnFwd++;
-					adjacentCytosineSeqLikelihood += tmpMethyStatus.ratio;
-				} else if (BaseUtilsMore.iupacCodeEqualNotConsiderMethyStatus(BaseUtils.C, BaseUtilsMore.iupacCodeComplement(tmpMethyStatus.genotype.base1))
-						|| BaseUtilsMore.iupacCodeEqualNotConsiderMethyStatus(BaseUtils.C, BaseUtilsMore.iupacCodeComplement(tmpMethyStatus.genotype.base2))) {
-
-					if (tmpMethyStatus.ratio < this.BAC.STANDARD_CONFIDENCE_FOR_CALLING) {
-						continue;
-					}
-
-					heterozygousPattern = true;
-					basesAlelleARev[cytosinePos - 1] = BaseUtilsMore.iupacCodeComplement(tmpMethyStatus.genotype.base1);
-					basesAlelleBRev[cytosinePos - 1] = BaseUtilsMore.iupacCodeComplement(tmpMethyStatus.genotype.base2);
-					countMatchedOnRvd++;
-					adjacentCytosineSeqLikelihoodReverseStrand += tmpMethyStatus.ratio;
-				} else {
-					continue;
-				}
-
-			} else {
-
-				if (BaseUtilsMore.iupacCodeEqualNotConsiderMethyStatus(BaseUtils.C, tmpMethyStatus.genotype.base1)) {
-
-					if (tmpMethyStatus.ratio < this.BAC.STANDARD_CONFIDENCE_FOR_CALLING) {
-						continue;
-					}
-
-					countMatchedOnFwd++;
-					adjacentCytosineSeqLikelihood += tmpMethyStatus.ratio;
-				} else if (BaseUtilsMore.iupacCodeEqualNotConsiderMethyStatus(BaseUtils.C, BaseUtilsMore.iupacCodeComplement(tmpMethyStatus.genotype.base1))) {
-
-					if (tmpMethyStatus.ratio < this.BAC.STANDARD_CONFIDENCE_FOR_CALLING) {
-						continue;
-					}
-
-					countMatchedOnRvd++;
-					adjacentCytosineSeqLikelihoodReverseStrand += tmpMethyStatus.ratio;
-				} else {
-
-				}
-
-			}
-
-			if (tmpMethyStatus.ratio > maxRatioInCytosinePos) {
-				maxRatioInCytosinePos = tmpMethyStatus.ratio;
-			}
-
-			if (countMatchedOnFwd >= cytosineType.length()) {
-				//CytosineParameters cps = new CytosineParameters();
+				bestCytosinePattern = cytosineType;
 				cps.isCytosinePattern = true;
 				cps.cytosineMethylation = tmpMethy;
-				cps.cytosineStrand = '+';
-				if (heterozygousPattern || heterozygousAtContext) {
-					cps.isHeterozygousCytosinePattern = heterozygousPattern;
-					cps.isHeterozygousInContextPosition = heterozygousAtContext;
-					cps.patternOfAlleleA = new String(basesAlelleAFwd);
-					cps.patternOfAlleleB = new String(basesAlelleBFwd);
+				cps.isHeterozygousCytosinePattern = heterozygousPattern;
+				cps.isHeterozygousInContextPosition = heterozygousAtContext;
 
-					if ((basesAlelleAFwd[cytosinePos - 1] == BaseUtils.C && basesAlelleBFwd[cytosinePos - 1] == BaseUtils.T)
-							|| (basesAlelleAFwd[cytosinePos - 1] == BaseUtils.T && basesAlelleBFwd[cytosinePos - 1] == BaseUtils.C)
-							|| (basesAlelleAFwd[cytosinePos - 1] == BaseUtils.G && basesAlelleBFwd[cytosinePos - 1] == BaseUtils.A)
-							|| (basesAlelleAFwd[cytosinePos - 1] == BaseUtils.A && basesAlelleBFwd[cytosinePos - 1] == BaseUtils.G)) {
-						cps.isCTHeterozygousLoci = true;
+				if(cytosinePatternNegStrand){
+					cps.cytosineStrand = '-';
+					if (heterozygousPattern || heterozygousAtContext) {
+						cps.patternOfAlleleA = new String(basesAlelleARev);
+						cps.patternOfAlleleB = new String(basesAlelleBRev);
+
+						if ((basesAlelleARev[cytosinePos - 1] == BaseUtils.C && basesAlelleBRev[cytosinePos - 1] == BaseUtils.T)
+								|| (basesAlelleARev[cytosinePos - 1] == BaseUtils.T && basesAlelleBRev[cytosinePos - 1] == BaseUtils.C)
+								|| (basesAlelleARev[cytosinePos - 1] == BaseUtils.G && basesAlelleBRev[cytosinePos - 1] == BaseUtils.A)
+								|| (basesAlelleARev[cytosinePos - 1] == BaseUtils.A && basesAlelleBRev[cytosinePos - 1] == BaseUtils.G)) {
+							cps.isCTHeterozygousLoci = true;
+						}
+
 					}
+				}else{
+					cps.cytosineStrand = '+';
+					if (heterozygousPattern || heterozygousAtContext) {
+						cps.patternOfAlleleA = new String(basesAlelleAFwd);
+						cps.patternOfAlleleB = new String(basesAlelleBFwd);
 
+						if ((basesAlelleAFwd[cytosinePos - 1] == BaseUtils.C && basesAlelleBFwd[cytosinePos - 1] == BaseUtils.T)
+								|| (basesAlelleAFwd[cytosinePos - 1] == BaseUtils.T && basesAlelleBFwd[cytosinePos - 1] == BaseUtils.C)
+								|| (basesAlelleAFwd[cytosinePos - 1] == BaseUtils.G && basesAlelleBFwd[cytosinePos - 1] == BaseUtils.A)
+								|| (basesAlelleAFwd[cytosinePos - 1] == BaseUtils.A && basesAlelleBFwd[cytosinePos - 1] == BaseUtils.G)) {
+							cps.isCTHeterozygousLoci = true;
+						}
+
+					}
 				}
-				//cps.isReferenceCytosinePattern = BaseUtilsMore.searchIupacPatternFromBases(cytosineType.getBytes(), refWindFwd, false);
+				cytosineParametersStatus.put(cytosineType, cps);
+			}
 				
 
-				if (adjacentCytosineSeqLikelihood > maxRatio) {
-					maxRatio = adjacentCytosineSeqLikelihood;
 
-					bestCytosinePattern = cytosineType;
-				}
-				//cytosineParametersStatus.put(cytosineType, cps);
 
-			} else if (countMatchedOnRvd >= cytosineType.length()) {
-				//CytosineParameters cps = new CytosineParameters();
-				cps.isCytosinePattern = true;
-				cps.cytosineMethylation = tmpMethy;
-				cps.cytosineStrand = '-';
-				if (heterozygousPattern || heterozygousAtContext) {
-					cps.isHeterozygousCytosinePattern = heterozygousPattern;
-					cps.isHeterozygousInContextPosition = heterozygousAtContext;
-					cps.patternOfAlleleA = new String(basesAlelleARev);
-					cps.patternOfAlleleB = new String(basesAlelleBRev);
 
-					if ((basesAlelleARev[cytosinePos - 1] == BaseUtils.C && basesAlelleBRev[cytosinePos - 1] == BaseUtils.T)
-							|| (basesAlelleARev[cytosinePos - 1] == BaseUtils.T && basesAlelleBRev[cytosinePos - 1] == BaseUtils.C)
-							|| (basesAlelleARev[cytosinePos - 1] == BaseUtils.G && basesAlelleBRev[cytosinePos - 1] == BaseUtils.A)
-							|| (basesAlelleARev[cytosinePos - 1] == BaseUtils.A && basesAlelleBRev[cytosinePos - 1] == BaseUtils.G)) {
-						cps.isCTHeterozygousLoci = true;
-					}
-
-				}
-				//cps.isReferenceCytosinePattern = BaseUtilsMore.searchIupacPatternFromBases(cytosineType.getBytes(), refWindRvd, true);
-				if (adjacentCytosineSeqLikelihoodReverseStrand > maxRatio) {
-					maxRatio = adjacentCytosineSeqLikelihoodReverseStrand;
-
-					bestCytosinePattern = cytosineType;
-				}
-				//cytosineParametersStatus.put(cytosineType, cps);
-
-			} else {
-				//CytosineParameters cps = new CytosineParameters();
-				//cps.isReferenceCytosinePattern = BaseUtilsMore.searchIupacPatternFromBases(cytosineType.getBytes(), refWindRvd, true);
-				cps.isCytosinePattern = false;
-				//cytosineParametersStatus.put(cytosineType, cps);
-			}
-			cytosineParametersStatus.put(cytosineType, cps);
+			
 			
 			if (position == BAC.testLocus) {
-				System.err.println("countMatchedOnFwd: " + countMatchedOnFwd + "\tcountMatchedOnRvd: " + countMatchedOnRvd);
+				System.err.println("countMatchedOnFwd: " + countMatched );
 			}
 		}
 
