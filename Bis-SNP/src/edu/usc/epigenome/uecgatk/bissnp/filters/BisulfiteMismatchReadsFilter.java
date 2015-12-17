@@ -64,4 +64,10 @@ public class BisulfiteMismatchReadsFilter extends ReadFilter {
 		return false;
 	}
 
+	@Override
+	public boolean filterOut(SAMRecord arg0, SAMRecord arg1) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
 }

@@ -37,6 +37,7 @@ import org.broadinstitute.sting.utils.sam.GATKSAMRecord;
 import edu.usc.epigenome.uecgatk.bissnp.BaseUtilsMore;
 import edu.usc.epigenome.uecgatk.bissnp.filters.InvertedDupsReadFilter;
 import edu.usc.epigenome.uecgatk.bissnp.filters.NotProperPairedReadFilter;
+import edu.usc.epigenome.uecgatk.bissnp.filters.BisulfiteMismatchReadsFilter;
 
 /**
  * @author yaping
@@ -48,7 +49,7 @@ import edu.usc.epigenome.uecgatk.bissnp.filters.NotProperPairedReadFilter;
 @Reference(window=@Window(start=-500,stop=500))
 @By(DataSource.READS)
 @Requires({DataSource.REFERENCE, DataSource.REFERENCE_BASES, DataSource.READS})
-@ReadFilters( {UnmappedReadFilter.class, MappingQualityFilter.class, BadMateFilter.class, NotPrimaryAlignmentFilter.class, DuplicateReadFilter.class, FailsVendorQualityCheckFilter.class, InvertedDupsReadFilter.class, NotProperPairedReadFilter.class} )
+@ReadFilters( {UnmappedReadFilter.class, MappingQualityFilter.class, BadMateFilter.class, NotPrimaryAlignmentFilter.class, DuplicateReadFilter.class, FailsVendorQualityCheckFilter.class, InvertedDupsReadFilter.class, NotProperPairedReadFilter.class, BisulfiteMismatchReadsFilter.class} )
 
 public class QuickMethylationLevelWalker extends ReadWalker<QuickMethylationLevelWalker.Datum, QuickMethylationLevelWalker.Datum> {
 

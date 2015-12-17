@@ -74,7 +74,7 @@ close(TMP);
 my $tmp_out=$prefix.".alignTo.$bw_prefix.min_data-$min_data.tmp_out.".rand().".tab";
 #my $tmp_paste=$prefix.".alignTo.$bw_prefix.min_data-$min_data.tmp_paste.".rand().".tab";
 
-my $cmd_tmp="/home/unix/lyping/compbio/software/UCSC_tools/bigWigAverageOverBed $input_wig $tmp_loc $tmp_out\n";
+my $cmd_tmp="bigWigAverageOverBed $input_wig $tmp_loc $tmp_out\n";
 system($cmd_tmp) == 0 or die "can't execute $cmd_tmp :$!\n";
 
 #

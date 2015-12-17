@@ -1125,3 +1125,74 @@ file_proportion<-function(files,breaks=4,bin_size_align=1, bin_size=20, scale=10
 	propor<-list(lht=lht,numEqualFracInRows=numEqualFracInRows)
 	propor
 }
+
+
+
+###added 2015-11-20
+plotHeatmapGeneral<-function(d, addNumber=FALSE,  na.color=par("bg"),label=TRUE,heatMapCols=jet.colors,colLim=NULL, ...){	
+	heatMapColsPlot<-colorRampPalette(heatMapCols)(100)
+	
+	breaks<-seq(min(d,na.rm=T), max(d,na.rm=T), length = (length(heatMapColsPlot)+1))
+	par(mar=c(1.5, 1.5, 1.5,2.0),usr=c(0,1,0,1))
+	nr=dim(d)[1]
+	nc=dim(d)[2]	
+	missingExist <- any(is.na(d))
+	if (missingExist) {
+		mmat <- ifelse(is.na(d), 1, NA)
+		image(1:nc, 1:nr, t(mmat), axes = FALSE, xlab = "", ylab = "", col = na.color)
+	}
+	if(!is.null(colLim)){
+		d[d<colLim[1]]=colLim[1]
+		d[d>colLim[2]]=colLim[2]
+		breaks<-seq(colLim[1], colLim[2], length = (length(heatMapColsPlot)+1))
+	}
+	image(1:nc, 1:nr, t(d), xlim = 0.5 + c(0, nc), ylim = 0.5 + 
+					c(0, nr), axes = FALSE, xlab = "", ylab = "", col = heatMapColsPlot, 
+			breaks = breaks, add = ifelse(missingExist,TRUE,FALSE), ...)
+	
+	if(addNumber){
+		axis(4, 0.5 + seq(0,nr,by=nr/5), labels=format(seq(0,nr,by=nr/5),digits=2), las = 2, tick = TRUE, font=1,cex.axis=0.5,line=0)
+	}
+	box(lty = '1111', col = 'black',cex=1)
+}
+
+
+plotSideBarGeneral<-function(col_list.reorder, horizontal=TRUE){
+	if(horizontal){
+		par(mar=c(1.5,0,1.5,0),usr=c(0,1,0,1))
+	}else{
+		par(mar=c(0,1.5,0,2.0),usr=c(0,1,0,1))
+	}
+	
+	if(horizontal){
+		image(1, 1:length(col_list.reorder), t(as.matrix(1:length(col_list.reorder))), col = as.vector(col_list.reorder), axes = FALSE)
+	}else{
+		image(1:length(col_list.reorder), 1, as.matrix(1:length(col_list.reorder)), col = as.vector(col_list.reorder), axes = FALSE)
+	}
+	axis(3, 1/2, "", las = 2, tick = FALSE, font=2)
+}
+
+plotTreeGeneral<-function(tree, horizontal=TRUE){
+	if(horizontal){
+		par(mar=c(1.5,0.5,1.5,0.5),usr=c(0,1,0,1))
+	}else{
+		par(mar=c(0.5, 0, 1.5, 0.5),usr=c(0,1,0,1))
+	}
+	plot(tree, horiz = horizontal, axes = FALSE, yaxs = "i", leaflab = "none")
+	
+}
+
+
+plotTree<-function(tree, horizontal=TRUE){
+	par(mar=c(0.5, 0, 1.5, 0.5),usr=c(0,1,0,1))
+	plot(tree, horiz = horizontal, axes = FALSE, yaxs = "i", leaflab = "none")
+	
+}
+
+
+
+
+
+
+
+
