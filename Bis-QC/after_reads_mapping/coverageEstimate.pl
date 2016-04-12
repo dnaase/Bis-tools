@@ -107,8 +107,8 @@ if(scalar(@intervals)==0 && $whole_genome ne ""){
 				"$bistools_path/resource/interval/hg19/knownGene-intergenic-ucsc08082013.2kbUpstreamFromGenes.uniq.hg19.noChrM.bed",
 				"$bistools_path/resource/interval/hg19/Takai_Jones_plus_GG.merged.hg19.bed",
 				"$bistools_path/resource/interval/hg19/xie_cuddapeh_plus_kim.orientedOnly.noKnownTss4kb.hg19.1kbUpDown.bed",
-				"$bistools_path/resource/interval/hg19/UCSC.ChromHmm.HMEC.hg19.StrongEnhancer.bed",						
-				"$bistools_path/resource/interval/hg19/wgEncodeOpenChromDnaseHmecPk.narrowPeak.bed");
+				"$bistools_path/resource/interval/hg19/UCSC.wgEncodeBroadHmmGm12878HMM.SE.hg19.bed",						
+				"$bistools_path/resource/interval/hg19/wgEncodeUwDnaseGm12878HotspotsRep1.hg19.bed");
 }
 
 foreach my $interval(@intervals){

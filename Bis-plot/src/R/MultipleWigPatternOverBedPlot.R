@@ -83,17 +83,20 @@ data_min=NA
 if(autoScale){
 	for(fn in fns){
 		gch<-read.table(fn,sep="\t",header=F)	
+		#gch[gch[,4]%in%"-",5:length(gch[1,])]=0-gch[gch[,4]%in%"-",5:length(gch[1,])]
 		if(smooth == 0){ ## no smooth
 			axisSeq<-seq(0-scale, scale, by=step)
 			dataSeq<-seq(5+((length(gch[1,])-5)/2)-as.integer(scale/bin_size_align), 5+((length(gch[1,])-5)/2)+as.integer(scale/bin_size_align), by=as.integer(step/bin_size_align))
 		}
 		if(smooth != 0){ ## smooth
 			axisSeq<-seq(0-scale, scale, by=smooth)
-			dataSeq<-seq(5+((length(gch[1,])-5)/2)-scale, 5+((length(gch[1,])-5)/2)-scale+scale * 2, by=smooth)
+			dataSeq<-seq(5+((length(gch[1,])-5)/2)-as.integer(scale/bin_size_align), 5+((length(gch[1,])-5)/2)+as.integer(scale/bin_size_align), by=as.integer(smooth/bin_size_align))
 			
 		}
 		
 		valueGch<-NULL	
+		
+		
 		for(i in dataSeq){
 			if(floor(i+step/(2*bin_size_align)-1)-ceiling(i-step/(2*bin_size_align)) <= 0){
 				valueGch<-cbind(valueGch,mean(gch[,ceiling(i-step/(2*bin_size_align))], na.rm=T))	
@@ -125,14 +128,14 @@ if(lowCov){
 
 for(j in fileOrder){
 	gch<-read.table(fns[j],sep="\t",header=F)	
-	
+	#gch[gch[,4]%in%"-",5:length(gch[1,])]=0-gch[gch[,4]%in%"-",5:length(gch[1,])]
 	if(smooth == 0){ ## no smooth
 		axisSeq<-seq(0-scale, scale, by=step)
 		dataSeq<-seq(5+((length(gch[1,])-5)/2)-as.integer(scale/bin_size_align), 5+((length(gch[1,])-5)/2)+as.integer(scale/bin_size_align), by=as.integer(step/bin_size_align))
 	}
 	if(smooth != 0){ ## smooth
 		axisSeq<-seq(0-scale, scale, by=smooth)
-		dataSeq<-seq(5+((length(gch[1,])-5)/2)-scale, 5+((length(gch[1,])-5)/2)-scale+scale * 2, by=smooth)
+		dataSeq<-seq(5+((length(gch[1,])-5)/2)-as.integer(scale/bin_size_align), 5+((length(gch[1,])-5)/2)+as.integer(scale/bin_size_align), by=as.integer(smooth/bin_size_align))
 		
 	}
 	valueGch<-array()

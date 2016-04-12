@@ -157,3 +157,9 @@ test/Bis-QC/IMR90_nomeseq_C18FYACXX.1Mreads.R2.fastq
 test/Bis-QC/snp.raw.vcf
 test/Bis-seg/HCT116.autoPlusChrX.cytosine.trainedHMM.minCT1.gap10k.txt
 test/Bis-seg/new/HCT116_merge_C118BACXX_C18FYACXX_D1W2BACXX.fastq-mcf.hg19.mdups.header.clean.realign.recal.cytosine.filtered.sort.BisSNP-0.81.1.GCH.chr21.bed
+resource/dbSNP/dbsnp_135.hg19_rCRSchrm.sort.vcf
+resource/dbSNP/dbsnp_135.hg19_rCRSchrm.sort.vcf.idx
+Bis-plot/test.all_cytosine_oocyte.alignedTo.test2.1200.1.txt
+Bis-plot/test.all_cytosine_oocyte.alignedTo.test2.1200.1.txt.pdf
+Bis-SNP/adam.log
+test/Bis-plot/test2.bedgraph

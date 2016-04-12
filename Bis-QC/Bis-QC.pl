@@ -197,7 +197,7 @@ sub mode_1 {
 	
 	##STEP 2 (Mode 1): coverage distribution check
 	if($disable_coverage_check eq ""){
-		#check_cov_dist(@ARGV);
+		check_cov_dist(@ARGV);
 	}
 	
 	##STEP 3 (Mode 1): NOMe enzyme efficiency check. Plot average NOMe-seq signal around CTCF and CGI_TSS
@@ -206,9 +206,9 @@ sub mode_1 {
 	}
 	
 	##STEP 4 (Mode 1): NOMe enzyme CCG off-target check. check trinucleotide methylation level in chr21 and chrM
-	#if($disable_trinuc_check eq ""){
-	#	check_trinuc(@ARGV);
-	#}
+	if($disable_trinuc_check eq ""){
+		check_trinuc(@ARGV);
+	}
 	
 }
 
@@ -309,7 +309,7 @@ sub check_cov_dist {
 	my $prefix=basename($bam);
 	my $dirname=dirname($bam);
 	$prefix=~s/(\w+)\S+$/Coverage_distribution_$1/;
-	my $cmd="perl $bistools_path/Bis-QC/after_reads_mapping/coverageEstimate.pl --mem $mem --cpu $nt --ref $genome --bissnp $bistools_path/Bis-SNP/Bis-SNP.latest.jar --result_dir $dirname  $prefix $bam\n";
+	my $cmd="perl $bistools_path/Bis-QC/after_reads_mapping/coverageEstimate.pl --covs 1 --covs 3 --covs 5 --covs 7 --covs 10 --covs 15 --covs 20 --covs 30 --covs 60 --mem $mem --cpu $nt --ref $genome --bissnp $bistools_path/Bis-SNP/Bis-SNP.latest.jar --result_dir $dirname  $prefix $bam\n";
 	print STDERR "Coverage distribution check:\n $cmd\n";
 	system($cmd)==0 || die "Unexpected stop at coverage distribution check step: $! \n";
 }
@@ -322,7 +322,7 @@ sub check_enzyme_eff {
 	my $dirname=dirname($bam);
 	if(scalar(@enzyme_eff_regions)==0){
 		$prefix=~s/(\w+)\S+$/Conserved_CTCF_$1/;
-		my $cmd="perl $bistools_path/Bis-QC/after_reads_mapping/MethyPatternAlignEasyUsage.pl --mem $mem --cpu $nt --nomeseq $bistools_path/Bis-SNP/Bis-SNP.latest.jar $bam $bistools_path/resource/ctcf/xie_cuddapeh_plus_kim.orientedOnly.noKnownTss4kb.hg19.sort.bed $genome $prefix $dbsnp ";
+		my $cmd="perl $bistools_path/Bis-QC/after_reads_mapping/MethyPatternAlignEasyUsage.pl --mem $mem --cpu $nt --nomeseq $bistools_path/Bis-SNP/Bis-SNP.latest.jar $bam $bistools_path/resource/ctcf/wgEncodeUwTfbsAllCtcf.hg19.uniq.no_ensembl_r75_tss.chr1.sort.bed $genome $prefix $dbsnp ";
 		$cmd.="--r_script $bistools_path/Bis-QC/after_reads_mapping/MethyPatternFeaturePlotForNOMeSeq.R --sort_perl_script $bistools_path/utils/sortByRefAndCor.pl --result_dir $dirname\n";
 		print STDERR "Check NOMe Enyzme efficiency methylation/accessibility level around conserved CTCF motif:\n $cmd\n";
 		print STDERR "Default refion is on hg19 !!!\n";
