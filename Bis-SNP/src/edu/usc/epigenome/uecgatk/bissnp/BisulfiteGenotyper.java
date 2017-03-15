@@ -92,7 +92,7 @@ import edu.usc.epigenome.uecgatk.bissnp.filters.BisulfiteMismatchReadsFilter;
 //@BisBAQMode(QualityMode = BisBAQ.QualityMode.ADD_TAG, ApplicationTime = BisBAQ.ApplicationTime.ON_INPUT)
 @Reference(window = @Window(start = -500, stop = 500))
 @By(DataSource.READS)
-@ReadFilters({UnmappedReadFilter.class, DuplicateReadFilter.class, NotPrimaryAlignmentFilter.class, FailsVendorQualityCheckFilter.class, MappingQualityFilter.class, MappingQualityZeroFilter.class, NotProperPairedReadFilter.class, InvertedDupsReadFilter.class, BisulfiteMismatchReadsFilter.class, BisulfiteIncompleteConvReadsFilter.class, BisulfiteFivePrimeConvReadsFilter.class})
+@ReadFilters({UnmappedReadFilter.class, DuplicateReadFilter.class, NotPrimaryAlignmentFilter.class, FailsVendorQualityCheckFilter.class, MappingQualityFilter.class, NotProperPairedReadFilter.class, InvertedDupsReadFilter.class, BisulfiteMismatchReadsFilter.class, BisulfiteIncompleteConvReadsFilter.class, BisulfiteFivePrimeConvReadsFilter.class})
 @Downsample(by = DownsampleType.NONE)
 public class BisulfiteGenotyper extends LocusWalker<BisulfiteVariantCallContext, BisulfiteGenotyper.ContextCondition> implements
 		TreeReducible<BisulfiteGenotyper.ContextCondition> {

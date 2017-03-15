@@ -9,7 +9,7 @@
 ## 4. label multiple matrix name, also cluster tree
 
 ###############################################################################
-source("/Users/yaping/Documents/workspace/code/github/bis-tools/Bis-tools/Bis-plot/src/R/heatmapRUtils.R")
+source("/Users/yaping/Documents/workspace/code/Bis-tools/Bis-plot/src/R/heatmapRUtils.R")
 library(gplots)
 library(colorRamps)
 library(RColorBrewer)
@@ -47,7 +47,7 @@ multiSampleClustering=NULL
 regionToClusterLow=-500
 regionToClusterHigh=500
 addAverage=FALSE
-
+simpleSorting=FALSE
 
 breaks<-NULL 
 wd="./"
@@ -126,6 +126,9 @@ for (e in commandArgs(TRUE)) {
 		if(ta[[1]][1] == "notPlotIndexMatrix"){
 			notPlotIndexMatrix<-as.logical(ta[[1]][2])
 		}
+		if(ta[[1]][1] == "simpleSorting"){
+			simpleSorting<-as.logical(ta[[1]][2])
+		}
 		if(ta[[1]][1] == "multiSampleClustering"){
 			multiSampleClustering<-c(multiSampleClustering, as.numeric(ta[[1]][2]))
 		}
@@ -148,7 +151,7 @@ for(i in seq(1,length(files),by=breaks)){ ##do it in multiple locations
 	filesInOneLoc<-files[start:end]
 	limit<-plotMultiWigToHeatmapPlusAveInSingleLoc(filesInOneLoc, sampleNames[start:end],prefix=prefix[start], fileNumToOrder=multiSampleClustering, regionToCluster=regionToCluster,numCluster=numCluster[start], notPlotIndexMatrix=notPlotIndexMatrix, 
 			bin_size_align=bin_size_align,bin_size=bin_size, scale=scale,heatmap_clustering_bin_size_align=heatmap_clustering_bin_size_align, heatmap_clustering_bin_size=heatmap_clustering_bin_size,heatmap_clustering_scale=heatmap_clustering_scale,
-			capLimit=capLimit[start:end],capUpLimit=capUpLimit[start:end], capDownLimit=capDownLimit[start:end],logScale=logScale[start:end],heatMapCols=heatMapCols[start:end], addAverage=addAverage)
+			capLimit=capLimit[start:end],capUpLimit=capUpLimit[start:end], capDownLimit=capDownLimit[start:end],logScale=logScale[start:end],heatMapCols=heatMapCols[start:end], addAverage=addAverage, simpleSortin=simpleSorting)
 
 }
 

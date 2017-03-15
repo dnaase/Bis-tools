@@ -17,16 +17,17 @@ library(dendextend)
 
 ###function to plot one NOMe-seq clustering heatmap + multiple ChIP-seq heatmap
 plotMultiWigToHeatmapPlusAveInSingleLoc<-function(files, sampleNames, prefix="test",capUpLimit=NULL, capDownLimit=NULL,fileNumToOrder=1, regionToCluster=c(-500,500), numCluster=2, bin_size_align=20, notPlotIndexMatrix=FALSE,
-		bin_size=20, scale=5000, heatmap_clustering_bin_size_align=1, heatmap_clustering_bin_size=20, heatmap_clustering_scale=1000, capLimit=NULL, logScale=NULL, heatMapCols=NULL, addAverage=addAverage, order_dendgram=NULL){##return limit boundary of the data
+		bin_size=20, scale=5000, heatmap_clustering_bin_size_align=1, heatmap_clustering_bin_size=20, heatmap_clustering_scale=1000, capLimit=NULL, logScale=NULL, heatMapCols=NULL, addAverage=addAverage, simpleSorting=FALSE, order_dendgram=NULL){##return limit boundary of the data
 	##read index matrix, do clustering
-	orderStat<-clusteringMultiMatrixNew(files[fileNumToOrder],regionToCluster=regionToCluster, numCluster=numCluster, bin_size_align=heatmap_clustering_bin_size_align, bin_size=heatmap_clustering_bin_size, scale=heatmap_clustering_scale, order_dendgram=order_dendgram)
+	orderStat<-clusteringMultiMatrixNew(files[fileNumToOrder],regionToCluster=regionToCluster, numCluster=numCluster, bin_size_align=heatmap_clustering_bin_size_align, bin_size=heatmap_clustering_bin_size, scale=heatmap_clustering_scale, order_dendgram=order_dendgram, simpleSorting=simpleSorting)
 	
 	##read data, follow the order index matrix give
 	
 	if(!is.null(logScale)){
 		#logScale=logScale[-fileNumToOrder]
 	}
-	dataSummaryFrame<-readMultiMatrix(files[-fileNumToOrder], sampleNames[-fileNumToOrder],rowOrder=orderStat$rowOrder, capUpLimit=capUpLimit[-fileNumToOrder], capDownLimit=capDownLimit[-fileNumToOrder],numCluster=numCluster,
+	#print(fileNumToOrder)
+	dataSummaryFrame<-readMultiMatrix(files[-fileNumToOrder], sampleNames[-fileNumToOrder],rowOrder=orderStat$rowOrder, capUpLimit=capUpLimit[-fileNumToOrder], capDownLimit=capDownLimit[-fileNumToOrder],numCluster=numCluster,regionToCluster=regionToCluster,
 			subClusterOrder=orderStat$subClusterOrder, doClustering=F, capLimit=capLimit[-fileNumToOrder], logScale=logScale[-fileNumToOrder], bin_size_align=bin_size_align, bin_size=bin_size,scale=scale) 
 	##get a data frame, 1st is category name, 2nd is average data in each category, 3rd is data matrix ordered in each category, 4th is hclust tree, 5th is value limit
 	##name, average, matrix, tree, limit
@@ -35,18 +36,19 @@ plotMultiWigToHeatmapPlusAveInSingleLoc<-function(files, sampleNames, prefix="te
 	##layout
 	#####make the distribution of height and width in each block
 	
-	numEqualFracInRows=ifelse(addAverage,9.5,7.5) #1:6:2 or when no average plot, 1:6
-	numEqualFracInCols=1+0.1+3*length(fileNumToOrder)+length(files)-length(fileNumToOrder) #tree, sideBar, index matrix, chip-seq sample
+	numEqualFracInRows=ifelse(addAverage,9,7) #1:6:2 or when no average plot, 1:6
+	#numEqualFracInCols=1+0.1+3*length(fileNumToOrder)+length(files)-length(fileNumToOrder) #tree, sideBar, index matrix, chip-seq sample
+	numEqualFracInCols=0.8 + 0.2 + length(files)
 	numCols=2+length(files)
 	numRows=ifelse(addAverage,3,2)
 	
-	titleFrac=1.5/numEqualFracInRows
+	titleFrac=1/numEqualFracInRows
 	heatmapFrac=6/numEqualFracInRows
 	averageFrac=2/numEqualFracInRows
 	
 	
-	treeFrac=1/numEqualFracInCols
-	sideBarFrac=0.1/numEqualFracInCols
+	treeFrac=0.8/numEqualFracInCols
+	sideBarFrac=0.2/numEqualFracInCols
 	indexFrac=1/numEqualFracInCols
 	sampleFrac=1/numEqualFracInCols
 	
@@ -736,7 +738,7 @@ plotHeatmap<-function(x, categoryNum,addNumber=FALSE, xAxisScale=c(-5000,5000), 
 		axis(1, at= (0.5 + c(0,nc/2,nc)), labels=s, las = 1, tick = TRUE, font=1,cex.axis=1,line=0)
 		axis(4, 0.5 + seq(0,nr,by=nr/5), labels=format(seq(0,nr,by=nr/5),digits=2), las = 2, tick = TRUE, font=1,cex.axis=1,line=0)
 	}
-	#box(lty = '1111', col = 'black',cex=1)
+	box(lty = '1111', col = 'black',cex=1)
 }
 
 ##TODO: need to make plot multiple sidebar possible...
@@ -901,7 +903,7 @@ plotAverage<-function(x, categoryNum, xAxisScale=c(-5000,5000), xStep=5000, yAxi
 	
 }
 
-readSingleMatrix<-function(fileName,capLimit=T, capUpLimit=NULL, capDownLimit=NULL, logScale=F, psedoCount=0.1, median=F, bin_size_align=20, bin_size=20, scale=5000){
+readSingleMatrix<-function(fileName,capLimit=T, capUpLimit=NULL, capDownLimit=NULL, logScale=F, psedoCount=0.0001, median=F, bin_size_align=20, bin_size=20, scale=5000){
 	content<-read.table(fileName,sep="\t",header=F)	
 	content<-content[!duplicated(content),]
 	rownames(content)<-paste(content[,1],content[,2],content[,3],content[,4],sep=":")
@@ -940,6 +942,10 @@ readSingleMatrix<-function(fileName,capLimit=T, capUpLimit=NULL, capDownLimit=NU
 readMultiMatrix<-function(files, sampleNames, rowOrder=NULL, subClusterOrder=NULL, fileNumToOrder=1, doClustering=T, regionToCluster=c(-500,500),numCluster=2,
 		capLimit=NULL, capUpLimit=NULL, capDownLimit=NULL, logScale=NULL, psedoCount=0.1, median=F, bin_size_align=20, bin_size=20, scale=5000){ ##by default, capLimit top 5% and bottom 5% for ChIP-seq, require the first 3 columns in each line have: chr, start, end, strand 
 	##do clustering or ordering the index matrix
+	#print(scale)
+	#print(regionToCluster)
+	#print(bin_size_align)
+	#print(bin_size)
 	binToCluster<-(seq(as.integer((scale+regionToCluster[1])/bin_size_align),as.integer((scale+regionToCluster[2])/bin_size_align),by=as.integer(bin_size/bin_size_align)))/(bin_size/bin_size_align)
 	tree<-NULL
 	if(!is.null(rowOrder)){
@@ -970,7 +976,9 @@ readMultiMatrix<-function(files, sampleNames, rowOrder=NULL, subClusterOrder=NUL
 
 
 	matAverage<-array(NA, dim = c(length(sampleNames),numCluster, nc))
+	#print(files)
 	for(i in 1:length(files)){
+		print(files[i])
 		content<-readSingleMatrix(files[i],capLimit=ifelse(is.null(capLimit),FALSE,capLimit[i]),capUpLimit=capUpLimit[i], capDownLimit=capDownLimit[i], logScale=ifelse(is.null(logScale),FALSE,logScale[i]), psedoCount=psedoCount, median=median,bin_size_align=bin_size_align,bin_size=bin_size,scale=scale)
 		commonNames<-intersect(commonNames,rownames(content))
 
@@ -978,6 +986,11 @@ readMultiMatrix<-function(files, sampleNames, rowOrder=NULL, subClusterOrder=NUL
 			#matAverage[i,]<-colMedians(content,na.rm=T)
 		}else{
 			if(is.null(subClusterOrder) || numCluster<2){
+				##print(dim(matAverage))
+				#print(length(sampleNames))
+				#print(numCluster)
+				#print(nc)
+				#print(dim(content))
 				matAverage[i,1,]<-colMeans(content,na.rm=T)
 			}else{
 				for(num in c(1:numCluster)){
@@ -992,6 +1005,7 @@ readMultiMatrix<-function(files, sampleNames, rowOrder=NULL, subClusterOrder=NUL
 	nr<-length(commonNames)
 	mat<-array(NA, dim = c(length(sampleNames),nr,nc))
 	for(i in 1:length(files)){
+		#print(files[i])
 		content<-readSingleMatrix(files[i],capLimit=ifelse(is.null(capLimit),FALSE,capLimit[i]),capUpLimit=capUpLimit[i], capDownLimit=capDownLimit[i], logScale=ifelse(is.null(logScale),FALSE,logScale[i]), psedoCount=psedoCount, median=median,bin_size_align=bin_size_align,bin_size=bin_size,scale=scale)
 		content<-content[commonNames,]
 		mat[i,,]=content
@@ -1039,7 +1053,7 @@ clusteringMultiMatrix<-function(fileNames, regionToCluster=c(-500,500),numCluste
 	indexContentToDoClustering<-NULL
 	for(fileName in fileNames){
 		content<-readSingleMatrix(fileName,capLimit=F,bin_size_align=bin_size_align,bin_size=bin_size,scale=scale)
-		print(dim(content))
+		#print(dim(content))
 		content<-content[rowSums(is.na(content[,binToCluster]))<=length(binToCluster)/2,]
 		if(is.null(indexContentToDoClustering)){
 			indexContentToDoClustering<-content[,binToCluster]
@@ -1064,13 +1078,13 @@ clusteringMultiMatrix<-function(fileNames, regionToCluster=c(-500,500),numCluste
 } 
 
 
-clusteringMultiMatrixNew<-function(fileNames, regionToCluster=c(-500,500),numCluster=2,bin_size_align=1, bin_size=20, scale=1000, order_dendgram=NULL){ ##object read from readSingleMatrix()
+clusteringMultiMatrixNew<-function(fileNames, regionToCluster=c(-500,500),numCluster=2,bin_size_align=1, bin_size=20, scale=1000, order_dendgram=NULL,simpleSorting=FALSE){ ##object read from readSingleMatrix()
 	binToCluster<-(seq(as.integer((scale+regionToCluster[1])/bin_size_align),as.integer((scale+regionToCluster[2])/bin_size_align),by=as.integer(bin_size/bin_size_align)))/(bin_size/bin_size_align)
 	print(binToCluster)
 	indexContentToDoClustering<-NULL
 	for(fileName in fileNames){
 		content<-readSingleMatrix(fileName,capLimit=F,bin_size_align=bin_size_align,bin_size=bin_size,scale=scale)
-		print(dim(content))
+		#print(dim(content))
 		content<-content[rowSums(is.na(content[,binToCluster]))<=length(binToCluster)/2,]
 		if(is.null(indexContentToDoClustering)){
 			indexContentToDoClustering<-content[,binToCluster]
@@ -1083,27 +1097,39 @@ clusteringMultiMatrixNew<-function(fileNames, regionToCluster=c(-500,500),numClu
 		
 	}
 	
-	
-	tree<-hclust(dist(indexContentToDoClustering),method="ward")
-	
-	subClusterOrder<-cutree(tree, k = numCluster)
-	
-	if(is.null(order_dendgram)){
-		rowOrder<-rownames(indexContentToDoClustering[tree$order,])
-		dataFram<-list(rowOrder=rowOrder, subClusterOrder=subClusterOrder,average=NULL, tree=tree, matrix=NULL, limit=NULL)
-	}else{ ##reordering dendgram by provided order of clusters
-		if(length(order_dendgram) != numCluster){
-			stop("length of provided clusters' order is different from required cluster number")
+	if(simpleSorting){
+		#print(head(indexContentToDoClustering))
+		#print(head(rowMeans(indexContentToDoClustering,na.rm=T)))
+		#print(head(order(rowMeans(indexContentToDoClustering,na.rm=T),decreasing=T)))
+		rowOrder=rownames(indexContentToDoClustering[order(rowMeans(indexContentToDoClustering,na.rm=T),decreasing=F),])
+		#print(head(rowOrder))
+		#print(length(rowOrder))
+		
+		dataFram<-list(rowOrder=rowOrder, subClusterOrder=NULL,average=NULL, tree=NULL, matrix=NULL, limit=NULL)
+	}else{
+		tree<-hclust(dist(indexContentToDoClustering),method="ward")
+		
+		subClusterOrder<-cutree(tree, k = numCluster)
+		
+		if(is.null(order_dendgram)){
+			rowOrder<-rownames(indexContentToDoClustering[tree$order,])
+			dataFram<-list(rowOrder=rowOrder, subClusterOrder=subClusterOrder,average=NULL, tree=tree, matrix=NULL, limit=NULL)
+		}else{ ##reordering dendgram by provided order of clusters
+			if(length(order_dendgram) != numCluster){
+				stop("length of provided clusters' order is different from required cluster number")
+			}
+			newOrder<-NULL
+			for(i in order_dendgram){
+				newOrder<-c(newOrder,subClusterOrder[subClusterOrder==i])
+			}
+			hc<-rotate(tree,newOrder)
+			rowOrder<-rownames(indexContentToDoClustering[hc$order,])
+			subClusterOrder<-cutree(hc, k = numCluster)
+			dataFram<-list(rowOrder=rowOrder, subClusterOrder=subClusterOrder,average=NULL, tree=hc, matrix=NULL, limit=NULL)
 		}
-		newOrder<-NULL
-		for(i in order_dendgram){
-			newOrder<-c(newOrder,subClusterOrder[subClusterOrder==i])
-		}
-		hc<-rotate(tree,newOrder)
-		rowOrder<-rownames(indexContentToDoClustering[hc$order,])
-		subClusterOrder<-cutree(hc, k = numCluster)
-		dataFram<-list(rowOrder=rowOrder, subClusterOrder=subClusterOrder,average=NULL, tree=hc, matrix=NULL, limit=NULL)
 	}
+	
+	
 
 	dataFram
 

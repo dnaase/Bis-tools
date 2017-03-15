@@ -1,8 +1,11 @@
 package edu.usc.epigenome.uecgatk.bissnp;
 
 import gnu.trove.map.hash.THashMap;
+import htsjdk.samtools.util.CigarUtil;
+import htsjdk.samtools.util.SequenceUtil;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -15,7 +18,7 @@ import net.sf.samtools.CigarElement;
 import net.sf.samtools.CigarOperator;
 import net.sf.samtools.SAMRecord;
 
-
+import org.apache.commons.lang3.ArrayUtils;
 import org.broadinstitute.sting.gatk.contexts.AlignmentContext;
 import org.broadinstitute.sting.gatk.contexts.ReferenceContext;
 
@@ -26,7 +29,6 @@ import org.broadinstitute.sting.utils.GenomeLoc;
 import org.broadinstitute.sting.utils.exceptions.UserException;
 import org.broadinstitute.sting.utils.pileup.PileupElement;
 import org.broadinstitute.sting.utils.pileup.ReadBackedPileup;
-
 import org.broadinstitute.sting.utils.sam.GATKSAMRecord;
 import org.broadinstitute.sting.utils.variantcontext.Genotype;
 import org.broadinstitute.sting.utils.variantcontext.VariantContext;
@@ -60,8 +62,8 @@ import org.broadinstitute.sting.utils.variantcontext.VariantContext;
 
 public class BisSNPUtils {
 	
-	private final static Pattern mdPat = Pattern.compile("\\G(?:([0-9]+)|([ACTGNactgn])|(\\^[ACTGNactgn]+))");
-	
+	//private final static Pattern mdPat = Pattern.compile("\\G(?:([0-9]+)|([ACTGNactgn])|(\\^[ACTGNactgn]+))");
+	private final static Pattern mdPat = Pattern.compile("\\G(?:([0-9]+)|([ABCDGHKMNRSTVWXYabcdghkmnrstvwxy])|(\\^[ABCDGHKMNRSTVWXYabcdghkmnrstvwxy]+))");
 	
 	
 	public static boolean isCytosine(byte base, boolean bisulfiteConversionSpace) {
@@ -991,5 +993,74 @@ public class BisSNPUtils {
 
         return contexts;
     }
+	
+	static public byte[] getClippedReadsBase(SAMRecord r){
+		char[] cigarList = CigarUtil.cigarArrayFromString(r.getCigarString());
+		byte[] seqByte = r.getReadBases();
+		ArrayList<Byte> seqsNew = new ArrayList<Byte>();
+		
+		int offSet = 0;
+		for(char cigar : cigarList){
+			if(cigar == 'M' || cigar == 'I'){
+				seqsNew.add(seqByte[offSet]);
+				offSet++;
+			}else if(cigar == 'D'){
+
+			}else if(cigar == 'S'){
+				offSet++;
+			}
+		}
+		return ArrayUtils.toPrimitive(seqsNew.toArray(new Byte[seqsNew.size()]));
+
+	}
+	
+	static public byte[] getClippedReadsBaseQuality(SAMRecord r){
+		char[] cigarList = CigarUtil.cigarArrayFromString(r.getCigarString());
+		byte[] seqByte = r.getBaseQualities();
+		ArrayList<Byte> seqsNew = new ArrayList<Byte>();
+		
+		int offSet = 0;
+		for(char cigar : cigarList){
+			if(cigar == 'M' || cigar == 'I'){
+				seqsNew.add(seqByte[offSet]);
+				offSet++;
+			}else if(cigar == 'D'){
+
+			}else if(cigar == 'S'){
+				offSet++;
+			}
+		}
+		return ArrayUtils.toPrimitive(seqsNew.toArray(new Byte[seqsNew.size()]));
+	}
+	
+	
+	
+	static public byte[] modifyRefSeqByCigar(byte[] seqByte, String cigarString){ 
+		char[] cigarList = CigarUtil.cigarArrayFromString(cigarString);
+
+		ArrayList<Byte> seqsNew = new ArrayList<Byte>();
+		
+		int offSet = 0;
+		for(char cigar : cigarList){
+			if(cigar == 'M' || cigar == 'I'){
+				seqsNew.add(seqByte[offSet]);
+				offSet++;
+			}else if(cigar == 'D'){
+				//seqsNew.add(SequenceUtil.N);
+				
+			}else if(cigar == 'S'){
+				offSet++;
+			}
+		}
+		return ArrayUtils.toPrimitive(seqsNew.toArray(new Byte[seqsNew.size()]));
+	}
+	
+	static public byte[] complementArray(byte[] a){
+		byte[] b = new byte[a.length];
+		for(int i = 0; i < a.length; i++){
+			b[i]=SequenceUtil.complement(a[i]);
+		}
+		return b;
+	}
 	
 }

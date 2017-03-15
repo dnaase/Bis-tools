@@ -21,7 +21,8 @@ for (e in commandArgs(TRUE)) {
 d <-read.table(input,sep="\t",header=F)
 data<-100*d[,1]/d[,2]
 data[data<0]=as.numeric("NaN")
-
+data[data>100]=100
+data[is.infinite(data)]=as.numeric("NaN")
 pdf(output, paper="special", height=4, width=4)
 #par(oma=c(0, 0, 0, 0), mar=c(3, 3, 3, 0.1))
 

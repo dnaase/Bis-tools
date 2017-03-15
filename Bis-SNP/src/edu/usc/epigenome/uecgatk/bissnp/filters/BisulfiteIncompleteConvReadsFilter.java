@@ -49,20 +49,26 @@ public class BisulfiteIncompleteConvReadsFilter extends ReadFilter {
 	}
 	
 	private boolean incompleteConversion(SAMRecord read) throws Exception{
-		int readLength = read.getReadLength();
+		
 		boolean negativeStrand = read.getReadNegativeStrandFlag();
+		
+		byte[] refBases = BaseUtilsMore.toUpperCase(BisSNPUtils.modifyRefSeqByCigar(BisSNPUtils.refStrFromMd(read), read.getCigarString()));
+		
+		
+		byte[] bases = BaseUtilsMore.toUpperCase(BisSNPUtils.getClippedReadsBase(read));
+		if(negativeStrand){
+			bases = BisSNPUtils.complementArray(bases);
+		}
+		
 		if(read.getReadPairedFlag() && read.getSecondOfPairFlag())
 			negativeStrand = !negativeStrand;
 		
 		String pattern = patConv;
-		byte[] bases = read.getReadBases();
+		
 		short numberOfPatternInRef = 0; 
 
 		
-		//TODO: need to check window length in boundary...
-		
-		byte[] refBases = BisSNPUtils.refStrFromMd(read);
-		
+		int readLength = bases.length;
 
 		if(negativeStrand){
 			bases = BaseUtils.simpleReverseComplement(bases);

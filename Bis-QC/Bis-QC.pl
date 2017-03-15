@@ -207,7 +207,7 @@ sub mode_1 {
 	
 	##STEP 4 (Mode 1): NOMe enzyme CCG off-target check. check trinucleotide methylation level in chr21 and chrM
 	if($disable_trinuc_check eq ""){
-		check_trinuc(@ARGV);
+		#check_trinuc(@ARGV);
 	}
 	
 }
@@ -322,7 +322,7 @@ sub check_enzyme_eff {
 	my $dirname=dirname($bam);
 	if(scalar(@enzyme_eff_regions)==0){
 		$prefix=~s/(\w+)\S+$/Conserved_CTCF_$1/;
-		my $cmd="perl $bistools_path/Bis-QC/after_reads_mapping/MethyPatternAlignEasyUsage.pl --mem $mem --cpu $nt --nomeseq $bistools_path/Bis-SNP/Bis-SNP.latest.jar $bam $bistools_path/resource/ctcf/wgEncodeUwTfbsAllCtcf.hg19.uniq.no_ensembl_r75_tss.chr1.sort.bed $genome $prefix $dbsnp ";
+		my $cmd="perl $bistools_path/Bis-QC/after_reads_mapping/MethyPatternAlignEasyUsage.pl --mem $mem --cpu $nt --nomeseq $bistools_path/Bis-SNP/Bis-SNP.latest.jar $bam $bistools_path/resource/ctcf/xie_cuddapeh_plus_kim.orientedOnly.noKnownTss4kb.hg19.sort.bed $genome $prefix $dbsnp ";
 		$cmd.="--r_script $bistools_path/Bis-QC/after_reads_mapping/MethyPatternFeaturePlotForNOMeSeq.R --sort_perl_script $bistools_path/utils/sortByRefAndCor.pl --result_dir $dirname\n";
 		print STDERR "Check NOMe Enyzme efficiency methylation/accessibility level around conserved CTCF motif:\n $cmd\n";
 		print STDERR "Default refion is on hg19 !!!\n";

@@ -3,6 +3,7 @@
  */
 package edu.usc.epigenome.uecgatk.bissnp.filters;
 
+import htsjdk.samtools.util.SequenceUtil;
 import net.sf.samtools.SAMRecord;
 
 import org.broadinstitute.sting.commandline.Argument;
@@ -21,8 +22,8 @@ import edu.usc.epigenome.uecgatk.bissnp.BisulfiteSAMConstants;
  */
 public class BisulfiteMismatchReadsFilter extends ReadFilter {
 
-	@Argument(fullName = "max_mismatches", shortName = "mm", doc = "Maximum percentage of non-bisulfite mismatches within a read for a read to be used for calling. Default: 0.05(5% of mismatches allowed)", required = false)
-	public static double MAX_MISMATCHES = 0.05;
+	@Argument(fullName = "max_mismatches", shortName = "mm", doc = "Maximum percentage of non-bisulfite mismatches within a read for a read to be used for calling. Default: 0.1(10% of mismatches allowed)", required = false)
+	public static double MAX_MISMATCHES = 0.1;
 	
 	/* (non-Javadoc)
 	 * @see net.sf.picard.filter.SamRecordFilter#filterOut(net.sf.samtools.SAMRecord)
@@ -42,23 +43,30 @@ public class BisulfiteMismatchReadsFilter extends ReadFilter {
 	}
 	
 	public static boolean hasTooManyBisulfiteMismathces(SAMRecord read) throws Exception{
-		int readLength = read.getReadLength();
+		
 		boolean negativeStrand = read.getReadNegativeStrandFlag();
 		boolean secondEnd = read.getReadPairedFlag() && read.getSecondOfPairFlag();
 
-		byte[] bases = read.getReadBases();
+		byte[] refBases = BaseUtilsMore.toUpperCase(BisSNPUtils.modifyRefSeqByCigar(BisSNPUtils.refStrFromMd(read), read.getCigarString()));
 		
-		//TODO: need to check window length in boundary...
-		byte[] refBases = BisSNPUtils.refStrFromMd(read);
-		//System.err.println(new String(refBasesInWidnow) + "\t" + refBasesInWidnow.length);
-		//System.err.println(new String(refBases) + "\t" + len);
-		//System.err.println(new String(bases) + "\t" + readLength + "\t" + negativeStrand + "\t" + secondEnd);
+		
+		byte[] bases = BaseUtilsMore.toUpperCase(BisSNPUtils.getClippedReadsBase(read));
+		if(negativeStrand){
+			bases = BisSNPUtils.complementArray(bases);
+		}
+		
 		int numberOfMismatches = 0;
-		for(int i = 0; i < readLength; i++){
+		for(int i = 0; i < bases.length; i++){
 			if( !BaseUtils.basesAreEqual(refBases[i], bases[i]) && BaseUtilsMore.isBisulfiteMismatch(refBases[i], bases[i],negativeStrand, secondEnd))
 				numberOfMismatches++;
-			if(numberOfMismatches > MAX_MISMATCHES * readLength)
+			if(numberOfMismatches > MAX_MISMATCHES * bases.length){
+				//System.err.println(read.getReadString() + "\t" + read.getCigarString());
+			//	System.err.println(new String(refBases) + "\t" + refBases.length);
+			//	System.err.println(new String(bases) + "\t" + bases.length + "\t" + negativeStrand + "\t" + secondEnd + "\t" + numberOfMismatches);
+
 				return true;
+			}
+				
 		}
 		//System.err.println(numberOfMismatches);
 		return false;

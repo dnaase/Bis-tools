@@ -3,11 +3,14 @@ package edu.usc.epigenome.uecgatk.bissnp;
 import java.util.ArrayList;
 import java.util.Map.Entry;
 import java.util.Set;
-
 import java.util.List;
 
 
 
+
+
+import net.sf.picard.util.CigarUtil;
+import net.sf.samtools.CigarOperator;
 import net.sf.samtools.SAMRecord;
 
 import org.broadinstitute.sting.gatk.contexts.AlignmentContext;
@@ -518,6 +521,11 @@ public class BisulfiteSNPGenotypeLikelihoodsCalculationModel {
 							numAPosStrand++;
 						}
 					}
+					
+					//System.err.println(CigarUtil.cigarArrayFromString(p.getRead().getCigarString())[offset]);
+					//if(CigarUtil.cigarArrayFromString(p.getRead().getCigarString())[offset]=='S'){
+					//	System.err.println(p.getRead().getCigarString() + "\t" + p.getRead().getReadName());
+					//}
 
 				}
 				
@@ -599,7 +607,7 @@ public class BisulfiteSNPGenotypeLikelihoodsCalculationModel {
 				
 				numOtherCalleleStrand = numGNegStrand + numANegStrand;
 			}
-
+			
 			double[] prio = GL.getPriors();
 			double[] likelihoods = GL.getLikelihoods();
 			double[] posterior = MathUtils.normalizeFromLog10(GL.getPosteriors(), true, false);

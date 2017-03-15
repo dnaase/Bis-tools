@@ -46,22 +46,26 @@ public class BisulfiteFivePrimeConvReadsFilter extends ReadFilter {
 	}
 	
 	public static void tagBisulfiteConvStart(GATKSAMRecord samRecord) throws Exception{
-		int readLength = samRecord.getReadLength();
+		
 
 
-		byte[] bases = samRecord.getReadBases();
-
+		byte[] refBases = BaseUtilsMore.toUpperCase(BisSNPUtils.modifyRefSeqByCigar(BisSNPUtils.refStrFromMd(samRecord), samRecord.getCigarString()));
 		
 		
-		//TODO: need to check window length in boundary...
-		byte[] refBases = BisSNPUtils.refStrFromMd(samRecord);
+		byte[] bases = BaseUtilsMore.toUpperCase(BisSNPUtils.getClippedReadsBase(samRecord));
+		boolean negStrand = samRecord.getReadNegativeStrandFlag();
+		if(negStrand){
+			bases = BisSNPUtils.complementArray(bases);
+		}
+		
+		int readLength = bases.length;
 		if (refBases.length <= 0){
 			//samRecord.setTemporaryAttribute(BisulfiteSAMConstants.BIT_WISE_TAG, -1);
 			return ;
 		}
 			
 		
-		boolean negStrand = samRecord.getReadNegativeStrandFlag();
+		
 		if(samRecord.getReadPairedFlag() && samRecord.getSecondOfPairFlag())
 			negStrand = !negStrand;
 		
