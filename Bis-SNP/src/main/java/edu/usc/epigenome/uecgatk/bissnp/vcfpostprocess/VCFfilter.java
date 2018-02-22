@@ -45,7 +45,7 @@ import org.broadinstitute.gatk.utils.pileup.PileupElement;
 @By(DataSource.READS)
 @Requires({ DataSource.READS, DataSource.REFERENCE, DataSource.REFERENCE_ORDERED_DATA })
 @PartitionBy(PartitionType.LOCUS)
-public class VCFfilterWalker extends LocusWalker<Integer, Integer> implements TreeReducible<Integer> {
+public class VCFfilter extends LocusWalker<Integer, Integer> implements TreeReducible<Integer> {
 
 	@Output(fullName = "filteredMinorAllele", shortName = "filteredMinorAllele", doc = "output filtered Minor Allele", required = false)
 	public PrintStream filteredMinorAllele = null;

@@ -1,6 +1,6 @@
 /**
  * This is to implement Robert Shoemaker 2010 Genome Research paper's algorithm's comparison with
- * BisSNP it is only dealing with ShoemakerReadsConversionWalker's resul. It only looks at dbSNP
+ * BisSNP it is only dealing with ShoemakerReadsConversion's resul. It only looks at dbSNP
  * position with 10X, then it will do overlapped with samtools result..
  */
 package main.java.edu.usc.epigenome.uecgatk.bissnp.otherwalker;

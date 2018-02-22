@@ -29,7 +29,7 @@ import main.java.edu.usc.epigenome.uecgatk.bissnp.filters.NotProperPairedReadFil
  */
 @ReadFilters({UnmappedReadFilter.class, DuplicateReadFilter.class, NotPrimaryAlignmentFilter.class, FailsVendorQualityCheckFilter.class,  MappingQualityZeroFilter.class, NotProperPairedReadFilter.class, InvertedDupsReadFilter.class, BisulfiteMismatchReadsFilter.class, BisulfiteIncompleteConvReadsFilter.class})
 @By(DataSource.READS)
-public class BisSNPCoverageWalker extends DepthOfCoverage{
+public class BisSNPCoverage extends DepthOfCoverage{
 
 	/**
 	 * 

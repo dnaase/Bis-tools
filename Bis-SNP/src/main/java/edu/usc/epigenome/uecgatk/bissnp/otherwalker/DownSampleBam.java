@@ -36,7 +36,7 @@ import main.java.edu.usc.epigenome.uecgatk.bissnp.DownsamplingBAM;
 @By(DataSource.REFERENCE)
 @Downsample(by = DownsampleType.NONE)
 @ReadFilters()
-public class DownSampleBamWalker extends LocusWalker<DownSampleBamWalker.Condition, DownSampleBamWalker.Condition> implements TreeReducible<DownSampleBamWalker.Condition> {
+public class DownSampleBam extends LocusWalker<DownSampleBam.Condition, DownSampleBam.Condition> implements TreeReducible<DownSampleBam.Condition> {
 
 	@ArgumentCollection
 	private static BisulfiteArgumentCollection BAC = new BisulfiteArgumentCollection();

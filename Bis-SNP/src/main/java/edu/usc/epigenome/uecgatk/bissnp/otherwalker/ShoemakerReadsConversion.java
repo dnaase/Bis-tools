@@ -44,9 +44,9 @@ import org.broadinstitute.gatk.utils.text.TextFormattingUtils;
 @WalkerName("ShoemakerReadsConversion")
 @Requires({ DataSource.READS })
 @ReadFilters({ UnmappedReadFilter.class, BadMateFilter.class, NotPrimaryAlignmentFilter.class })
-public class ShoemakerReadsConversionWalker extends ReadWalker<SAMRecord, SAMFileWriter> {
+public class ShoemakerReadsConversion extends ReadWalker<SAMRecord, SAMFileWriter> {
 
-	public static final String PROGRAM_RECORD_NAME = "ShoemakerReadsConversionWalker";
+	public static final String PROGRAM_RECORD_NAME = "ShoemakerReadsConversion";
 	/**
 	 * 
 	 */

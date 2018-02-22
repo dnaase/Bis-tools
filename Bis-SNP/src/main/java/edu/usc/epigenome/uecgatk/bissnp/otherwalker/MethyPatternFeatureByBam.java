@@ -65,7 +65,7 @@ import java.util.HashSet;
 @Reference(window=@Window(start=-500,stop=500))
 @By(DataSource.REFERENCE)
 @Downsample(by=DownsampleType.NONE)
-public class MethyPatternFeatureByBamWalker extends LocusWalker<Boolean, Boolean>
+public class MethyPatternFeatureByBam extends LocusWalker<Boolean, Boolean>
 		implements TreeReducible<Boolean> {
 
 	@ArgumentCollection private static BisulfiteArgumentCollection BAC = new BisulfiteArgumentCollection();

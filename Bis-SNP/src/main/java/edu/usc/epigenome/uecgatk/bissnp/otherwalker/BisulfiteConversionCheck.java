@@ -46,7 +46,7 @@ import main.java.edu.usc.epigenome.uecgatk.bissnp.BaseUtilsMore;
 @Requires({DataSource.READS, DataSource.REFERENCE})
 @By(DataSource.READS)
 @ReadFilters( {FailsVendorQualityCheckFilter.class} )
-public class BisulfiteConversionCheckWalker extends ReadWalker<SAMRecord, Long> {
+public class BisulfiteConversionCheck extends ReadWalker<SAMRecord, Long> {
 
 	@Output(fullName = "histogram_methylated_pattern_in_reads", shortName = "patternHist", doc = "output histogram of number of methylated pattern(HCH) in the reads ", required = false)
 	public PrintStream patternHistWriter = null;

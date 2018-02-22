@@ -21,7 +21,7 @@
         <entry file="file://$PROJECT_DIR$/src/main/java/edu/usc/epigenome/uecgatk/bissnp/filters/BisulfiteMismatchReadsFilter.java">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="131">
-              <caret line="21" column="0" lean-forward="true" selection-start-line="21" selection-start-column="0" selection-end-line="21" selection-end-column="0" />
+              <caret line="21" column="0" lean-forward="false" selection-start-line="21" selection-start-column="0" selection-end-line="21" selection-end-column="0" />
               <folding />
             </state>
           </provider>
@@ -61,7 +61,7 @@
         <entry file="file://$PROJECT_DIR$/src/main/java/edu/usc/epigenome/uecgatk/bissnp/filters/BisulfiteIncompleteConvReadsFilter.java">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="240">
-              <caret line="27" column="4" lean-forward="true" selection-start-line="27" selection-start-column="4" selection-end-line="27" selection-end-column="4" />
+              <caret line="27" column="4" lean-forward="false" selection-start-line="27" selection-start-column="4" selection-end-line="27" selection-end-column="4" />
               <folding />
             </state>
           </provider>
@@ -469,12 +469,13 @@
         <option value="$PROJECT_DIR$/src/main/java/edu/usc/epigenome/uecgatk/bissnp/BisulfiteSNPGenotypeLikelihoodsCalculationModel.java" />
         <option value="$PROJECT_DIR$/src/main/java/edu/usc/epigenome/uecgatk/bissnp/filters/BisulfiteIncompleteConvReadsFilter.java" />
         <option value="$PROJECT_DIR$/src/main/java/edu/usc/epigenome/uecgatk/bissnp/filters/BisulfiteMismatchReadsFilter.java" />
+        <option value="$PROJECT_DIR$/src/main/java/edu/usc/epigenome/uecgatk/bissnp/vcfpostprocess/VCFpostprocess.java" />
       </list>
     </option>
   </component>
   <component name="ProjectFrameBounds">
-    <option name="x" value="75" />
-    <option name="y" value="261" />
+    <option name="x" value="100" />
+    <option name="y" value="289" />
     <option name="width" value="1579" />
     <option name="height" value="793" />
   </component>
@@ -712,12 +713,12 @@
     <servers />
   </component>
   <component name="ToolWindowManager">
-    <frame x="75" y="261" width="1579" height="793" extended-state="0" />
+    <frame x="100" y="289" width="1579" height="793" extended-state="0" />
     <editor active="true" />
     <layout>
       <window_info id="Palette" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
-      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3288889" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
+      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.3288889" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
       <window_info id="Palette&#9;" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Image Layers" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Capture Analysis" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
@@ -756,17 +757,7 @@
     <watches-manager />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/src/main/java/edu/usc/epigenome/uecgatk/bissnp/otherwalker/shoemakerGenotyper.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="315">
-          <caret line="363" column="0" lean-forward="true" selection-start-line="363" selection-start-column="0" selection-end-line="363" selection-end-column="0" />
-          <folding>
-            <element signature="imports" expanded="false" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/edu/usc/epigenome/uecgatk/bissnp/otherwalker/BamFilterWalker.java">
+    <entry file="file://$PROJECT_DIR$/src/main/java/edu/usc/epigenome/uecgatk/bissnp/otherwalker/BamFilter.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="333">
           <caret line="66" column="110" lean-forward="true" selection-start-line="63" selection-start-column="8" selection-end-line="66" selection-end-column="110" />
@@ -776,7 +767,7 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/edu/usc/epigenome/uecgatk/bissnp/otherwalker/BisulfiteConversionCheckWalker.java">
+    <entry file="file://$PROJECT_DIR$/src/main/java/edu/usc/epigenome/uecgatk/bissnp/otherwalker/BisulfiteConversionCheck.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="60">
           <caret line="104" column="123" lean-forward="true" selection-start-line="104" selection-start-column="24" selection-end-line="104" selection-end-column="123" />
@@ -794,7 +785,7 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/edu/usc/epigenome/uecgatk/bissnp/otherwalker/ShoemakerReadsConversionWalker.java">
+    <entry file="file://$PROJECT_DIR$/src/main/java/edu/usc/epigenome/uecgatk/bissnp/otherwalker/ShoemakerReadsConversion.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="-137">
           <caret line="114" column="26" lean-forward="false" selection-start-line="114" selection-start-column="26" selection-end-line="114" selection-end-column="26" />
@@ -1182,7 +1173,7 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/edu/usc/epigenome/uecgatk/bissnp/otherwalker/QuickMethylationLevelWalker.java">
+    <entry file="file://$PROJECT_DIR$/src/main/java/edu/usc/epigenome/uecgatk/bissnp/otherwalker/QuickMethylationLevel.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="559">
           <caret line="82" column="49" lean-forward="false" selection-start-line="82" selection-start-column="49" selection-end-line="82" selection-end-column="49" />
@@ -1195,10 +1186,10 @@
         <state relative-caret-position="102">
           <caret line="152" column="45" lean-forward="false" selection-start-line="152" selection-start-column="26" selection-end-line="152" selection-end-column="45" />
           <folding>
-            <element signature="e#4523#4524#0" expanded="true" />
-            <element signature="e#4570#4571#0" expanded="true" />
-            <element signature="e#14547#14548#0" expanded="true" />
-            <element signature="e#14599#14600#0" expanded="true" />
+            <element signature="e#4523#4524#0" expanded="false" />
+            <element signature="e#4570#4571#0" expanded="false" />
+            <element signature="e#14547#14548#0" expanded="false" />
+            <element signature="e#14599#14600#0" expanded="false" />
           </folding>
         </state>
       </provider>
@@ -1687,7 +1678,7 @@
     <entry file="file://$PROJECT_DIR$/src/main/java/edu/usc/epigenome/uecgatk/bissnp/filters/BisulfiteIncompleteConvReadsFilter.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="240">
-          <caret line="27" column="4" lean-forward="true" selection-start-line="27" selection-start-column="4" selection-end-line="27" selection-end-column="4" />
+          <caret line="27" column="4" lean-forward="false" selection-start-line="27" selection-start-column="4" selection-end-line="27" selection-end-column="4" />
           <folding />
         </state>
       </provider>
@@ -1695,7 +1686,7 @@
     <entry file="file://$PROJECT_DIR$/src/main/java/edu/usc/epigenome/uecgatk/bissnp/filters/BisulfiteMismatchReadsFilter.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="131">
-          <caret line="21" column="0" lean-forward="true" selection-start-line="21" selection-start-column="0" selection-end-line="21" selection-end-column="0" />
+          <caret line="21" column="0" lean-forward="false" selection-start-line="21" selection-start-column="0" selection-end-line="21" selection-end-column="0" />
           <folding />
         </state>
       </provider>
@@ -1720,6 +1711,14 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="180">
           <caret line="17" column="26" lean-forward="false" selection-start-line="17" selection-start-column="26" selection-end-line="17" selection-end-column="26" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/edu/usc/epigenome/uecgatk/bissnp/vcfpostprocess/VCFpostprocess.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="105">
+          <caret line="47" column="25" lean-forward="false" selection-start-line="47" selection-start-column="25" selection-end-line="47" selection-end-column="25" />
           <folding />
         </state>
       </provider>

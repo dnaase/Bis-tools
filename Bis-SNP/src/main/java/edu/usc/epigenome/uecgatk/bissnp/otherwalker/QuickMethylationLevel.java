@@ -49,7 +49,7 @@ import main.java.edu.usc.epigenome.uecgatk.bissnp.filters.BisulfiteMismatchReads
 @Requires({DataSource.REFERENCE, DataSource.READS})
 @ReadFilters( {UnmappedReadFilter.class, MappingQualityFilter.class, BadMateFilter.class, NotPrimaryAlignmentFilter.class, DuplicateReadFilter.class, FailsVendorQualityCheckFilter.class, InvertedDupsReadFilter.class, NotProperPairedReadFilter.class, BisulfiteMismatchReadsFilter.class} )
 
-public class QuickMethylationLevelWalker extends ReadWalker<QuickMethylationLevelWalker.Datum, QuickMethylationLevelWalker.Datum> {
+public class QuickMethylationLevel extends ReadWalker<QuickMethylationLevel.Datum, QuickMethylationLevel.Datum> {
 
 	@Input(fullName = "pattern_to_search", shortName = "pattern", doc = "cytosines pattern to search in provided BAM", required = false)
 	public String pattern = "ACT";

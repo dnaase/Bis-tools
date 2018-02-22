@@ -22,7 +22,7 @@ import htsjdk.variant.variantcontext.VariantContext;
  * @time May 5, 2012 5:09:11 PM
  * 
  */
-public class vcfComparisonWalker extends RodWalker<Integer, Integer> {
+public class vcfComparison extends RodWalker<Integer, Integer> {
 
 	/**
 	 * 

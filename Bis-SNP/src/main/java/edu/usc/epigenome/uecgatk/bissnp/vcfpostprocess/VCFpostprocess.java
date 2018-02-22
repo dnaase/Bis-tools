@@ -34,7 +34,6 @@ import org.broadinstitute.gatk.utils.BaseUtils;
 import org.broadinstitute.gatk.utils.GenomeLoc;
 import htsjdk.variant.vcf.VCFConstants;
 import htsjdk.variant.vcf.VCFHeader;
-import htsjdk.variant.vcf.VCFUtils;
 import htsjdk.variant.variantcontext.Genotype;
 import htsjdk.variant.variantcontext.VariantContext;
 
@@ -51,7 +50,7 @@ import main.java.edu.usc.epigenome.uecgatk.bissnp.writer.TcgaVCFWriter;
  * 
  */
 @Reference(window = @Window(start = -200, stop = 200))
-public class VCFpostprocessWalker extends RodWalker<VCFpostprocessWalker.VCFplusRef, VCFpostprocessWalker.VCFCondition> implements TreeReducible<VCFpostprocessWalker.VCFCondition> {
+public class VCFpostprocess extends RodWalker<VCFpostprocess.VCFplusRef, VCFpostprocess.VCFCondition> implements TreeReducible<VCFpostprocess.VCFCondition> {
 
 	@Argument(fullName = "cytosine_contexts_checked", shortName = "C", doc = "Specify the cytosine contexts to check (e.g. -C CG,1 -C CH,1... You could specify '-C' multiple times for different cytosine pattern). default: CG,1, CH,1", required = false)
 	public List<String> cytosineContextsChecked = new ArrayList<String>();

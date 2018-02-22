@@ -21,7 +21,6 @@ import org.broadinstitute.gatk.engine.filters.UnmappedReadFilter;
 import org.broadinstitute.gatk.utils.refdata.RefMetaDataTracker;
 import org.broadinstitute.gatk.engine.walkers.By;
 import org.broadinstitute.gatk.engine.walkers.DataSource;
-import org.broadinstitute.gatk.engine.walkers.Downsample;
 import org.broadinstitute.gatk.engine.walkers.LocusWalker;
 import org.broadinstitute.gatk.engine.walkers.ReadFilters;
 import org.broadinstitute.gatk.engine.walkers.Reference;
@@ -48,7 +47,7 @@ import main.java.edu.usc.epigenome.uecgatk.bissnp.filters.NotProperPairedReadFil
 @By(DataSource.READS)
 @Downsample(by = DownsampleType.NONE)
 @ReadFilters({UnmappedReadFilter.class, DuplicateReadFilter.class, NotPrimaryAlignmentFilter.class, FailsVendorQualityCheckFilter.class, MappingQualityFilter.class, NotProperPairedReadFilter.class, InvertedDupsReadFilter.class, BisulfiteMismatchReadsFilter.class, BisulfiteIncompleteConvReadsFilter.class, BisulfiteFivePrimeConvReadsFilter.class})
-public class BamFilterWalker extends LocusWalker<BamFilterWalker.Condition, BamFilterWalker.Condition> implements TreeReducible<BamFilterWalker.Condition> {
+public class BamFilter extends LocusWalker<BamFilter.Condition, BamFilter.Condition> implements TreeReducible<BamFilter.Condition> {
 
 	@ArgumentCollection
 	private static BisulfiteArgumentCollection BAC = new BisulfiteArgumentCollection();
