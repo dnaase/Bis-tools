@@ -53,9 +53,9 @@ public class BisulfiteFivePrimeConvReadsFilter extends ReadFilter {
 		
 		byte[] bases = BaseUtilsMore.toUpperCase(BisSNPUtils.getClippedReadsBase(samRecord));
 		boolean negStrand = samRecord.getReadNegativeStrandFlag();
-		if(negStrand){
-			bases = BisSNPUtils.complementArray(bases);
-		}
+		//if(negStrand){
+		//	bases = BisSNPUtils.complementArray(bases);
+		//}
 		
 		int readLength = bases.length;
 		if (refBases.length <= 0){

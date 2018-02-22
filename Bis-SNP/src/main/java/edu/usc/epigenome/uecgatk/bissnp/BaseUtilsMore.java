@@ -149,6 +149,24 @@ public class BaseUtilsMore {
 		}
 	}
 
+	//second end bases have been cpnverted already..
+	static public boolean isBisulfiteMismatch(byte refBase, byte base, boolean negStrand) {
+		if (!negStrand){
+				if (BaseUtils.basesAreEqual(refBase, C) && BaseUtils.basesAreEqual(base, T)) {
+					return false;
+				} else {
+					return true;
+				}
+		}else {
+				if (BaseUtils.basesAreEqual(refBase, G) && BaseUtils.basesAreEqual(base, A)) {
+					return false;
+				} else {
+					return true;
+				}
+
+		}
+	}
+
 	static public boolean isRegularBase(byte base) {
 		return simpleBaseToBaseIndex(base) != -1;
 	}

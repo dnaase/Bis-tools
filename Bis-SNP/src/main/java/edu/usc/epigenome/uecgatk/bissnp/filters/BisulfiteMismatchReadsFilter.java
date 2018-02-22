@@ -20,8 +20,8 @@ import org.broadinstitute.gatk.utils.BaseUtils;
  */
 public class BisulfiteMismatchReadsFilter extends ReadFilter {
 
-	@Argument(fullName = "max_mismatches", shortName = "mm", doc = "Maximum percentage of non-bisulfite mismatches within a read for a read to be used for calling. Default: 0.1(10% of mismatches allowed)", required = false)
-	public static double MAX_MISMATCHES = 0.1;
+	@Argument(fullName = "max_mismatches", shortName = "mm", doc = "Maximum percentage of non-bisulfite mismatches within a read for a read to be used for calling. Default: 0.3(30% of mismatches allowed)", required = false)
+	public static double MAX_MISMATCHES = 0.3;
 	
 	/* (non-Javadoc)
 	 * @see net.sf.picard.filter.SamRecordFilter#filterOut(htsjdk.samtools.SAMRecord)
@@ -57,7 +57,7 @@ public class BisulfiteMismatchReadsFilter extends ReadFilter {
 		
 		int numberOfMismatches = 0;
 		for(int i = 0; i < bases.length; i++){
-			if( !BaseUtils.basesAreEqual(refBases[i], bases[i]) && BaseUtilsMore.isBisulfiteMismatch(refBases[i], bases[i],negativeStrand, secondEnd))
+			if( !BaseUtils.basesAreEqual(refBases[i], bases[i]) && BaseUtilsMore.isBisulfiteMismatch(refBases[i], bases[i],negativeStrand))
 				numberOfMismatches++;
 			if(numberOfMismatches > MAX_MISMATCHES * bases.length){
 				//System.err.println(read.getReadString() + "\t" + read.getCigarString());

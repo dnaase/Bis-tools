@@ -1,0 +1,2 @@
+sudo mvn compile assembly:single
+

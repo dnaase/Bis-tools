@@ -26,8 +26,8 @@ public class BisulfiteIncompleteConvReadsFilter extends ReadFilter {
 	@Argument(fullName = "minmum_pattern_converted", shortName = "minPatConv", doc = "minimum frequency of C pattern (e.g.HCH) allowed to get methylated inside the reads (methylated C/ reference C in the reads). Default: 0.4 ", required = false)
 	public double minPatConv = 0.4;
 	
-	@Argument(fullName = "conversion_pattern_to_check", shortName = "patConv", doc = "define the methylation pattern to check for bisulfite_conversion. Default: HCH", required = false)
-    public String patConv = "HCH";
+	@Argument(fullName = "conversion_pattern_to_check", shortName = "patConv", doc = "define the methylation pattern to check for bisulfite_conversion. Default: CH", required = false)
+    public String patConv = "CH";
 	
 	public BisulfiteIncompleteConvReadsFilter(){
 		
@@ -55,16 +55,16 @@ public class BisulfiteIncompleteConvReadsFilter extends ReadFilter {
 		
 		
 		byte[] bases = BaseUtilsMore.toUpperCase(BisSNPUtils.getClippedReadsBase(read));
-		if(negativeStrand){
-			bases = BisSNPUtils.complementArray(bases);
-		}
+		//if(negativeStrand){
+		//	bases = BisSNPUtils.complementArray(bases);
+		//}
 		
 		if(read.getReadPairedFlag() && read.getSecondOfPairFlag())
 			negativeStrand = !negativeStrand;
 		
 		String pattern = patConv;
 		
-		short numberOfPatternInRef = 0; 
+		int numberOfPatternInRef = read.getReadUnmappedFlag() ? -1 : 0;
 
 		
 		int readLength = bases.length;
