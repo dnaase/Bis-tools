@@ -10,9 +10,7 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.HashMap;
-import java.io.OutputStream;
 
-import htsjdk.variant.variantcontext.writer.VariantContextWriter;
 import org.broadinstitute.gatk.utils.commandline.ArgumentCollection;
 import org.broadinstitute.gatk.utils.commandline.Input;
 import org.broadinstitute.gatk.utils.commandline.Output;
@@ -24,7 +22,6 @@ import org.broadinstitute.gatk.engine.filters.DuplicateReadFilter;
 import org.broadinstitute.gatk.engine.filters.NotPrimaryAlignmentFilter;
 import org.broadinstitute.gatk.engine.filters.UnmappedReadFilter;
 import org.broadinstitute.gatk.engine.filters.FailsVendorQualityCheckFilter;
-import org.broadinstitute.gatk.engine.filters.MappingQualityZeroFilter;
 import org.broadinstitute.gatk.utils.refdata.RefMetaDataTracker;
 import org.broadinstitute.gatk.engine.walkers.By;
 import org.broadinstitute.gatk.engine.walkers.DataSource;
@@ -35,7 +32,6 @@ import org.broadinstitute.gatk.engine.walkers.Reference;
 import org.broadinstitute.gatk.engine.walkers.TreeReducible;
 import org.broadinstitute.gatk.engine.walkers.Window;
 import org.broadinstitute.gatk.utils.BaseUtils;
-import org.broadinstitute.gatk.engine.SampleUtils;
 import org.broadinstitute.gatk.utils.collections.Pair;
 import org.broadinstitute.gatk.utils.exceptions.UserException;
 import org.broadinstitute.gatk.utils.pileup.PileupElement;
@@ -68,7 +64,7 @@ import main.java.edu.usc.epigenome.uecgatk.bissnp.filters.BisulfiteFivePrimeConv
 import main.java.edu.usc.epigenome.uecgatk.bissnp.filters.BisulfiteMismatchReadsFilter;
 
 
-/*
+		/*
  * Bis-SNP/BisSNP: It is a genotyping and methylation calling in bisulfite treated massively
  * parallel sequencing (Bisulfite-seq and NOMe-seq) on Illumina platform Copyright (C) <2011>
  * <Yaping Liu: lyping1986@gmail.com>
@@ -94,7 +90,7 @@ import main.java.edu.usc.epigenome.uecgatk.bissnp.filters.BisulfiteMismatchReads
 //@BisBAQMode(QualityMode = BisBAQ.QualityMode.ADD_TAG, ApplicationTime = BisBAQ.ApplicationTime.ON_INPUT)
 @Reference(window = @Window(start = -500, stop = 500))
 @By(DataSource.READS)
-@ReadFilters({UnmappedReadFilter.class, DuplicateReadFilter.class, NotPrimaryAlignmentFilter.class, FailsVendorQualityCheckFilter.class, MappingQualityFilter.class, NotProperPairedReadFilter.class, InvertedDupsReadFilter.class, BisulfiteMismatchReadsFilter.class, BisulfiteIncompleteConvReadsFilter.class, BisulfiteFivePrimeConvReadsFilter.class})
+@ReadFilters({UnmappedReadFilter.class, DuplicateReadFilter.class, NotPrimaryAlignmentFilter.class, FailsVendorQualityCheckFilter.class,MappingQualityFilter.class, NotProperPairedReadFilter.class, InvertedDupsReadFilter.class, BisulfiteMismatchReadsFilter.class, BisulfiteIncompleteConvReadsFilter.class, BisulfiteFivePrimeConvReadsFilter.class})
 @Downsample(by = DownsampleType.NONE)
 public class BisulfiteGenotyper extends LocusWalker<BisulfiteVariantCallContext, BisulfiteGenotyper.ContextCondition> implements
 		TreeReducible<BisulfiteGenotyper.ContextCondition> {

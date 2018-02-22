@@ -26,7 +26,7 @@ public class BisulfiteIncompleteConvReadsFilter extends ReadFilter {
 	@Argument(fullName = "minmum_pattern_converted", shortName = "minPatConv", doc = "minimum frequency of C pattern (e.g.HCH) allowed to get methylated inside the reads (methylated C/ reference C in the reads). Default: 0.4 ", required = false)
 	public double minPatConv = 0.4;
 	
-	@Argument(fullName = "conversion_pattern_to_check", shortName = "patConv", doc = "define the methylation pattern to check for bisulfite_conversion. Default: CH", required = false)
+	@Argument(fullName = "conversion_pattern_to_check", shortName = "patConv", doc = "define the methylation pattern to check for bisulfite_conversion. Default: HCH", required = false)
     public String patConv = "CH";
 	
 	public BisulfiteIncompleteConvReadsFilter(){

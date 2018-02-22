@@ -67,7 +67,7 @@ public class BisSNP extends CommandLineExecutable {
 		List<String> header = new ArrayList<String>();
 		header.add(String.format("The %s, Compiled %s", getBisSNPVersionNumber(), getBuildTime()));
 		header.add(String
-				.format("Based on The Genome Analysis Toolkit (GATK) v%s (prebuild GATK package could be download here: ftp://ftp.broadinstitute.org/pub/gsa/GenomeAnalysisTK/GenomeAnalysisTK-1.5-3-gbb2c10b.tar.bz2)",
+				.format("Based on The Genome Analysis Toolkit (GATK) v%s (prebuild GATK package could be download here: https://github.com/broadgsa/gatk-protected/releases)",
 						getVersionNumber()));
 		header.add("Copyright (c) 2011 USC Epigenome Center");
 		header.add("Please view our documentation at http://epigenome.usc.edu/publicationdata/bissnp2011/");

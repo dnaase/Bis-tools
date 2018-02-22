@@ -103,17 +103,19 @@ public class BisulfiteSNPGenotypeLikelihoodsCalculationModel {
 
             for (PileupElement p : pileup) {
                 int elementOffset = i + p.getOffset();
-                int pos = p.getRead().getReferencePositionAtReadPosition(elementOffset);
+              //  int pos = p.getRead().getReferencePositionAtReadPosition(elementOffset);
                 if (elementOffset < 0 || elementOffset > p.getRead().getReadLength() - 1
-                        || pos < p.getRead().getAlignmentStart() || pos >= p.getRead().getAlignmentEnd())
+                    || BisSNPUtils.isInsertionDeletionSoftHardClipByPos(p.getRead(),elementOffset))
+                        //|| pos < p.getRead().getAlignmentStart() || pos >= p.getRead().getAlignmentEnd())
                     continue;
                 elementOffsets.add(elementOffset);
                 reads.add(p.getRead());
+
                // if(p.getRead().getReadName().equalsIgnoreCase("H32CJADXY160408:2:1216:18985:75061")){
-                //    System.err.println(p.getRead().getReadName() + "\t" + p.getRead().getReadNegativeStrandFlag() + "\t" +
-                //            p.getRead().getAlignmentStart()  + "\t" +  p.getRead().getAlignmentEnd()+ "\t" +
-               //            p.getRead().getUnclippedStart()  + "\t" +  p.getRead().getUnclippedEnd() + "\t"
-                //            + elementOffset + "\t" + i + "\t" + p.getOffset() + "\t" + pos);
+                   // System.err.println(p.getRead().getReadName() + "\t" + p.getRead().getReadNegativeStrandFlag() + "\t" +
+                    //        p.getRead().getAlignmentStart()  + "\t" +  p.getRead().getAlignmentEnd()+ "\t" +
+                   //        p.getRead().getUnclippedStart()  + "\t" +  p.getRead().getUnclippedEnd() + "\t"
+                    //        + elementOffset + "\t" + i + "\t" + p.getOffset() + "\t" + pos + "\t" + p.getRead().getCigarString());
                // }
 
             }

@@ -11,7 +11,6 @@ import org.broadinstitute.gatk.engine.filters.UnmappedReadFilter;
 import org.broadinstitute.gatk.engine.walkers.By;
 import org.broadinstitute.gatk.engine.walkers.DataSource;
 import org.broadinstitute.gatk.engine.walkers.ReadFilters;
-import org.broadinstitute.gatk.engine.walkers.TreeReducible;
 import org.broadinstitute.gatk.tools.walkers.coverage.DepthOfCoverage;
 
 import main.java.edu.usc.epigenome.uecgatk.bissnp.filters.BisulfiteIncompleteConvReadsFilter;
@@ -27,7 +26,7 @@ import main.java.edu.usc.epigenome.uecgatk.bissnp.filters.NotProperPairedReadFil
  * @time Oct 30, 2013 5:57:16 PM
  * 
  */
-@ReadFilters({UnmappedReadFilter.class, DuplicateReadFilter.class, NotPrimaryAlignmentFilter.class, FailsVendorQualityCheckFilter.class,  MappingQualityZeroFilter.class, NotProperPairedReadFilter.class, InvertedDupsReadFilter.class, BisulfiteMismatchReadsFilter.class, BisulfiteIncompleteConvReadsFilter.class})
+@ReadFilters({UnmappedReadFilter.class, DuplicateReadFilter.class, NotPrimaryAlignmentFilter.class, FailsVendorQualityCheckFilter.class, MappingQualityZeroFilter.class, NotProperPairedReadFilter.class, InvertedDupsReadFilter.class, BisulfiteMismatchReadsFilter.class, BisulfiteIncompleteConvReadsFilter.class})
 @By(DataSource.READS)
 public class BisSNPCoverage extends DepthOfCoverage{
 

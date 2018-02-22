@@ -1065,4 +1065,24 @@ public class BisSNPUtils {
 		return b;
 	}
 
+	static public boolean isInsertionDeletionSoftHardClipByPos(SAMRecord r, int pos){
+		char[] cigarList = CigarUtil.cigarArrayFromString(r.getCigarString());
+
+		int offSet = 0;
+		for(char cigar : cigarList){
+			if(cigar == 'M' ){
+				offSet++;
+			}else if(cigar == 'D' || cigar == 'H'){
+
+			}else if(cigar == 'S' || cigar == 'I'){
+				if(offSet == pos){
+					return true;
+				}
+				offSet++;
+			}
+		}
+		return false;
+
+	}
+
 }
