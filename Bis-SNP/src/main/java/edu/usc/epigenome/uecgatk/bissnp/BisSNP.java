@@ -45,7 +45,7 @@ public class BisSNP extends CommandLineExecutable {
 
 	private static String argCommandline = "";
   
-	private static String BisVersion = "BisSNP-1.0.0";
+	private static String BisVersion = "BisSNP-1.0.1";
  
 	public Walker<?, ?> walker = null;
 

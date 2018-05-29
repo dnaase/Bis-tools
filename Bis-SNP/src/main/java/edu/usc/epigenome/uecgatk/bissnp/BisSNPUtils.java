@@ -584,7 +584,11 @@ public class BisSNPUtils {
 			if(ref == null || convStart == -1)
 				return true;
 			byte refBase=ref.getBase();
-			if(samRecord.getReadNegativeStrandFlag()){
+			boolean negStrand = samRecord.getReadNegativeStrandFlag();
+			if(samRecord.getReadPairedFlag() && samRecord.getSecondOfPairFlag()){
+				negStrand = !negStrand;
+			}
+			if(negStrand){
 				if(offset > samRecord.getReadLength()-convStart){ //unconverted region in the read, the cytosine strand are filter out for methylation calling
 					if(samRecord.getReadPairedFlag() && samRecord.getSecondOfPairFlag()){
 						if(BaseUtils.basesAreEqual(refBase, BaseUtils.Base.C.base)){

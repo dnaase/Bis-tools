@@ -122,6 +122,9 @@ public class BisulfiteGenotyper extends LocusWalker<BisulfiteVariantCallContext,
 	@Input(fullName = "cgi_file", shortName = "cgi", doc = "Give the CGI bed file for the coverage estimation", required = false)
 	public RodBinding<BEDFeature> cgi = null;
 
+	@Input(fullName = "ref_cpg_file", shortName = "cpg", doc = "Give the reference cpg sites bed file, only look at these regions", required = false)
+	public RodBinding<BEDFeature> cpg = null;
+
 	private TcgaVCFWriter additionalWriterForDefaultTcgaMode = null;
 
 	private String argCommandline = "";
@@ -210,6 +213,9 @@ public class BisulfiteGenotyper extends LocusWalker<BisulfiteVariantCallContext,
 				return null;
 			}
 			
+		}
+		if(cpg.isBound() && tracker.getValues(cpg).isEmpty()){
+			return null;
 		}
 		BG_engine = new BisulfiteGenotyperEngine(tracker, refContext, rawContext, BAC, getToolkit());
 

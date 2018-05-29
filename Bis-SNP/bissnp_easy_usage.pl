@@ -458,7 +458,7 @@ sub bissnp{
 	if($interval ne ""){
 		$cmd .= "-L $interval ";
 	}
-	$cmd .= "-stand_call_conf $qual -stand_emit_conf 0 -nt $nt ";
+	$cmd .= "-stand_call_conf $qual -nt $nt ";
 	$cmd .= "-minConv $minConv -vcfCache 1000000 ";
 	$cmd .= "-mmq $mmq ";
 	$cmd .= "-mbq $mbq\n";
@@ -696,7 +696,7 @@ sub vcf2bigwig{
 }
 
 ##-cpgreads /Volumes/HD_2/Documents/workspace/hcg.reads.txt -gchreads /Volumes/HD_2/Documents/workspace/gch.reads.txt -out_modes NOMESEQ_MODE -sm GM
-##-cpgreads /Volumes/HD_2/Documents/temp/lei/cpg.reads.txt  -stand_call_conf 20 -stand_emit_conf 0
+##-cpgreads /Volumes/HD_2/Documents/temp/lei/cpg.reads.txt  -stand_call_conf 20
 sub bissnp_epistate{
 	my $cmd .= "$JAVA -jar $BISSNP -R $ref ";
 	$cmd .= "-I $input_file ";									
@@ -714,7 +714,7 @@ sub bissnp_epistate{
 	if($interval ne ""){
 		$cmd .= "-L $interval ";
 	}
-	$cmd .= "-stand_call_conf $qual -stand_emit_conf 0 -nt $nt ";
+	$cmd .= "-stand_call_conf $qual -nt $nt ";
 	$cmd .= "-minConv $minConv -vcfCache 1000000 ";
 	$cmd .= "-mmq $mmq ";
 	$cmd .= "-mbq $mbq\n";

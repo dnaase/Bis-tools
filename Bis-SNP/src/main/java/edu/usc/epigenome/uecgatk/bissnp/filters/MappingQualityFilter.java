@@ -23,9 +23,8 @@ public class MappingQualityFilter extends ReadFilter {
 	 * @see net.sf.picard.filter.SamRecordFilter#filterOut(htsjdk.samtools.SAMRecord)
 	 */
 	@Override
-	public boolean filterOut(SAMRecord arg0) {
-		// TODO Auto-generated method stub
-		return false;
+	public boolean filterOut(SAMRecord read) {
+		return read.getMappingQuality() < MIN_MAPPING_QUALTY_SCORE;
 	}
 
 }
