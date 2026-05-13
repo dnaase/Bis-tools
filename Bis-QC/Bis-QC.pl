@@ -63,6 +63,7 @@ sub usage {
 	print STDERR "  --genome FILE: reference genome .fasta file that are used when you map reads in the bam file (Default: not specified. use hg19.fa in Bis-tools' resource directory).\n\n";
 	print STDERR "  --dbsnp FILE: dbSNP .vcf file that are used for genotyping (Default: not specified. use dbSNP_135.hg19.sort.vcf in Bis-tools' resource directory).\n\n";
 	print STDERR "  --enzyme_eff_regions FILES: Region to test enzyme efficiency. (Default: just use CTCF conserved motif and CGI promoters. allow multiple location files).\n\n";
+	print STDERR "  --nonDirectional: enable non-directional bisulfite mode (scNOMe-HiC, scNMT-seq, and other libraries where bisulfite-conversion frame is encoded in the XG tag rather than BAM is_reverse). Propagates -nonDirectional -badMate to all BisSNP invocations in Mode 1. (Default: not enabled)\n\n";
  	
     exit(1);
 }
@@ -97,6 +98,7 @@ my $pattern = "WCW";
 my $genome="$bistools_path/resource/genome/hg19_rCRSchrm.fa";
 my $dbsnp="$bistools_path/resource/dbSNP/dbsnp_135.hg19.sort.vcf";
 my @enzyme_eff_regions=();
+my $nonDirectional = "";
 
 
 GetOptions( 
@@ -120,6 +122,7 @@ GetOptions(
 			"genome=s" => \$genome,
 			"dbsnp=s" => \$dbsnp,
 			"enzyme_eff_regions=s" => \@enzyme_eff_regions,
+			"nonDirectional" => \$nonDirectional,
 			#"r=s" => \$r,
 );
 
@@ -274,32 +277,33 @@ sub check_bam_preprocess {
 
 sub check_bs_conv {
 	my $bam=shift @_;
+	my $nondir_flag = $nonDirectional ne "" ? "--nonDirectional " : "";
 	#### Methylation bias check, bisulfite conversion along cycle, check 5' conversion rate
-	my $cmd="perl $bistools_path/Bis-QC/after_reads_mapping/methylation_bias_plot.pl --bissnp $bistools_path/Bis-SNP/Bis-SNP.latest.jar --r $r --pattern $pattern --genome $genome $bam\n";
+	my $cmd="perl $bistools_path/Bis-QC/after_reads_mapping/methylation_bias_plot.pl --bissnp $bistools_path/Bis-SNP/Bis-SNP.latest.jar --r $r --pattern $pattern --genome $genome ${nondir_flag}$bam\n";
 	print STDERR "Methylation bias check:\n $cmd\n";
 	system($cmd)==0 || die "Unexpected stop at methylation bias check step: $! \n";
-	
+
 	##bisulfite conversion rate for the whole reads
-	$cmd="perl $bistools_path/Bis-QC/after_reads_mapping/bisulfite_conv_distribution.pl --bissnp $bistools_path/Bis-SNP/Bis-SNP.latest.jar --r $r --pattern $pattern --genome $genome $bam\n";
+	$cmd="perl $bistools_path/Bis-QC/after_reads_mapping/bisulfite_conv_distribution.pl --bissnp $bistools_path/Bis-SNP/Bis-SNP.latest.jar --r $r --pattern $pattern --genome $genome ${nondir_flag}$bam\n";
 	print STDERR "Bisulfite conversion rate distribution of whole reads:\n $cmd\n";
 	system($cmd)==0 || die "Unexpected stop at bisulfite conversion rate distribution check step: $! \n";
-	
+
 	##Methylation level around different trinucleotide on chrM and chr21
 	if($disable_trinuc_check eq ""){
 		my $tri_nuc_log=$bam;
 		$tri_nuc_log=~s/\.bam$/.trinuc_methy.chrM.txt/;
-		$cmd="perl $bistools_path/Bis-QC/after_reads_mapping/bissnp_trinuc_sample.pl --bissnp $bistools_path/Bis-SNP/Bis-SNP.latest.jar --genome $genome --dbsnp $dbsnp --nt $nt --mem $mem --interval chrM $tri_nuc_log $bam\n";
+		$cmd="perl $bistools_path/Bis-QC/after_reads_mapping/bissnp_trinuc_sample.pl --bissnp $bistools_path/Bis-SNP/Bis-SNP.latest.jar --genome $genome --dbsnp $dbsnp --nt $nt --mem $mem --interval chrM ${nondir_flag}$tri_nuc_log $bam\n";
 		print STDERR "Bisulfite conversion rate distribution of whole reads at chrM:\n $cmd\n";
 		system($cmd)==0 || die "Unexpected stop at methylation level of trinucleotides in chrM check step: $! \n";
-	
+
 		$tri_nuc_log=$bam;
 		$tri_nuc_log=~s/\.bam$/.trinuc_methy.chr21.txt/;
-		$cmd="perl $bistools_path/Bis-QC/after_reads_mapping/bissnp_trinuc_sample.pl --bissnp $bistools_path/Bis-SNP/Bis-SNP.latest.jar --genome $genome --dbsnp $dbsnp --nt $nt --mem $mem --interval chr21 $tri_nuc_log $bam\n";
+		$cmd="perl $bistools_path/Bis-QC/after_reads_mapping/bissnp_trinuc_sample.pl --bissnp $bistools_path/Bis-SNP/Bis-SNP.latest.jar --genome $genome --dbsnp $dbsnp --nt $nt --mem $mem --interval chr21 ${nondir_flag}$tri_nuc_log $bam\n";
 		print STDERR "Bisulfite conversion rate distribution of whole reads at chr21:\n $cmd\n";
 		system($cmd)==0 || die "Unexpected stop at methylation level of trinucleotides in chr21 check step: $! \n";
 	}
 
-	
+
 }
 
 
@@ -317,20 +321,21 @@ sub check_cov_dist {
 sub check_enzyme_eff {
 	##check NOMe Enyzme efficiency methylation/accessibility level around conserved CTCF motif and CGI promoters
 	my $bam=shift @_;
+	my $nondir_flag = $nonDirectional ne "" ? "--nonDirectional " : "";
 	#--r_script /home/uec-00/yapingli/code/mytools/R/MethyPatternFeaturePlotSinglePlotNoSumFeature.R --sort_perl_script /home/uec-00/yapingli/code/mytools/perl/sortByRefAndCor.pl --pbs --result_dir /export/uec-gs1/laird/users/yaping/code/NOMeseq/MethyPatternFeatureWalker/HCT116_hg19/MethyPatternResult/MAR_MPR/
 	my $prefix=basename($bam);
 	my $dirname=dirname($bam);
 	if(scalar(@enzyme_eff_regions)==0){
 		$prefix=~s/(\w+)\S+$/Conserved_CTCF_$1/;
-		my $cmd="perl $bistools_path/Bis-QC/after_reads_mapping/MethyPatternAlignEasyUsage.pl --mem $mem --cpu $nt --nomeseq $bistools_path/Bis-SNP/Bis-SNP.latest.jar $bam $bistools_path/resource/ctcf/xie_cuddapeh_plus_kim.orientedOnly.noKnownTss4kb.hg19.sort.bed $genome $prefix $dbsnp ";
+		my $cmd="perl $bistools_path/Bis-QC/after_reads_mapping/MethyPatternAlignEasyUsage.pl --mem $mem --cpu $nt --nomeseq ${nondir_flag}$bistools_path/Bis-SNP/Bis-SNP.latest.jar $bam $bistools_path/resource/ctcf/xie_cuddapeh_plus_kim.orientedOnly.noKnownTss4kb.hg19.sort.bed $genome $prefix $dbsnp ";
 		$cmd.="--r_script $bistools_path/Bis-QC/after_reads_mapping/MethyPatternFeaturePlotForNOMeSeq.R --sort_perl_script $bistools_path/utils/sortByRefAndCor.pl --result_dir $dirname\n";
 		print STDERR "Check NOMe Enyzme efficiency methylation/accessibility level around conserved CTCF motif:\n $cmd\n";
 		print STDERR "Default refion is on hg19 !!!\n";
 		system($cmd)==0 || die "Unexpected stop at NOMe Enyzme efficiency check step: $! \n";
-	
+
 		$prefix=basename($bam);
 		$prefix=~s/(\w+)\S+$/CGI_TSS_$1/;
-		$cmd="perl $bistools_path/Bis-QC/after_reads_mapping/MethyPatternAlignEasyUsage.pl --mem $mem --cpu $nt --nomeseq $bistools_path/Bis-SNP/Bis-SNP.latest.jar $bam $bistools_path/resource/tss/knownGene-tss-ucsc08082013-unique.tj_gg_plus200bp_cgi.hg19.noChrM.sort.bed $genome $prefix $dbsnp ";
+		$cmd="perl $bistools_path/Bis-QC/after_reads_mapping/MethyPatternAlignEasyUsage.pl --mem $mem --cpu $nt --nomeseq ${nondir_flag}$bistools_path/Bis-SNP/Bis-SNP.latest.jar $bam $bistools_path/resource/tss/knownGene-tss-ucsc08082013-unique.tj_gg_plus200bp_cgi.hg19.noChrM.sort.bed $genome $prefix $dbsnp ";
 		$cmd.="--r_script $bistools_path/Bis-QC/after_reads_mapping/MethyPatternFeaturePlotForNOMeSeq.R --sort_perl_script $bistools_path/utils/sortByRefAndCor.pl --result_dir $dirname\n";
 		print STDERR "Check NOMe Enyzme efficiency methylation/accessibility level around CGI promoters:\n $cmd\n";
 		print STDERR "Default refion is on hg19 !!!\n";
@@ -340,15 +345,15 @@ sub check_enzyme_eff {
 			$prefix=~s/(\w+)\S+$/$1/;
 			my $loc_prefix=basename($enzyme_eff_region);
 			$loc_prefix=~s/(\S+)\.\S+$/$1/;
-			my $cmd="perl $bistools_path/Bis-QC/after_reads_mapping/MethyPatternAlignEasyUsage.pl --mem $mem --cpu $nt --nomeseq $bistools_path/Bis-SNP/Bis-SNP.latest.jar $bam $enzyme_eff_region $genome $prefix $dbsnp ";
+			my $cmd="perl $bistools_path/Bis-QC/after_reads_mapping/MethyPatternAlignEasyUsage.pl --mem $mem --cpu $nt --nomeseq ${nondir_flag}$bistools_path/Bis-SNP/Bis-SNP.latest.jar $bam $enzyme_eff_region $genome $prefix $dbsnp ";
 			$cmd.="--r_script $bistools_path/Bis-QC/after_reads_mapping/MethyPatternFeaturePlotForNOMeSeq.R --sort_perl_script $bistools_path/utils/sortByRefAndCor.pl --result_dir $dirname\n";
 			print STDERR "Check NOMe Enyzme efficiency methylation/accessibility level around $enzyme_eff_region:\n $cmd\n";
 
 			system($cmd)==0 || die "Unexpected stop at NOMe Enyzme efficiency check step: $! \n";
-			
+
 		}
 	}
-	
+
 }
 
 

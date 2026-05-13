@@ -19,6 +19,7 @@ my $pattern = "WCW";
 my $genome="$bistools_path/resource/genome/hg19_rCRSchrm.fa";
 my $mem="8"; #how many Giga bytes memory need
 my $r_script = "$bistools_path/Bis-QC/after_reads_mapping/methyBiasDistPlot.R";
+my $nonDirectional = "";
 
 GetOptions(
 	"bissnp=s" => \$BISSNP,
@@ -26,14 +27,22 @@ GetOptions(
 	"pattern=s" => \$pattern,
 	"genome=s" => \$genome,
 	"mem=i" => \$mem,
+	"nonDirectional" => \$nonDirectional,
 );
 
 my $file=$ARGV[0];
 
+# Non-directional libraries (scNOMe-HiC, scNMT-seq, etc.) encode the
+# bisulfite-conversion frame in the XG tag rather than BAM is_reverse, and
+# Hi-C chimeric mates need -badMate to be kept past the GATK 3.8 adaptor
+# clip filter. The XG-aware code paths in BisSNP >= 1.1 only engage when
+# -nonDirectional is passed.
+my $nondir_args = $nonDirectional ne "" ? " -nonDirectional -badMate" : "";
+
 ##generate pattern methylation matrix file:
 my $out=$file;
 $out =~ s/\.bam$/.${pattern}.methy.cycle.txt/;
-my $cmd="java -Xmx${mem}g -jar $BISSNP -T QuickMethylationLevel -R $genome -I $file -pattern $pattern -patternHist $out\n";
+my $cmd="java -Xmx${mem}g -jar $BISSNP -T QuickMethylationLevel -R $genome -I $file -pattern $pattern -patternHist $out${nondir_args}\n";
 print STDERR $cmd;
 system($cmd)==0 || die "can't generate methylation matrix file in methylation bias check part:$!\n";
 

@@ -52,6 +52,7 @@ sub usage {
     print "  --qual NUM : genotyping quality score (Default: 20)\n\n";
     print "  --smooth : enable smooth around bin_size region, e.g. each data point represent the avergae of methylation value around 20bp\n\n";
     print "  --use_bad_mate : enable the use of unproper paired reads\n\n";
+    print "  --nonDirectional : enable non-directional bisulfite mode (scNOMe-HiC, scNMT-seq, etc.). Adds -nonDirectional -badMate to BisSNP commands. (Default: not enabled)\n\n";
     print "  --invert_dups_usage : when met inverted dups reads (Default: --invert_dups_usage 1)\n";
     print "                         1) USE_ONLY_1ST_END: only use the 1st end of reads  when it was a inverted dups\n";
 	print "                         2) USE_BOTH_END: use both ends of reads  when it was a inverted dups\n";
@@ -106,6 +107,7 @@ my $smooth = "";
 my $invert_dups_usage = 1;
 my $use_bad_mate = "";
 my $minConv=1;
+my $nonDirectional = "";
 
 my $qual = 20;
 my $bin_size = 20;
@@ -162,7 +164,8 @@ GetOptions( "pbs" => \$pbs,
 			"trim3=i" => \$trim3,
 			"alignment_mode=i" => \$alignment_mode,
 			"cytosines=s" => \@cytosines,
-			"bed_format_style=i" => \$bed_format_style);
+			"bed_format_style=i" => \$bed_format_style,
+			"nonDirectional" => \$nonDirectional);
 
 usage() if ( scalar(@ARGV) == 0 );
 
@@ -267,13 +270,20 @@ sub align_bam{
 	my $sort_feature_file_notpath = $sort_feature_file;
 	$sort_feature_file_notpath =~ s/.+\///g;
 	$sort_feature_file_notpath =~ s/minusUpstream\S+.plusDownstream\S+\.bed//;
+	# Non-directional libraries (scNOMe-HiC, scNMT-seq): MethyPatternFeatureByBam
+	# delegates methylation calling to BisulfiteGenotyperEngine, which uses the
+	# XG-aware code paths in BisSNP >= 1.1 only when -nonDirectional is passed.
+	# -nonDirectional also implies we should keep Hi-C chimeric mates (-badMate).
 	if($nomeseq ne ""){
 		 $java_cmd = "java -Xmx$mem -jar $bissnp_jar -T MethyPatternFeatureByBam ";
 		$java_cmd .= "-R $ref -I $input_file -D $dbsnp -stand_call_conf $qual -stand_emit_conf 0 -orientated -mmq $mmq -mbq $mbq -trim5 $trim5 -trim3 $trim3 -minConv $minConv ";
 		$java_cmd .= "-feature $sort_feature_file -distance $data_matrix_scale -minCTdepth $minCT -alignmentType $alignment_modes_hash{$alignment_mode} ";
 		$java_cmd .= "-L $location_file -invDups $invert_dups_hash{$invert_dups_usage} ";
-		if($use_bad_mate ne ""){
+		if($use_bad_mate ne "" || $nonDirectional ne ""){
 			$java_cmd .= "-badMate ";
+		}
+		if($nonDirectional ne ""){
+			$java_cmd .= "-nonDirectional ";
 		}
 		
 		$gch_file = $result_dir."$prefix.alignedTo.$sort_feature_file_notpath.gch.$data_matrix_scale.txt";
@@ -289,8 +299,11 @@ sub align_bam{
 			$java_cmd .= "-R $ref -I $input_file -D $dbsnp -stand_call_conf $qual -stand_emit_conf 0 -orientated -mmq $mmq -mbq $mbq -trim5 $trim5 -trim3 $trim3 -minConv $minConv ";
 			$java_cmd .= "-feature $sort_feature_file -distance $data_matrix_scale -minCTdepth $minCT -alignmentType $alignment_modes_hash{$alignment_mode} ";
 			$java_cmd .= "-L $location_file -invDups $invert_dups_hash{$invert_dups_usage} ";
-			if($use_bad_mate ne ""){
+			if($use_bad_mate ne "" || $nonDirectional ne ""){
 				$java_cmd .= "-badMate ";
+			}
+			if($nonDirectional ne ""){
+				$java_cmd .= "-nonDirectional ";
 			}
 			$hcg_file = $result_dir."$prefix.alignedTo.$sort_feature_file_notpath.hcg.$data_matrix_scale.txt";
 			$java_cmd = $java_cmd."-methyFile $hcg_file -C HCG,2 \n";
@@ -305,8 +318,11 @@ sub align_bam{
 			$java_cmd_hcg .= "-R $ref -I $input_file -D $dbsnp -stand_call_conf $qual -stand_emit_conf 0 -orientated -mmq $mmq -mbq $mbq -minConv $minConv ";
 			$java_cmd_hcg .= "-feature $sort_feature_file -distance $data_matrix_scale -minCTdepth $minCT -alignmentType $alignment_modes_hash{$alignment_mode} ";
 			$java_cmd_hcg .= "-L $location_file -invDups $invert_dups_hash{$invert_dups_usage} ";
-			if($use_bad_mate ne ""){
+			if($use_bad_mate ne "" || $nonDirectional ne ""){
 				$java_cmd_hcg .= "-badMate ";
+			}
+			if($nonDirectional ne ""){
+				$java_cmd_hcg .= "-nonDirectional ";
 			}
 			$hcg_file = $result_dir."$prefix.alignedTo.$sort_feature_file_notpath.hcg.$data_matrix_scale.txt";
 			$java_cmd_hcg = $java_cmd_hcg."-methyFile $hcg_file -C HCG,2 \n";
@@ -328,8 +344,11 @@ sub align_bam{
 			$java_cmd .= "-feature $sort_feature_file -distance $data_matrix_scale -minCTdepth $minCT -alignmentType $alignment_modes_hash{$alignment_mode} ";
 			$java_cmd .= "-C $cytosine ";
 			$java_cmd .= "-L $location_file -invDups $invert_dups_hash{$invert_dups_usage} ";
-			if($use_bad_mate ne ""){
+			if($use_bad_mate ne "" || $nonDirectional ne ""){
 				$java_cmd .= "-badMate ";
+			}
+			if($nonDirectional ne ""){
+				$java_cmd .= "-nonDirectional ";
 			}
 			$cpg_file = $result_dir."$prefix.alignedTo.$sort_feature_file_notpath.$output_format.$data_matrix_scale.txt";
 			$java_cmd = $java_cmd."-methyFile $cpg_file ";

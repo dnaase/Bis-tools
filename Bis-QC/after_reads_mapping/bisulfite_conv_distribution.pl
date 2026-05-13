@@ -19,6 +19,7 @@ my $pattern = "WCW";
 my $genome="$bistools_path/resource/genome/hg19_rCRSchrm.fa";
 my $mem="8"; #how many Giga bytes memory need
 my $r_script = "$bistools_path/Bis-QC/after_reads_mapping/bisulfiteConvDistPlot.R";
+my $nonDirectional = "";
 
 GetOptions(
 	"bissnp=s" => \$BISSNP,
@@ -26,16 +27,21 @@ GetOptions(
 	"pattern=s" => \$pattern,
 	"genome=s" => \$genome,
 	"mem=i" => \$mem,
+	"nonDirectional" => \$nonDirectional,
 );
 
 my $file=$ARGV[0];
+
+# Non-directional libraries (scNOMe-HiC, scNMT-seq) need the XG-aware code
+# paths and -badMate; see methylation_bias_plot.pl for details.
+my $nondir_args = $nonDirectional ne "" ? " -nonDirectional -badMate" : "";
 
 ##generate pattern methylation histgram file:
 
 my $out_hist=$file;
 $out_hist=~ s/\.bam$/.hist.txt/;
 
-my $cmd .= "java -Xmx${mem}g -jar $BISSNP -T BisulfiteConversionCheck -R $genome -I $file -pattern $pattern -patternHist $out_hist \n";
+my $cmd .= "java -Xmx${mem}g -jar $BISSNP -T BisulfiteConversionCheck -R $genome -I $file -pattern $pattern -patternHist $out_hist${nondir_args} \n";
 print STDERR $cmd;
 system($cmd)==0 || die "can't generate methylation histogram file in bisulfite conversion distribution check part:$!\n";
 
