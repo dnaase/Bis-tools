@@ -73,13 +73,25 @@ public class QuickMethylationLevel extends ReadWalker<QuickMethylationLevel.Datu
 	@Override
 	public Datum map(ReferenceContext ref, GATKSAMRecord read, RefMetaDataTracker metaDataTracker) {
 		int readLength = read.getReadLength();
-		boolean negativeStrand = read.getReadNegativeStrandFlag();
+		// XG-aware bisulfite-frame determination (matches PR #11 patches in
+		// BisulfiteGenotyper). For non-directional libraries (scNOMe-HiC,
+		// scNMT-seq), XG=CT means top-strand (positive) frame and XG=GA means
+		// bottom-strand (negative) frame, regardless of the BAM is_reverse
+		// flag. When XG is absent (directional library) fall back to is_reverse.
+		String __xgTag = read.getStringAttribute("XG");
+		boolean negativeStrand;
+		if (__xgTag != null) {
+			negativeStrand = __xgTag.equalsIgnoreCase("GA");
+		} else {
+			negativeStrand = read.getReadNegativeStrandFlag();
+		}
 		boolean secondPair = false;
 
-		
 		if (read.getReadPairedFlag()) {
 			secondPair = read.getSecondOfPairFlag();
-			if(secondPair)
+			// Only flip on secondOfPair when XG was absent (directional library);
+			// XG already encodes the correct frame for both mates.
+			if (__xgTag == null && secondPair)
 				negativeStrand = !negativeStrand;
 		}
 	
